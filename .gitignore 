@@ -1,0 +1,92 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.env/
+.venv/
+env/
+ENV/
+
+# IDE specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# FastAPI specific
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Log files
+*.log
+logs/
+
+# Environment variables
+.env
+.env.local
+.env.dev
+.env.prod
+.env.test
+
+# Secrets
+secrets.yml
+config_secret.json
+*.key
+*.pem
+*.crt
+
+# Build and distribution directories
+/dist/
+/build/
+*.egg-info/
+*.egg
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Database files
+*.db
+*.sqlite
+*.db-journal
+
+# macOS
+.DS_Store
+
+# Docker
+docker-compose.override.yml
+
+# Local development
+local_settings.py
+instance/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+.vscode/extensions.json
