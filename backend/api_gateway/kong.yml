@@ -1,0 +1,26 @@
+_format_version: '3.0'
+
+services:
+  - name: auth-service
+    url: http://backend-auth:9001
+    routes:
+      - name: auth-route
+        paths: ['/auth']
+        methods: ['POST', 'GET']
+        strip_path: true
+
+  - name: user-service
+    url: http://backend-user:9002
+    routes:
+      - name: user-route
+        paths: ['/users']
+        methods: ['GET', 'POST', 'PUT', 'DELETE']
+        strip_path: true
+
+plugins:
+  - name: cors
+    config:
+      origins: ['*']
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+      headers: ['Content-Type', 'Authorization']
+      credentials: true

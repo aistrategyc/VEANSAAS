@@ -6,7 +6,7 @@ services:
     entrypoint: /app/services/auth/entrypoint.sh
     container_name: auth-svc
     ports:
-      - '8001:8001'
+      - '9001:9001'
     volumes:
       - ./backend/shared:/app/shared
       - ./backend/services/auth/src:/app/services/auth/src
@@ -23,7 +23,7 @@ services:
     entrypoint: /app/services/user/entrypoint.sh
     container_name: user-svc
     ports:
-      - '8002:8002'
+      - '9002:9002'
     volumes:
       - ./backend/shared:/app/shared
       - ./backend/services/user/src:/app/services/user/src
@@ -41,6 +41,19 @@ services:
       - postgres_data:/var/lib/postgresql/data
     env_file:
       - ./backend/.env
+
+  kong:
+    image: kong:latest
+    environment:
+      KONG_DATABASE: off
+      KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/kong.yml
+    volumes:
+      - ./backend/api_gateway/kong.yml:/usr/local/kong/declarative/kong.yml
+    ports:
+      - '8000:8000'
+      - '8001:8001'
+      - '8443:8443'
+      - '8444:8444'
 
 volumes:
   postgres_data:
