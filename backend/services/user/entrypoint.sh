@@ -2,7 +2,16 @@
 
 APP="services.user.src.main:app"
 
-echo "Starting in DEVELOPMENT mode"
+run_migrations() {
+    echo "Applying database migrations..."
+    alembic upgrade head
+    if [ $? -ne 0 ]; then
+        echo "Failed to apply migrations!"
+        exit 1
+    fi
+    echo "Migrations applied successfully"
+}
+
 
 if [ "$DEBUG" = "True" ] || [ "$DEBUG" = "true" ] || [ "$DEBUG" = "1" ]; then
     echo "Starting in DEVELOPMENT mode"

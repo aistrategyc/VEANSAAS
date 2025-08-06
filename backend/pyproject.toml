@@ -1,0 +1,11 @@
+[project]
+name = "VEAN-SAAS"
+requires-python = ">=3.13"
+
+[tool.ruff]
+target-version = "py313"
+lint.select = ["E", "W", "F"]
+lint.ignore = ["E501", "F821"]
+
+format.quote-style = "single"
+format.line-ending = "lf"

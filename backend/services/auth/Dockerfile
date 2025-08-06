@@ -6,10 +6,12 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir uv && \
     uv pip install --system --no-cache-dir --upgrade pip setuptools wheel
 
-COPY ../../requirements.txt .
+COPY requirements.txt /tmp/common-requirements.txt
+COPY services/auth/requirements.txt /tmp/local-requirements.txt
 
-
-RUN uv pip install --system --no-cache-dir -r requirements.txt
+RUN uv pip install --system --no-cache-dir \
+    -r /tmp/common-requirements.txt \
+    -r /tmp/local-requirements.txt
 
 COPY . .
 
