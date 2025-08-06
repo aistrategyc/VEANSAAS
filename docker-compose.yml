@@ -1,0 +1,40 @@
+services:
+  backend-auth:
+    build:
+      context: ./backend
+      dockerfile: services/auth/Dockerfile
+    entrypoint: /app/services/auth/entrypoint.sh
+    container_name: auth-svc
+    ports:
+      - '8001:8001'
+    volumes:
+      - ./backend/services/auth/src:/app/services/auth/src
+    env_file:
+      - ./backend/.env
+      - ./backend/services/auth/.env
+
+  backend-user:
+    build:
+      context: ./backend
+      dockerfile: services/user/Dockerfile
+    entrypoint: /app/services/user/entrypoint.sh
+    container_name: user-svc
+    ports:
+      - '8002:8002'
+    volumes:
+      - ./backend/services/user/src:/app/services/user/src
+    env_file:
+      - ./backend/.env
+      - ./backend/services/user/.env
+
+  postgres:
+    image: postgres:latest
+    ports:
+      - 5433:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - ./backend/.env
+
+volumes:
+  postgres_data:
