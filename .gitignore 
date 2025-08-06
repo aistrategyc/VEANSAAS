@@ -1,92 +1,103 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
+### General system files ###
+.DS_Store                  # macOS folder attributes
+Thumbs.db                  # Windows thumbnail cache
+*.log                      # Log files
+*.tmp                      # Temporary files
+*.bak                      # Backup files
 
-# Virtual environment
-venv/
-.env/
-.venv/
-env/
-ENV/
+### Python (FastAPI backend) ###
+# Bytecode and cache
+__pycache__/               # Python bytecode cache
+*.py[cod]                  # Compiled Python files
+*$py.class                 # Jython compiled files
+*.pyc                      # Python compiled files
+*.pyo                      # Python optimized bytecode
+*.pyd                      # Python dynamic modules
+.cpython-*.pyc             # CPython-specific bytecode
 
-# IDE specific files
-.vscode/
-.idea/
-*.swp
-*.swo
+# Virtual environments
+.venv/                     # Python virtual environment
+venv/                      # Alternative venv folder
+env/                       # Another common venv name
+ENV/                       # Sometimes used venv name
+.env/                      # Environment configuration
+.env.local                 # Local environment overrides
 
-# FastAPI specific
-*.pyc
-*.pyo
-*.pyd
-__pycache__/
+# Dependencies and builds
+*.egg-info/                # Python package metadata
+*.egg                      # Python package
+/dist/                     # Built distribution
+/build/                    # Build artifacts
+/pip-wheel-metadata/       # Pip wheel metadata
 
-# Log files
-*.log
-logs/
+# Testing and coverage
+.coverage                  # Coverage data
+htmlcov/                   # HTML coverage reports
+.pytest_cache/             # Pytest cache
+.tox/                      # Tox environments
+.nox/                      # Nox environments
+test-reports/              # Test reports
 
-# Environment variables
-.env
-.env.local
-.env.dev
-.env.prod
-.env.test
+### Frontend (Node.js/React/Vue) ###
+# Dependencies
+node_modules/              # Node.js modules
+.npm                       # npm config
+.pnpm                      # pnpm files
+.yarn-integrity            # Yarn integrity file
+.yarn/cache                # Yarn cache
+.yarn/unplugged            # Yarn unplugged packages
+.yarn/build-state.yml      # Yarn build state
+.yarn/install-state.gz     # Yarn install state
 
-# Secrets
-secrets.yml
-config_secret.json
-*.key
-*.pem
-*.crt
+# Build artifacts
+dist/                      # Production build
+build/                     # Common build folder
+.next/                     # Next.js build
+out/                       # Alternative build folder
+.serverless/               # Serverless deployments
+.serverless_nextjs/        # Next.js serverless
+.storybook-out/            # Storybook output
 
-# Build and distribution directories
-/dist/
-/build/
-*.egg-info/
-*.egg
+# Cache folders
+.cache/                    # General cache
+.turbo/                    # Turborepo cache
+.eslintcache               # ESLint cache
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
+### IDE (VS Code) ###
+.vscode/*                  # All VSCode files
+!.vscode/settings.json     # Except settings
+!.vscode/tasks.json        # Except tasks
+!.vscode/launch.json       # Except launch configs
+!.vscode/extensions.json   # Except extensions
+.idea/                     # JetBrains IDE config
 
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
+### Environment variables ###
+.env                       # Environment file
+.env.development           # Dev environment
+.env.production            # Prod environment
+.env.test                  # Test environment
+.env.local                 # Local overrides
 
-# Jupyter Notebook
-.ipynb_checkpoints
+### Docker ###
+docker-compose.override.yml # Docker override file
 
-# Database files
-*.db
-*.sqlite
-*.db-journal
+### Databases ###
+*.db                       # Database files
+*.sqlite                   # SQLite databases
+*.db-journal               # SQLite journals
+db.sqlite3                 # Common SQLite name
 
-# macOS
-.DS_Store
+### Logs ###
+logs/                      # Log directory
+*.log                      # Log files
+npm-debug.log*             # npm debug logs
+yarn-debug.log*            # Yarn debug logs
+yarn-error.log*            # Yarn error logs
 
-# Docker
-docker-compose.override.yml
-
-# Local development
-local_settings.py
-instance/
-
-# Celery
-celerybeat-schedule
-celerybeat.pid
-
-# PyCharm
-.idea/
-
-# VS Code
-.vscode/settings.json
-.vscode/tasks.json
-.vscode/launch.json
-.vscode/extensions.json
+### Miscellaneous ###
+/coverage/                 # Coverage reports
+/.nyc_output/              # NYC coverage output
+/.sass-cache/              # Sass cache
+/connect.lock/             # Connect lockfile
+/typings/                  # TypeScript typings
+/.env.local                # Local env file
