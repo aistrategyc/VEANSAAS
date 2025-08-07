@@ -14,6 +14,7 @@ class User(Base):
     email: Mapped[str | None] = mapped_column(
         String(255), nullable=True, unique=True, index=True
     )
+    phone_number: Mapped[str | None] = mapped_column(String(24), nullable=True)
     first_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
     last_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, server_default=true())

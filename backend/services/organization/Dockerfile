@@ -13,6 +13,6 @@ RUN uv pip install --system --no-cache-dir \
 
 COPY . .
 
-ENV PYTHONPATH=/app/services/user/src
+ENV PYTHONPATH=/app/services/organization/src
 
-RUN chmod +x /app/services/user/entrypoint.sh
+RUN chmod +x /app/services/organization/entrypoint.sh
