@@ -2,12 +2,12 @@ from sqlalchemy import Boolean, String, true
 from sqlalchemy.orm import Mapped, mapped_column
 
 from shared.database import Base
-from shared.models import created_at, updated_at, uuid_primary_key
+from shared.models.base import created_at, updated_at, uuid_primary_key
 
 
 class User(Base):
     __tablename__ = 'users'
-    __table_args__ = {'schema': 'user_service', 'extend_existing': True}
+    __table_args__ = {'schema': 'user_service'}
 
     uuid: Mapped[uuid_primary_key]
     username: Mapped[str] = mapped_column(String(50), unique=True, index=True)

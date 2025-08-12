@@ -2,7 +2,7 @@ from fastapi import Request, status
 from fastapi.responses import JSONResponse
 
 from shared.logger import logger
-from shared.schemas.base import ErrorResponse
+from shared.schemas.error import ErrorResponse
 
 
 async def error_handler(request: Request, call_next) -> JSONResponse:

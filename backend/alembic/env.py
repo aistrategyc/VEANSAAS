@@ -3,9 +3,11 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-from services.user.src.models import User  # noqa
 from shared.config import settings
 from shared.database import Base
+from shared.models.organization import Organization, OrganizationMember  # noqa
+from shared.models.studio import Studio, StudioMember  # noqa
+from shared.models.user import User  # noqa
 
 config = context.config
 

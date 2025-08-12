@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from router import router
 
 from shared.config import settings
 from shared.exceptions import validation_exception_handler
@@ -23,3 +24,6 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
+
+
+app.include_router(router=router, prefix='/api/v1')

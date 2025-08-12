@@ -1,5 +1,6 @@
-from models import User
 from sqladmin import ModelView
+
+from shared.models.user import User
 
 
 class UserAdmin(ModelView, model=User):

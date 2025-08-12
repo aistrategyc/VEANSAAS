@@ -5,6 +5,7 @@ from uuid import UUID, uuid4
 from sqlalchemy import DateTime, ForeignKey, Uuid, func
 from sqlalchemy.orm import mapped_column
 
+
 uuid_primary_key = Annotated[
     UUID,
     mapped_column(Uuid(as_uuid=True), primary_key=True, default=uuid4),

@@ -33,12 +33,12 @@ services:
       - ./backend/.env
       - ./backend/services/user/.env
 
-  backend-organization:
+  backend-org:
     build:
       context: ./backend
       dockerfile: services/organization/Dockerfile
     entrypoint: /app/services/organization/entrypoint.sh
-    container_name: organization-svc
+    container_name: org-svc
     ports:
       - '9003:9003'
     volumes:
@@ -61,6 +61,7 @@ services:
 
   kong:
     image: kong:latest
+    container_name: api-gateway
     environment:
       KONG_DATABASE: off
       KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/kong.yml

@@ -1,6 +1,13 @@
+from admin import (
+    OrganizationAdmin,
+    OrganizationMemberAdmin,
+    StudioAdmin,
+    StudioMemberAdmin,
+)
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from router.organization import router as router_organization
 from sqladmin import Admin
 
 from shared.config import settings
@@ -17,7 +24,7 @@ app = FastAPI(
 
 
 app.middleware('http')(error_handler)
-
+app.include_router(router=router_organization, prefix='/api/v1')
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_middleware(
     CORSMiddleware,
@@ -32,3 +39,9 @@ admin = Admin(
     app=app,
     engine=engine,
 )
+
+
+admin.add_view(OrganizationAdmin)
+admin.add_view(OrganizationMemberAdmin)
+admin.add_view(StudioAdmin)
+admin.add_view(StudioMemberAdmin)
