@@ -68,12 +68,19 @@ async def create_user_with_user_service(
                 json=request_data.model_dump(),
                 timeout=aiohttp.ClientTimeout(total=10),
             ) as response:
-                if response.status != 201:
+                if response.status == 400:
+                    error = await response.json()
+                    raise HTTPException(
+                        status_code=response.status,
+                        detail=error.get('detail'),
+                    )
+                elif response.status != 201:
                     error = await response.text()
                     raise HTTPException(
                         status_code=response.status,
                         detail=f'User service error: {error}',
                     )
+
                 data = await response.json()
                 return UserResponse(**data)
 
@@ -86,7 +93,6 @@ async def create_user_with_user_service(
 async def create_organization_with_org_service(
     request_data: OrganizationCreateRequest,
 ) -> OrganizationResponse:
-    print(request_data.model_dump(), 'request_data.model_dump()')
     async with aiohttp.ClientSession() as session:
         try:
             async with session.post(

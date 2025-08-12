@@ -22,7 +22,7 @@ class OrganizationBase(BaseModel):
     description: str | None = Field(default=None)
     plan_type: OrganizationPlanType
     is_active: bool = Field(default=True)
-    created_by_uuid: UUID | str
+    created_by_uuid: UUID | str | None = Field(default=None)
 
 
 class OrganizationCreateRequest(OrganizationBase):

@@ -16,7 +16,7 @@ class StudioRole(str, enum.Enum):
 class StudioBase(BaseModel):
     name: str = Field(max_length=255)
     organization_uuid: UUID | None = Field(default=None)
-    created_by_uuid: UUID | str
+    created_by_uuid: UUID | str | None = Field(default=None)
 
 
 class StudioCreateRequest(StudioBase):
