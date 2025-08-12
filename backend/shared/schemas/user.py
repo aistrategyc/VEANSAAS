@@ -15,6 +15,7 @@ class UserBase(BaseModel):
 
 class UserResponse(UserBase):
     uuid: UUID
+
     created_at: datetime
     updated_at: datetime
 
@@ -22,8 +23,15 @@ class UserResponse(UserBase):
         from_attributes = True
 
 
-class UserCreateInternal(UserBase):
+class UserInDB(UserResponse):
     hashed_password: str
+
+    class Config:
+        from_attributes = True
+
+
+class UserCreateInternal(UserBase):
+    pass
 
 
 class UserCreateRequest(UserBase):

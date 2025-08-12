@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from shared.database import get_db
 from shared.schemas.user import (
     UserCreateInternal,
-    UserResponse,
+    UserInDB,
     UserUniquenessCheckRequest,
     UserUniquenessCheckResponse,
 )
@@ -20,7 +20,7 @@ async def create_user_route(
     return await create_user(request=request, user=user, db=db)
 
 
-@router.get('/{username}', response_model=UserResponse, status_code=status.HTTP_200_OK)
+@router.get('/{username}', response_model=UserInDB, status_code=status.HTTP_200_OK)
 async def get_user_by_username_route(
     request: Request, username: str, db: AsyncSession = Depends(get_db)
 ):

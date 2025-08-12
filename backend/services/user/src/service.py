@@ -14,6 +14,10 @@ from shared.schemas.user import (
 async def get_user_by_username(request: Request, username: str, db: AsyncSession):
     result = await db.execute(select(User).filter(User.username == username))
     user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail='User not found'
+        )
     return user
 
 

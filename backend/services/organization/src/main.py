@@ -23,9 +23,13 @@ app = FastAPI(
 )
 
 
-app.middleware('http')(error_handler)
+if not settings.DEBUG:
+    app.middleware('http')(error_handler)
+    app.add_exception_handler(RequestValidationError, validation_exception_handler)
+
+
 app.include_router(router=router_organization, prefix='/api/v1')
-app.add_exception_handler(RequestValidationError, validation_exception_handler)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
