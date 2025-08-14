@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone
-from typing import Dict
+from typing import Dict, Union
+from uuid import UUID
 
 import aiohttp
 from config import auth_settings
@@ -11,22 +12,25 @@ from shared.config import settings
 from shared.schemas.error import FieldError, ValidationError
 from shared.schemas.organization import OrganizationCreateRequest, OrganizationResponse
 from shared.schemas.user import (
+    AuthUser,
     UserCreateInternal,
-    UserInDB,
     UserResponse,
     UserUniquenessCheckRequest,
     UserUniquenessCheckResponse,
 )
+from shared.security import create_service_access_token
 
 
 async def check_user_uniqueness_with_user_service(
     request_data: UserUniquenessCheckRequest,
 ) -> UserUniquenessCheckResponse:
+    token = await create_service_access_token()
     async with aiohttp.ClientSession() as session:
         try:
             async with session.post(
                 url=f'{settings.USER_SERVICE_URL}/check-uniqueness-user',
                 json=request_data.model_dump(),
+                headers={'Authorization': f'Bearer {token}'},
                 timeout=aiohttp.ClientTimeout(total=10),
             ) as response:
                 if response.status != 200:
@@ -68,11 +72,14 @@ async def check_user_uniqueness_with_user_service(
 async def create_user_with_user_service(
     request_data: UserCreateInternal,
 ) -> UserResponse:
+    token = await create_service_access_token()
+
     async with aiohttp.ClientSession() as session:
         try:
             async with session.post(
                 url=f'{settings.USER_SERVICE_URL}',
                 json=request_data.model_dump(),
+                headers={'Authorization': f'Bearer {token}'},
                 timeout=aiohttp.ClientTimeout(total=10),
             ) as response:
                 if response.status == 400:
@@ -100,11 +107,14 @@ async def create_user_with_user_service(
 async def create_organization_with_org_service(
     request_data: OrganizationCreateRequest,
 ) -> OrganizationResponse:
+    token = await create_service_access_token()
+
     async with aiohttp.ClientSession() as session:
         try:
             async with session.post(
                 url=f'{settings.ORG_SERVICE_URL}',
                 json=request_data.model_dump(),
+                headers={'Authorization': f'Bearer {token}'},
                 timeout=aiohttp.ClientTimeout(total=10),
             ) as response:
                 if response.status != 201:
@@ -122,24 +132,26 @@ async def create_organization_with_org_service(
             )
 
 
-async def get_user_by_username_user_service(
+async def get_user_for_auth(
     username: str,
-) -> UserInDB:
+) -> AuthUser:
+    token = await create_service_access_token()
     async with aiohttp.ClientSession() as session:
         try:
             async with session.get(
-                url=f'{settings.USER_SERVICE_URL}/{username}',
+                url=f'{settings.USER_SERVICE_URL}/{username}/auth',
                 timeout=aiohttp.ClientTimeout(total=10),
+                headers={'Authorization': f'Bearer {token}'},
             ) as response:
                 if not response.ok:
                     error_data = await response.json()
                     raise HTTPException(
                         status_code=response.status,
-                        detail=f'User service error: {error_data.get("detail")}',
+                        detail=f'User service error: {error_data}',
                     )
 
                 data = await response.json()
-                return UserInDB(**data)
+                return AuthUser(**data)
 
         except aiohttp.ClientError as e:
             raise HTTPException(
@@ -151,11 +163,16 @@ async def verify_password(password: str, hashed_password: str):
     return pwd_context.verify(password, hashed_password)
 
 
-async def create_access_token(data: Dict[str, str]):
+async def create_access_token(data: Dict[str, Union[str, datetime | UUID]]):
     expire = datetime.now(timezone.utc) + timedelta(
         minutes=auth_settings.ACCESS_TOKEN_EXPIRE_MINUTES
     )
-    data.update({'exp': expire})
+    data.update(
+        {
+            'iss': 'iss-auth-user-vean-saas-v1',
+            'exp': expire,
+        }
+    )
     encoded_jwt = jwt.encode(
         data, auth_settings.SECRET_KEY, algorithm=auth_settings.ALGORITHM
     )

@@ -5,7 +5,7 @@ from utils import (
     create_access_token,
     create_organization_with_org_service,
     create_user_with_user_service,
-    get_user_by_username_user_service,
+    get_user_for_auth,
     verify_password,
 )
 
@@ -28,7 +28,7 @@ async def register(request: Request, data: RegisterUserRequest):
 
 
 async def login(request: Request, data: LoginUserRequest) -> TokenResponse:
-    user = await get_user_by_username_user_service(username=data.username)
+    user = await get_user_for_auth(username=data.username)
     if not await verify_password(
         password=data.password, hashed_password=user.hashed_password
     ):
@@ -38,6 +38,13 @@ async def login(request: Request, data: LoginUserRequest) -> TokenResponse:
             headers={'WWW-Authenticate': 'Bearer'},
         )
 
-    access_token = await create_access_token(data={'sub': user.username})
+    access_token = await create_access_token(
+        data={
+            'sub': 'user',
+            'user_uuid': user.uuid,
+            'username': user.username,
+            'email': user.email,
+        }
+    )
 
-    return TokenResponse(access_token=access_token, user=user)
+    return TokenResponse(access_token=access_token)

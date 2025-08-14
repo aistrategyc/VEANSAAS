@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, Request, status
-from service import check_uniqueness_user, get_user_by_username, create_user
+from service import check_uniqueness_user, create_user, get_user_for_auth
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.database import get_db
 from shared.schemas.user import (
+    AuthUser,
     UserCreateInternal,
-    UserInDB,
     UserUniquenessCheckRequest,
     UserUniquenessCheckResponse,
 )
@@ -20,11 +20,13 @@ async def create_user_route(
     return await create_user(request=request, user=user, db=db)
 
 
-@router.get('/{username}', response_model=UserInDB, status_code=status.HTTP_200_OK)
-async def get_user_by_username_route(
-    request: Request, username: str, db: AsyncSession = Depends(get_db)
+@router.get('/{username}/auth', response_model=AuthUser, status_code=status.HTTP_200_OK)
+async def get_user_for_auth_route(
+    request: Request,
+    username: str,
+    db: AsyncSession = Depends(get_db),
 ):
-    return await get_user_by_username(request=request, username=username, db=db)
+    return await get_user_for_auth(request=request, username=username, db=db)
 
 
 @router.post(

@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 
 from shared.schemas.organization import OrganizationCreateRequest
-from shared.schemas.user import UserCreateRequest, UserResponse
+from shared.schemas.user import UserCreateRequest
 
 
 class RegisterUserRequest(BaseModel):
@@ -17,4 +17,3 @@ class LoginUserRequest(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = Field(default='bearer')
-    user: UserResponse

@@ -3,6 +3,9 @@ from pydantic_settings import BaseSettings
 
 class Config(BaseSettings):
     DEBUG: bool = True
+    SECRET_KEY: str = ''
+    SECRET_KEY_SERVICE: str = ''
+    ALGORITHM: str = 'HS256'
     POSTGRES_USER: str = 'postgres'
     POSTGRES_PASSWORD: str = 'postgres'
     POSTGRES_DB: str = 'database'

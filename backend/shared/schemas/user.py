@@ -31,7 +31,7 @@ class UserInDB(UserResponse):
 
 
 class UserCreateInternal(UserBase):
-    pass
+    hashed_password: str
 
 
 class UserCreateRequest(UserBase):
@@ -55,3 +55,13 @@ class UserUniquenessCheckResponse(BaseModel):
     is_valid: bool = Field(default=False)
     username_exists: bool = Field(default=False)
     email_exists: bool = Field(default=False)
+
+
+class AuthUser(BaseModel):
+    uuid: UUID | str
+    username: str
+    email: str
+    hashed_password: str
+
+    class Config:
+        from_attributes = True

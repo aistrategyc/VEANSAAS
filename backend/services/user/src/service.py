@@ -11,7 +11,7 @@ from shared.schemas.user import (
 )
 
 
-async def get_user_by_username(request: Request, username: str, db: AsyncSession):
+async def get_user_for_auth(request: Request, username: str, db: AsyncSession):
     result = await db.execute(select(User).filter(User.username == username))
     user = result.scalar_one_or_none()
     if not user:

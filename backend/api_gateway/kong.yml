@@ -16,6 +16,14 @@ services:
         paths: ['/api/v1/users']
         methods: ['GET', 'POST', 'PUT', 'DELETE']
         strip_path: true
+        plugins:
+          - name: jwt
+            config:
+              run_on_preflight: true
+              claims_to_verify: ['exp']
+              key_claim_name: 'iss'
+              secret_is_base64: false
+              anonymous: null
 
   - name: org-service
     url: http://backend-org:9003/api/v1/orgs
@@ -24,6 +32,23 @@ services:
         paths: ['/api/v1/orgs']
         methods: ['GET', 'POST', 'PUT', 'DELETE']
         strip_path: true
+        plugins:
+          - name: jwt
+            config:
+              run_on_preflight: true
+              claims_to_verify: ['exp']
+              key_claim_name: 'iss'
+              secret_is_base64: false
+
+consumers:
+  - username: my-app
+    jwt_secrets:
+      - key: iss-auth-user-vean-saas-v1
+        secret: test_key_KIQ20UE_Geeb8zpk5LYRBnLanYQjAdvyUbxh50CDuQb4HvztZMQxiJpuhup2U1lfkYQ
+        algorithm: HS256
+      - key: iss-auth-service-vean-saas-v1
+        secret: test_key_4354345
+        algorithm: HS256
 
 plugins:
   - name: cors
