@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from shared.schemas.organization import OrganizationCreateRequest
 from shared.schemas.user import UserCreateRequest
@@ -12,6 +12,12 @@ class RegisterUserRequest(BaseModel):
 class LoginUserRequest(BaseModel):
     username: str
     password: str
+
+    @field_validator('username')
+    @classmethod
+    def validate_username(cls, v):
+        v = v.lower().strip()
+        return v
 
 
 class TokenResponse(BaseModel):

@@ -36,7 +36,25 @@ class UserCreateInternal(UserBase):
 
 
 class UserCreateRequest(UserBase):
+    username: str
     password: str
+
+    @field_validator('username')
+    @classmethod
+    def validate_username(cls, v):
+        v = v.lower().strip()
+
+        if len(v) < 3:
+            raise ValueError('Username must be at least 3 characters long')
+        if len(v) > 32:
+            raise ValueError('Username must be less than 32 characters long')
+
+        if not re.match(r'^[a-z0-9_]+$', v):
+            raise ValueError(
+                'Username can only contain lowercase letters, numbers, and underscores'
+            )
+
+        return v
 
     @field_validator('password')
     @classmethod
