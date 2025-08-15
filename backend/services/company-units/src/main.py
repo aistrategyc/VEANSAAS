@@ -1,17 +1,9 @@
-from admin import (
-    OrganizationAdmin,
-    OrganizationMemberAdmin,
-    StudioAdmin,
-    StudioMemberAdmin,
-)
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from router.organization import router as router_organization
-from sqladmin import Admin
+from routers.org import router as router_organization
 
 from shared.config import settings
-from shared.database import engine
 from shared.exceptions import validation_exception_handler
 from shared.middleware import error_handler
 
@@ -37,15 +29,3 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
-
-
-admin = Admin(
-    app=app,
-    engine=engine,
-)
-
-
-admin.add_view(OrganizationAdmin)
-admin.add_view(OrganizationMemberAdmin)
-admin.add_view(StudioAdmin)
-admin.add_view(StudioMemberAdmin)

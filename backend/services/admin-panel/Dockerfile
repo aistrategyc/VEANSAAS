@@ -8,11 +8,12 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 COPY requirements.txt /tmp/common-requirements.txt
 
+
 RUN uv pip install --system --no-cache-dir \
     -r /tmp/common-requirements.txt
 
 COPY . .
 
-ENV PYTHONPATH=/app/services/organization/src
+ENV PYTHONPATH=/app/services/admin-panel/src
 
-RUN chmod +x /app/services/organization/entrypoint.sh
+RUN chmod +x /app/services/admin-panel/entrypoint.sh

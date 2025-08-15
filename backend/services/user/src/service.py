@@ -1,4 +1,6 @@
-from fastapi import HTTPException, Request, status
+from uuid import UUID
+
+from fastapi import HTTPException, Request, Response, status
 from sqlalchemy import exists, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -70,3 +72,15 @@ async def create_user(request: Request, user: UserCreateInternal, db: AsyncSessi
     db.add(db_user)
     await db.commit()
     return db_user
+
+
+async def delete_user(request: Request, user_uuid: UUID, db: AsyncSession):
+    user = await db.get(User, user_uuid)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail='User not found'
+        )
+    await db.delete(user)
+    await db.commit()
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

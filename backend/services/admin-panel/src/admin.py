@@ -1,7 +1,14 @@
 from sqladmin import ModelView
 
-from shared.models.organization import Organization, OrganizationMember
-from shared.models.studio import Studio, StudioMember
+from shared.models.company_units.org import Organization, OrganizationMember
+from shared.models.company_units.studio import Studio, StudioMember
+from shared.models.user import User
+
+
+class UserAdmin(ModelView, model=User):
+    name = 'User'
+    name_plural = 'Users'
+    can_export = False
 
 
 class OrganizationAdmin(ModelView, model=Organization):

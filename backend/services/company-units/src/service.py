@@ -1,16 +1,20 @@
 from fastapi import Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from shared.models.organization import Organization, OrganizationMember
-from shared.models.studio import Studio, StudioMember
-from shared.schemas.organization import (
+from shared.models.company_units.org import Organization, OrganizationMember
+from shared.models.company_units.studio import Studio, StudioMember
+from shared.schemas.company_units.org import (
     OrganizationCreateRequest,
     OrganizationMemberCreateRequest,
     OrganizationPlanType,
     OrganizationResponse,
     OrganizationRole,
 )
-from shared.schemas.studio import StudioMemberCreateRequest, StudioResponse, StudioRole
+from shared.schemas.company_units.studio import (
+    StudioMemberCreateRequest,
+    StudioResponse,
+    StudioRole,
+)
 
 
 async def create_organization(

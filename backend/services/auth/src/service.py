@@ -1,34 +1,57 @@
 from fastapi import HTTPException, Request, status
 from schemas import LoginUserRequest, RegisterUserRequest, TokenResponse
 from security import pwd_context
+from sqlalchemy.ext.asyncio import AsyncSession
 from utils import (
     create_access_token,
-    create_organization_with_org_service,
-    create_user_with_user_service,
-    get_user_for_auth,
     verify_password,
 )
 
 from shared.schemas.user import (
     UserCreateInternal,
 )
+from shared.service_clients.company_units import CompanyUnitsServiceClient
+from shared.service_clients.user import UserServiceClient
 
 
-async def register(request: Request, data: RegisterUserRequest):
-    user, organization = data.user, data.organization
+async def register(
+    request: Request,
+    data: RegisterUserRequest,
+    db: AsyncSession,
+    user_service: UserServiceClient,
+    units_service: CompanyUnitsServiceClient,
+):
+    user_created = None
+    try:
+        user, organization = data.user, data.organization
 
-    hashed_password = pwd_context.hash(user.password)
-    user_internal = UserCreateInternal(
-        **user.model_dump(exclude={'password'}), hashed_password=hashed_password
-    )
-    user_created = await create_user_with_user_service(request_data=user_internal)
-    organization.created_by_uuid = str(user_created.uuid)
-    await create_organization_with_org_service(request_data=organization)
-    return user_created
+        hashed_password = pwd_context.hash(user.password)
+        user_internal = UserCreateInternal(
+            **user.model_dump(exclude={'password'}), hashed_password=hashed_password
+        )
+
+        user_created = await user_service.create_user(request_data=user_internal)
+
+        organization.created_by_uuid = str(user_created.uuid)
+
+        await units_service.create_organization(request_data=organization)
+
+        await db.commit()
+        return {
+            'status': 'success',
+            'message': 'User registered. Check your email for confirmation.',
+        }
+    except Exception:
+        if user_created:
+            await user_service.delete_user(user_created.uuid)
+        raise
 
 
-async def login(request: Request, data: LoginUserRequest) -> TokenResponse:
-    user = await get_user_for_auth(username=data.username)
+async def login(
+    request: Request, data: LoginUserRequest, user_service: UserServiceClient
+) -> TokenResponse:
+    user = await user_service.get_user_for_auth(username=data.username)
+
     if not await verify_password(
         password=data.password, hashed_password=user.hashed_password
     ):

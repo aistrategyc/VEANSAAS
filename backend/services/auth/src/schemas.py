@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, field_validator
 
-from shared.schemas.organization import OrganizationCreateRequest
+from shared.schemas.company_units.org import OrganizationCreateRequest
 from shared.schemas.user import UserCreateRequest
 
 

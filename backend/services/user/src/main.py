@@ -1,12 +1,9 @@
-from admin import UserAdmin
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from sqladmin import Admin
 
 from services.user.src.router import router
 from shared.config import settings
-from shared.database import engine
 from shared.exceptions import validation_exception_handler
 from shared.middleware import error_handler
 
@@ -30,12 +27,3 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
-
-
-admin = Admin(
-    app=app,
-    engine=engine,
-)
-
-
-admin.add_view(UserAdmin)

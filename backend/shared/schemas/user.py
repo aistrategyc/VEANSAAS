@@ -16,7 +16,6 @@ class UserBase(BaseModel):
 
 class UserResponse(UserBase):
     uuid: UUID
-
     created_at: datetime
     updated_at: datetime
 
@@ -93,13 +92,3 @@ class UserUniquenessCheckResponse(BaseModel):
     is_valid: bool = Field(default=False)
     username_exists: bool = Field(default=False)
     email_exists: bool = Field(default=False)
-
-
-class AuthUser(BaseModel):
-    uuid: UUID | str
-    username: str
-    email: str
-    hashed_password: str
-
-    class Config:
-        from_attributes = True

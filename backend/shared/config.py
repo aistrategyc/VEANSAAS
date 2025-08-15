@@ -16,7 +16,7 @@ class Config(BaseSettings):
     API_DEFAULT_VERSION: str = 'v1'
     AUTH_SERVICE_ROUTE: str = '/auth'
     USER_SERVICE_ROUTE: str = '/users'
-    ORG_SERVICE_ROUTE: str = '/orgs'
+    COMPANY_UNITS_SERVICE_ROUTE: str = '/orgs'
 
     @property
     def DATABASE_URL(self):
@@ -35,8 +35,8 @@ class Config(BaseSettings):
         return f'{self.BASE_API_URL}{self.USER_SERVICE_ROUTE}'
 
     @property
-    def ORG_SERVICE_URL(self) -> str:
-        return f'{self.BASE_API_URL}{self.ORG_SERVICE_ROUTE}'
+    def COMPANY_UNITS_SERVICE_URL(self) -> str:
+        return f'{self.BASE_API_URL}{self.COMPANY_UNITS_SERVICE_ROUTE}'
 
     class Config:
         env_file = '../.env'

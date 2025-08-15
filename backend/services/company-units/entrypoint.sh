@@ -1,6 +1,6 @@
 #!/bin/sh
 
-APP="services.organization.src.main:app"
+APP="services.company-units.src.main:app"
 
 run_migrations() {
     echo "Applying database migrations..."

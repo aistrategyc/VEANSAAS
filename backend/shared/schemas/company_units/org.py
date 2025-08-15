@@ -1,20 +1,11 @@
-import enum
 from datetime import datetime
 from typing import List
 from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from shared.schemas.studio import StudioCreateRequest, StudioResponse
-
-
-class OrganizationRole(str, enum.Enum):
-    OWNER = 'owner'
-
-
-class OrganizationPlanType(str, enum.Enum):
-    SOLO = 'solo'
-    NETWORK = 'network'
+from shared.schemas.company_units.enum import OrganizationPlanType, OrganizationRole
+from shared.schemas.company_units.studio import StudioCreateRequest, StudioResponse
 
 
 class OrganizationBase(BaseModel):
@@ -25,8 +16,18 @@ class OrganizationBase(BaseModel):
     created_by_uuid: UUID | str | None = Field(default=None)
 
 
+class OrganizationMemberBase(BaseModel):
+    user_uuid: UUID | str
+    organization_uuid: UUID | str
+    roles: List[OrganizationRole]
+
+
 class OrganizationCreateRequest(OrganizationBase):
     studio: StudioCreateRequest
+
+
+class OrganizationMemberCreateRequest(OrganizationMemberBase):
+    created_by_uuid: UUID | str
 
 
 class OrganizationResponse(OrganizationBase):
@@ -37,13 +38,3 @@ class OrganizationResponse(OrganizationBase):
 
     class Config:
         from_attributes = True
-
-
-class OrganizationMemberBase(BaseModel):
-    user_uuid: UUID | str
-    organization_uuid: UUID | str
-    roles: List[OrganizationRole]
-
-
-class OrganizationMemberCreateRequest(OrganizationMemberBase):
-    created_by_uuid: UUID | str

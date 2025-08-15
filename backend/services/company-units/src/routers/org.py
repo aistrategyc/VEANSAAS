@@ -3,7 +3,10 @@ from service import create_organization
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.database import get_db
-from shared.schemas.organization import OrganizationCreateRequest, OrganizationResponse
+from shared.schemas.company_units.org import (
+    OrganizationCreateRequest,
+    OrganizationResponse,
+)
 
 router = APIRouter(prefix='/orgs', tags=['Orgs'])
 

@@ -1,4 +1,23 @@
 services:
+
+
+  admin-panel:
+    build:
+      context: ./backend
+      dockerfile: services/admin-panel/Dockerfile
+    entrypoint: /app/services/admin-panel/entrypoint.sh
+    container_name: admin-panel-svc
+    ports:
+      - '9000:9000'
+    volumes:
+      - ./backend/shared:/app/shared
+      - ./backend/services/admin-panel/src:/app/services/admin-panel/src
+      - ./backend/alembic.ini:/app/alembic.ini
+      - ./backend/alembic:/app/alembic
+    env_file:
+      - ./backend/.env
+      - ./backend/services/admin-panel/.env
+
   backend-auth:
     build:
       context: ./backend
@@ -33,22 +52,22 @@ services:
       - ./backend/.env
       - ./backend/services/user/.env
 
-  backend-org:
+  backend-company-units:
     build:
       context: ./backend
-      dockerfile: services/organization/Dockerfile
-    entrypoint: /app/services/organization/entrypoint.sh
-    container_name: org-svc
+      dockerfile: services/company-units/Dockerfile
+    entrypoint: /app/services/company-units/entrypoint.sh
+    container_name: company-units-svc
     ports:
       - '9003:9003'
     volumes:
       - ./backend/shared:/app/shared
-      - ./backend/services/organization/src:/app/services/organization/src
+      - ./backend/services/company-units/src:/app/services/company-units/src
       - ./backend/alembic.ini:/app/alembic.ini
       - ./backend/alembic:/app/alembic
     env_file:
       - ./backend/.env
-      - ./backend/services/organization/.env
+      - ./backend/services/company-units/.env
 
   postgres:
     image: postgres:latest
