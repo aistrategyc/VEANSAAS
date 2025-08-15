@@ -1,7 +1,8 @@
+import re
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
 class UserBase(BaseModel):
@@ -36,6 +37,25 @@ class UserCreateInternal(UserBase):
 
 class UserCreateRequest(UserBase):
     password: str
+
+    @field_validator('password')
+    @classmethod
+    def validate_password(cls, v: str) -> str:
+        errors = []
+        if len(v) < 8:
+            errors.append('be at least 8 characters long')
+        if not re.search(r'[A-Z]', v):
+            errors.append('contain at least one uppercase letter')
+        if not re.search(r'[a-z]', v):
+            errors.append('contain at least one lowercase letter')
+        if not re.search(r'[0-9]', v):
+            errors.append('contain at least one digit')
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', v):
+            errors.append('contain at least one special character')
+
+        if errors:
+            raise ValueError(f'Password must: {", ".join(errors)}')
+        return v
 
 
 class UserUpdate(BaseModel):
