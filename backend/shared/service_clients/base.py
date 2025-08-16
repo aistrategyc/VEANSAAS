@@ -18,7 +18,7 @@ class BaseServiceClient:
     ) -> dict:
         token = await create_service_access_token()
         url = f'{self.service_url}/{endpoint}'
-        logger.warning(url)
+
         async with aiohttp.ClientSession() as session:
             try:
                 async with session.request(

@@ -6,6 +6,7 @@ class Config(BaseSettings):
     SECRET_KEY: str = ''
     SECRET_KEY_SERVICE: str = ''
     ALGORITHM: str = 'HS256'
+    RABBITMQ_URL: str = 'amqp://admin:admin@rabbitmq:5672/'
     POSTGRES_USER: str = 'postgres'
     POSTGRES_PASSWORD: str = 'postgres'
     POSTGRES_DB: str = 'database'

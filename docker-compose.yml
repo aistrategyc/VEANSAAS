@@ -1,7 +1,7 @@
 services:
-
-
   admin-panel:
+    depends_on:
+      - rabbitmq
     build:
       context: ./backend
       dockerfile: services/admin-panel/Dockerfile
@@ -19,6 +19,9 @@ services:
       - ./backend/services/admin-panel/.env
 
   backend-auth:
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
     build:
       context: ./backend
       dockerfile: services/auth/Dockerfile
@@ -36,6 +39,9 @@ services:
       - ./backend/services/auth/.env
 
   backend-user:
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
     build:
       context: ./backend
       dockerfile: services/user/Dockerfile
@@ -53,6 +59,9 @@ services:
       - ./backend/services/user/.env
 
   backend-company-units:
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
     build:
       context: ./backend
       dockerfile: services/company-units/Dockerfile
@@ -68,6 +77,26 @@ services:
     env_file:
       - ./backend/.env
       - ./backend/services/company-units/.env
+
+  backend-notification:
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    build:
+      context: ./backend
+      dockerfile: services/notification/Dockerfile
+    entrypoint: /app/services/notification/entrypoint.sh
+    container_name: notification-svc
+    ports:
+      - '9004:9004'
+    volumes:
+      - ./backend/shared:/app/shared
+      - ./backend/services/notification/src:/app/services/notification/src
+      - ./backend/alembic.ini:/app/alembic.ini
+      - ./backend/alembic:/app/alembic
+    env_file:
+      - ./backend/.env
+      - ./backend/services/notification/.env
 
   postgres:
     image: postgres:latest
@@ -92,5 +121,24 @@ services:
       - '8443:8443'
       - '8444:8444'
 
+
+  rabbitmq:
+    image: rabbitmq:3.13.7-management
+    container_name: rabbitmq
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+    healthcheck:
+      test: rabbitmq-diagnostics -q check_running && rabbitmq-diagnostics -q check_local_alarms
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
 volumes:
   postgres_data:
+  rabbitmq_data:

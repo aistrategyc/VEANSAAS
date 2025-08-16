@@ -18,6 +18,7 @@ class User(Base):
     first_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
     last_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, server_default=true())
+    is_verified: Mapped[bool] = mapped_column(Boolean, server_default=true())
     hashed_password: Mapped[str] = mapped_column(String(255))
     created_at: Mapped[created_at]
     updated_at: Mapped[updated_at]
