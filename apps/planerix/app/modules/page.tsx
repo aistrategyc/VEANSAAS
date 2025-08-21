@@ -81,7 +81,7 @@ export default function ModulesPage() {
     {
       icon: Plug,
       title: 'Integrations',
-      desc: 'Connect Planerix to your stack in minutes.',
+      desc: 'Connect Liderix to your stack in minutes.',
       color: 'from-indigo-600 to-violet-600',
       bullets: ['Native SaaS connectors', 'Open API & SDK', 'SSO/SAML/SCIM', 'Events & data sync'],
       anchor: 'integrations',
@@ -110,7 +110,7 @@ export default function ModulesPage() {
 
   const faqs = [
     { q: 'Can we enable modules gradually?', a: 'Yes. Start with any module and enable more as you scale. Permissions and navigation adapt automatically.' },
-    { q: 'Do modules share data?', a: 'Yes. Planerix uses a unified work graph, so goals, projects, CRM, and HR align by design.' },
+    { q: 'Do modules share data?', a: 'Yes. Liderix uses a unified work graph, so goals, projects, CRM, and HR align by design.' },
     { q: 'How do integrations work?', a: 'Use native connectors or the open API. SSO/SAML and SCIM are available on Premium.' },
     { q: 'Is Automation included?', a: 'Automation is included on Team and Premium. Advanced AI automation requires Premium.' },
   ];

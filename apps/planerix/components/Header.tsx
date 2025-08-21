@@ -45,7 +45,7 @@ export default function Header() {
             <div className="w-10 h-10 bg-blue-300 rounded-lg flex items-center justify-center">
               <BarChart3 className="w-6 h-6 text-gray-900" />
             </div>
-            <span className="text-2xl font-bold">Planerix</span>
+            <span className="text-2xl font-bold">Liderix</span>
           </Link>
 
           <div className="hidden md:flex items-center space-x-8">

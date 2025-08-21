@@ -41,7 +41,7 @@ export default function AutomationPage() {
     {
       icon: Plug,
       title: 'Actions & tools',
-      text: 'Write to Planerix modules and external systems.',
+      text: 'Write to Liderix modules and external systems.',
       bullets: ['OKR/Project/CRM actions', 'Email/Slack/Teams', 'HTTP + OAuth2', 'CSV/XLSX export'],
     },
     {

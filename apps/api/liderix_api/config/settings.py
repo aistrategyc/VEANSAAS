@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 class Settings(BaseSettings):
     # ── Общие ────────────────────────────────────────────────────────────────────
-    PROJECT_NAME: str = "Liderix API"
+    PROJECT_NAME: str = "Liderix API Production"
     PROJECT_VERSION: str = "0.2.0"
     API_PREFIX: str = "/api"
     LOG_LEVEL: str = "info"

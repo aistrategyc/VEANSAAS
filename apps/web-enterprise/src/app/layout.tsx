@@ -21,7 +21,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Planerix — Business OS",
+  title: "Liderix — Business OS",
   description: "AI-powered operating system for modern business.",
 }
 

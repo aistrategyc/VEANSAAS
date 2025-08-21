@@ -99,7 +99,7 @@ export default function IntegrationsPage() {
             <div className="space-y-6">
               <div className="inline-flex items-center px-4 py-2 bg-blue-100 rounded-full">
                 <Plug className="w-4 h-4 text-blue-600 mr-2" />
-                <span className="text-blue-800 text-sm font-medium">Connect Planerix to your stack in minutes</span>
+                <span className="text-blue-800 text-sm font-medium">Connect Liderix to your stack in minutes</span>
               </div>
               <h1 className="text-5xl lg:text-6xl font-bold leading-tight">Integrations & open API</h1>
               <p className="text-xl text-gray-600">

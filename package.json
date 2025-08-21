@@ -1,4 +1,14 @@
 {
+	"name": "liderix-monorepo",
+	"version": "1.0.0",
+	"description": "Liderix - Операционная система для современного бизнеса",
+	"author": "Liderix Team",
+	"license": "MIT",
+	"homepage": "https://liderix.ru",
+	"repository": {
+		"type": "git",
+		"url": "git@github.com:liderix/version-1.git"
+	},
 	"dependencies": {
 		"recharts": "^3.1.0"
 	}

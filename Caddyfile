@@ -2,7 +2,7 @@
 # Автоматические SSL сертификаты от Let's Encrypt
 
 # Landing page - главная страница
-planerix.com, www.planerix.com {
+liderix.ru, www.liderix.ru {
     reverse_proxy planerix-landing:3000
     
     # Security headers
@@ -16,7 +16,7 @@ planerix.com, www.planerix.com {
     
     # Logging
     log {
-        output file /var/log/caddy/planerix.access.log {
+        output file /var/log/caddy/liderix.access.log {
             roll_size 100mb
             roll_keep 5
         }
@@ -24,7 +24,7 @@ planerix.com, www.planerix.com {
 }
 
 # Web Enterprise Application
-app.planerix.com {
+app.liderix.ru {
     reverse_proxy liderix-web:3000
     
     header {
@@ -44,7 +44,7 @@ app.planerix.com {
 }
 
 # API subdomain
-api.planerix.com {
+api.liderix.ru {
     reverse_proxy liderix-api:8001
     
     header {

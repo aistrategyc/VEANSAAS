@@ -84,7 +84,7 @@ export default function PlatformPage() {
               </div>
               <h1 className="text-5xl lg:text-6xl font-bold leading-tight">Platform built for security and scale</h1>
               <p className="text-xl text-gray-600">
-                Planerix combines enterprise-grade security, regional data residency, and a developer-friendly API — so you can run mission-critical work with confidence.
+                Liderix combines enterprise-grade security, regional data residency, and a developer-friendly API — so you can run mission-critical work with confidence.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <a

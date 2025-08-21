@@ -107,7 +107,7 @@ export default function AiAgentsPage() {
               </div>
               <h1 className="text-5xl lg:text-6xl font-bold leading-tight">Ship reliable AI agents fast</h1>
               <p className="text-xl text-gray-600">
-                Planerix agents connect to your tools, follow policy guardrails, and deliver measurable outcomes — with full observability.
+                Liderix agents connect to your tools, follow policy guardrails, and deliver measurable outcomes — with full observability.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <a

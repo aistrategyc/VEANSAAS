@@ -4,13 +4,13 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
-  title: 'Planerix — Operating system for modern business',
-  description: 'OKR, projects, CRM, finance and AI analytics in one platform.',
+  title: 'Liderix — Операционная система для современного бизнеса',
+  description: 'OKR, проекты, CRM, финансы и ИИ аналитика в одной платформе.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="ru">
       <body>
         <Header />
         <main className="pt-24">{children}</main>

@@ -29,7 +29,7 @@ type ContactPayload = z.infer<typeof schema>;
 // --------------------------------------------------
 // Config
 // --------------------------------------------------
-const FROM = process.env.RESEND_FROM || 'Planerix <hello@planerix.com>';
+const FROM = process.env.RESEND_FROM || 'Liderix <hello@liderix.ru>';
 const TO = (process.env.CONTACT_TO || 'kprolieiev@gmail.com')
   .split(',')
   .map(s => s.trim())

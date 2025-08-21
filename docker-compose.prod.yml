@@ -18,7 +18,7 @@ services:
     env_file:
       - .env.production
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-liderixapp}
+      POSTGRES_DB: ${POSTGRES_DB:-firstAI}
       POSTGRES_USER: ${POSTGRES_USER:-manfromlamp}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-lashd87123kKJSDAH81}
     volumes:
@@ -26,7 +26,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-manfromlamp} -d ${POSTGRES_DB:-liderixapp}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-manfromlamp} -d ${POSTGRES_DB:-firstAI}"]
       interval: 30s
       timeout: 10s
       retries: 5

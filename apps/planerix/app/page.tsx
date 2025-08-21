@@ -33,19 +33,19 @@ export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const stats = [
-    { value: '1M+', label: 'Active users' },
-    { value: '50K+', label: 'Business customers' },
-    { value: '99.9%', label: 'Service uptime' },
-    { value: '4.9/5', label: 'Average rating' },
+    { value: '1М+', label: 'Активных пользователей' },
+    { value: '50К+', label: 'Бизнес-клиентов' },
+    { value: '99.9%', label: 'Время безотказной работы' },
+    { value: '4.9/5', label: 'Средний рейтинг' },
   ];
 
   const features = [
-    { icon: Target, title: 'OKR & Strategy', description: 'Set ambitious goals and track progress. Cascade OKRs across every level of the company.', color: 'from-blue-500 to-indigo-600', bgColor: 'from-blue-100 to-indigo-100', items: ['Goal cascading', 'Progress visualization', 'Quarterly cycles'] },
-    { icon: Briefcase, title: 'Projects & Tasks', description: 'Manage projects of any complexity. Kanban, Gantt, sprints — all in one place.', color: 'from-cyan-500 to-blue-600', bgColor: 'from-cyan-100 to-blue-100', items: ['Flexible methodologies', 'Workflow automation', 'Project templates'] },
-    { icon: Brain, title: 'AI Analytics', description: 'AI analyzes your data and suggests actions to drive business growth.', color: 'from-indigo-500 to-violet-600', bgColor: 'from-indigo-100 to-violet-100', items: ['Trend forecasting', 'Smart recommendations', 'Risk analysis'] },
-    { icon: Users, title: 'CRM & Sales', description: 'Full customer lifecycle — from first touch to repeat sales.', color: 'from-sky-500 to-blue-600', bgColor: 'from-sky-100 to-blue-100', items: ['Sales pipelines', 'Interaction history', 'Automation'] },
-    { icon: Award, title: 'People & HR', description: 'Talent management, employee growth, and strong culture development.', color: 'from-blue-500 to-cyan-600', bgColor: 'from-blue-100 to-cyan-100', items: ['1-on-1s', 'Skill assessments', 'Career tracks'] },
-    { icon: BarChart3, title: 'Finance & Budgets', description: 'Control cash flow, plan budgets, and track performance.', color: 'from-sky-600 to-indigo-600', bgColor: 'from-sky-100 to-indigo-100', items: ['Real-time P&L', 'Budgeting', 'Financial reports'] },
+    { icon: Target, title: 'OKR и Стратегия', description: 'Ставьте амбициозные цели и отслеживайте прогресс. Каскадируйте OKR на всех уровнях компании.', color: 'from-blue-500 to-indigo-600', bgColor: 'from-blue-100 to-indigo-100', items: ['Каскадирование целей', 'Визуализация прогресса', 'Квартальные циклы'] },
+    { icon: Briefcase, title: 'Проекты и Задачи', description: 'Управляйте проектами любой сложности. Kanban, Gantt, спринты — все в одном месте.', color: 'from-cyan-500 to-blue-600', bgColor: 'from-cyan-100 to-blue-100', items: ['Гибкие методологии', 'Автоматизация процессов', 'Шаблоны проектов'] },
+    { icon: Brain, title: 'ИИ Аналитика', description: 'ИИ анализирует ваши данные и предлагает действия для роста бизнеса.', color: 'from-indigo-500 to-violet-600', bgColor: 'from-indigo-100 to-violet-100', items: ['Прогнозирование трендов', 'Умные рекомендации', 'Анализ рисков'] },
+    { icon: Users, title: 'CRM и Продажи', description: 'Полный жизненный цикл клиента — от первого касания до повторных продаж.', color: 'from-sky-500 to-blue-600', bgColor: 'from-sky-100 to-blue-100', items: ['Воронки продаж', 'История взаимодействий', 'Автоматизация'] },
+    { icon: Award, title: 'HR и Команда', description: 'Управление талантами, развитие сотрудников и сильная корпоративная культура.', color: 'from-blue-500 to-cyan-600', bgColor: 'from-blue-100 to-cyan-100', items: ['Встречи 1-на-1', 'Оценка навыков', 'Карьерные треки'] },
+    { icon: BarChart3, title: 'Финансы и Бюджеты', description: 'Контролируйте денежные потоки, планируйте бюджеты и отслеживайте показатели.', color: 'from-sky-600 to-indigo-600', bgColor: 'from-sky-100 to-indigo-100', items: ['P&L в реальном времени', 'Бюджетирование', 'Финансовые отчеты'] },
   ];
 
   const pricing = [
@@ -67,13 +67,13 @@ export default function LandingPage() {
   ];
 
   const testimonials = [
-    { text: 'Planerix completely transformed how we run projects. Processes are transparent and the team works as one.', author: 'Anna Petrova', position: 'CEO, TechStart', rating: 5 },
+    { text: 'Liderix completely transformed how we run projects. Processes are transparent and the team works as one.', author: 'Anna Petrova', position: 'CEO, TechStart', rating: 5 },
     { text: 'AI recommendations helped us boost conversion by 40%. This is more than a CRM — it’s a real growth partner.', author: 'Mikhail Kozlov', position: 'CMO, E-Commerce Pro', rating: 5 },
-    { text: 'Rolling out OKRs with Planerix let us scale 3x in a year while staying focused on what matters.', author: 'Elena Sidorova', position: 'COO, FinTech Solutions', rating: 5 },
+    { text: 'Rolling out OKRs with Liderix let us scale 3x in a year while staying focused on what matters.', author: 'Elena Sidorova', position: 'COO, FinTech Solutions', rating: 5 },
   ];
 
   const faqs = [
-    { question: 'Can I try Planerix for free?', answer: 'Yes. The Starter plan is free forever. A 14-day trial is also available for the Team plan with no credit card required.' },
+    { question: 'Can I try Liderix for free?', answer: 'Yes. The Starter plan is free forever. A 14-day trial is also available for the Team plan with no credit card required.' },
     { question: 'How do I migrate data from other tools?', answer: 'We support imports from popular CRMs and project management systems. Our team will help with data transfer and integrations.' },
     { question: 'How secure is my data?', answer: 'We use bank-grade encryption, regular backups, and comply with GDPR. Your data is stored in secure ISO 27001 certified data centers.' },
     { question: 'Is there a mobile app?', answer: 'Yes — iOS and Android apps are available. They sync with the web app and support all core features on the go.' },
@@ -98,21 +98,21 @@ export default function LandingPage() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
                 </span>
-                <span className="text-blue-800 text-sm font-medium">New: AI Analytics is live</span>
+                <span className="text-blue-800 text-sm font-medium">Новое: ИИ Аналитика доступна</span>
               </div>
               <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
-                Ready to boost
-                <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"> your business performance?</span>
+                Готовы ускорить
+                <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"> рост вашего бизнеса?</span>
               </h1>
-              <p className="text-xl text-gray-600 leading-relaxed">Join hundreds of companies already using Planerix to hit their strategic goals.</p>
+              <p className="text-xl text-gray-600 leading-relaxed">Присоединитесь к сотням компаний, которые уже используют Liderix для достижения стратегических целей.</p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <button className="group relative px-8 py-4 bg-gray-900 text-white rounded-lg font-medium overflow-hidden transition-all duration-300 transform hover:scale-105 hover:shadow-xl">
-                  <span className="relative z-10">Book a live demo</span>
+                  <span className="relative z-10">Записаться на демо</span>
                   <ArrowRight className="w-5 h-5 ml-2 inline" />
                   <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"></div>
                 </button>
                 <button className="flex items-center justify-center px-8 py-4 bg-white border-2 border-gray-300 rounded-lg font-medium hover:border-gray-400 transition-colors text-gray-900">
-                  Launch sandbox
+                  Запустить песочницу
                 </button>
               </div>
             </div>
@@ -120,11 +120,11 @@ export default function LandingPage() {
               <div className="relative z-10 animate-float">
                 <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl shadow-2xl p-8 text-white">
                   <div className="text-center mb-6">
-                    <h3 className="text-2xl font-bold mb-2">Dashboard Preview</h3>
-                    <p className="text-blue-200">Your command center</p>
+                    <h3 className="text-2xl font-bold mb-2">Предпросмотр дашборда</h3>
+                    <p className="text-blue-200">Ваш центр управления</p>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    {['Revenue: +34%', 'Projects: 24', 'Team: 48', 'ROI: 156%'].map((stat, i) => (
+                    {['Выручка: +34%', 'Проекты: 24', 'Команда: 48', 'ROI: 156%'].map((stat, i) => (
                       <div key={i} className="bg-white/10 backdrop-blur rounded-lg p-4">
                         <p className="text-white/80 text-sm">{stat}</p>
                       </div>
@@ -137,7 +137,7 @@ export default function LandingPage() {
                       <TrendingUp className="w-6 h-6 text-blue-600" />
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600">Revenue growth</p>
+                      <p className="text-sm text-gray-600">Рост выручки</p>
                       <p className="text-lg font-bold">+34%</p>
                     </div>
                   </div>
@@ -214,7 +214,7 @@ export default function LandingPage() {
         <div className="container mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">How it works</h2>
-            <p className="text-xl text-gray-600">Get started with Planerix in 4 simple steps</p>
+            <p className="text-xl text-gray-600">Get started with Liderix in 4 simple steps</p>
           </div>
           <div className="grid md:grid-cols-4 gap-8">
             {[
@@ -243,7 +243,7 @@ export default function LandingPage() {
         <div className="container mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Solutions for your industry</h2>
-            <p className="text-xl text-gray-600">Planerix adapts to your business specifics</p>
+            <p className="text-xl text-gray-600">Liderix adapts to your business specifics</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {industries.map((industry, index) => {
@@ -325,7 +325,7 @@ export default function LandingPage() {
         <div className="container mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">What customers say</h2>
-            <p className="text-xl text-gray-600">Success stories from teams that chose Planerix</p>
+            <p className="text-xl text-gray-600">Success stories from teams that chose Liderix</p>
           </div>
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {testimonials.map((t, index) => (
@@ -368,7 +368,7 @@ export default function LandingPage() {
         <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Frequently asked questions</h2>
-            <p className="text-xl text-gray-600">Answers to common questions about Planerix</p>
+            <p className="text-xl text-gray-600">Answers to common questions about Liderix</p>
           </div>
           <div className="space-y-6">
             {faqs.map((faq, index) => (
@@ -388,7 +388,7 @@ export default function LandingPage() {
       <section className="py-20 px-6 bg-gradient-to-br from-blue-600 to-indigo-700 text-white">
         <div className="container mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to reach the next level?</h2>
-          <p className="text-xl mb-8 text-blue-100 max-w-2xl mx-auto">Join thousands of teams managing their business more effectively with Planerix</p>
+          <p className="text-xl mb-8 text-blue-100 max-w-2xl mx-auto">Join thousands of teams managing their business more effectively with Liderix</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button className="px-8 py-4 bg-white text-blue-600 rounded-lg font-bold hover:shadow-xl transition-all duration-300 transform hover:scale-105">Get started free</button>
             <button className="px-8 py-4 border-2 border-white text-white rounded-lg font-bold hover:bg-white hover:text-blue-600 transition-all duration-300">Request a demo</button>
@@ -405,7 +405,7 @@ export default function LandingPage() {
         <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Questions?</h2>
-            <p className="text-xl text-gray-600">Our team will help you get started with Planerix</p>
+            <p className="text-xl text-gray-600">Our team will help you get started with Liderix</p>
           </div>
           <div className="grid md:grid-cols-2 gap-12">
             <div>

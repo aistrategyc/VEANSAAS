@@ -180,7 +180,7 @@ export default function FeaturesPage() {
 
   const faqs = [
     { q: 'Do features require separate add-ons?', a: 'Core modules are available on Team and Premium. Starter includes OKR and tasks. Advanced AI and audit logs are part of Premium.' },
-    { q: 'How does AI work in Planerix?', a: 'AI runs forecasts, detects anomalies, and generates contextual insights using your authorized data and role permissions.' },
+    { q: 'How does AI work in Liderix?', a: 'AI runs forecasts, detects anomalies, and generates contextual insights using your authorized data and role permissions.' },
     { q: 'Can we import historical data?', a: 'Yes. Use CSV/XLSX importers or native integrations. Our team can assist with guided migration.' },
     { q: 'Is there a sandbox?', a: 'Yes — launch a sandbox from the hero section or request a live demo for your use case.' },
   ];
@@ -364,7 +364,7 @@ export default function FeaturesPage() {
         <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4">Frequently asked questions</h2>
-            <p className="text-xl text-gray-600">Answers about Planerix features and capabilities</p>
+            <p className="text-xl text-gray-600">Answers about Liderix features and capabilities</p>
           </div>
           <div className="space-y-6">
             {faqs.map((f, index) => (

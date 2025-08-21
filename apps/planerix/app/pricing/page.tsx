@@ -279,7 +279,7 @@ export default function PricingPage() {
       <section className="py-20 px-6">
         <div className="container mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">Why teams choose Planerix</h2>
+            <h2 className="text-4xl font-bold mb-4">Why teams choose Liderix</h2>
             <p className="text-xl text-gray-600">Deliver results faster — with security and governance built-in</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
