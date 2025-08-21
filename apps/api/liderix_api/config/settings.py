@@ -46,12 +46,7 @@ class Settings(BaseSettings):
     COOKIE_SAMESITE: str = Field(default_factory=lambda: "strict" if os.getenv("ENVIRONMENT", "development") == "production" else "lax")
     
     # ── CORS ────────────────────────────────────────────────────────────────────
-    CORS_ALLOW_ORIGINS: List[str] = Field(default_factory=lambda: [
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "https://app.planerix.com",
-        "https://www.planerix.com"
-    ])
+    CORS_ALLOW_ORIGINS: str = "*"
     CORS_ALLOW_CREDENTIALS: bool = True
     # 🔒 Ограничиваем CORS методы и заголовки для безопасности
     CORS_ALLOW_METHODS: List[str] = Field(default_factory=lambda: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"])
@@ -122,12 +117,6 @@ class Settings(BaseSettings):
                 raise ValueError("В продакшене БД URL не должен содержать пароль в открытом виде")
         return v
 
-    @field_validator("CORS_ALLOW_ORIGINS", mode="before")
-    @classmethod
-    def _parse_cors_origins(cls, v):
-        if isinstance(v, str):
-            return [s.strip() for s in v.split(",") if s.strip()]
-        return v
 
 settings = Settings()
 

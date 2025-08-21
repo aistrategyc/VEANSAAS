@@ -64,7 +64,7 @@ RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
 # Копируем standalone-билд
 COPY --from=build /app/.next/standalone ./
 COPY --from=build /app/.next/static ./.next/static
-COPY --from=build /app/apps/planerix/public ./public
+COPY --from=build /app/public ./public
 
 # Права
 RUN chown -R nextjs:nodejs /app

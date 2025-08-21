@@ -12,6 +12,36 @@ import type {
 
 export class OnboardingAPI {
   /**
+   * Complete onboarding in single atomic transaction
+   */
+  static async completeOnboarding(
+    organization: OrganizationCreatePayload,
+    departments: { name: string; description?: string }[],
+    invites: InviteItem[]
+  ): Promise<any> {
+    try {
+      const payload = {
+        organization,
+        departments: departments.filter(d => d.name.trim()).map(d => ({
+          name: d.name.trim(),
+          description: d.description?.trim() || null
+        })),
+        invites: invites.filter(i => i.email.trim()).map(i => ({
+          email: i.email.trim(),
+          role: i.role,
+          department_id: i.department_id
+        }))
+      }
+      
+      const response = await api.post('/orgs/onboarding', payload)
+      return response.data
+    } catch (error: any) {
+      console.error('Complete onboarding error:', error)
+      throw error
+    }
+  }
+
+  /**
    * Создать организацию
    */
   static async createOrganization(payload: OrganizationCreatePayload): Promise<OrganizationResponse> {
@@ -50,13 +80,13 @@ export class OnboardingAPI {
     try {
       const payload = {
         memberships: invites.map(invite => ({
-          user_id: invite.email, // предполагаем, что бэкенд принимает email
+          email: invite.email,
           role: invite.role,
           department_id: invite.department_id
         }))
       }
       
-      const response = await api.post(`/orgs/${orgId}/memberships/bulk`, payload)
+      const response = await api.post(`/orgs/${orgId}/memberships/bulk-invite`, payload)
       return response.data
     } catch (error: any) {
       console.error('Bulk invite error:', error)

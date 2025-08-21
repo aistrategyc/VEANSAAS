@@ -1,5 +1,6 @@
 from __future__ import annotations
 import logging
+import secrets
 from datetime import datetime, timezone, timedelta
 from typing import Optional, List, Dict, Any
 from uuid import UUID, uuid4
@@ -20,6 +21,7 @@ from liderix_api.schemas.membership import (
     MembershipListResponse,
     MembershipStatsResponse,
     MembershipBulkCreateRequest,
+    MembershipBulkInviteRequest,
 )
 from liderix_api.services.guards import tenant_guard, TenantContext, require_perm
 from liderix_api.services.audit import AuditLogger
@@ -312,6 +314,135 @@ async def bulk_create_memberships(
         {"org_id": str(org_id), "results": results},
     )
     return results
+
+
+# ----------------- bulk invite by email -----------------
+@router.post("/bulk-invite", response_model=dict[str, Any])
+async def bulk_invite_by_email(
+    org_id: UUID,
+    data: MembershipBulkInviteRequest,
+    request: Request,
+    background: BackgroundTasks,
+    ctx: TenantContext = Depends(tenant_guard),
+    session: AsyncSession = Depends(get_async_session),
+):
+    """Bulk invite users by email - creates invitations, not direct memberships."""
+    require_perm(ctx, "member:manage")
+    await _validate_org_exists(session, org_id)
+    
+    if len(data.memberships) > 100:
+        problem(400, "urn:problem:bulk-limit", "Bulk Limit Exceeded",
+                "Cannot create more than 100 invitations at once")
+    
+    results: dict[str, Any] = {"created": [], "errors": [], "total": len(data.memberships)}
+    
+    # Import here to avoid circular imports
+    from liderix_api.models.invitations import Invitation
+    from liderix_api.services.mailer import send_invitation_email
+    from liderix_api.models.users import User
+    
+    for i, item in enumerate(data.memberships):
+        try:
+            # Check if user already exists
+            existing_user = await session.scalar(
+                select(User).where(User.email == item.email.lower())
+            )
+            
+            if existing_user:
+                # Check if already a member
+                existing_membership = await session.scalar(
+                    select(Membership).where(
+                        and_(
+                            Membership.org_id == org_id,
+                            Membership.user_id == existing_user.id,
+                            Membership.deleted_at.is_(None)
+                        )
+                    )
+                )
+                if existing_membership:
+                    results["errors"].append({
+                        "index": i, 
+                        "email": item.email, 
+                        "error": "User is already a member"
+                    })
+                    continue
+            
+            # Check for existing invitation
+            existing_invitation = await session.scalar(
+                select(Invitation).where(
+                    and_(
+                        Invitation.org_id == org_id,
+                        Invitation.email == item.email.lower(),
+                        Invitation.status == "pending"
+                    )
+                )
+            )
+            
+            if existing_invitation:
+                results["errors"].append({
+                    "index": i,
+                    "email": item.email,
+                    "error": "Invitation already pending"
+                })
+                continue
+            
+            # Create invitation
+            invitation = Invitation(
+                id=uuid4(),
+                org_id=org_id,
+                email=item.email.lower(),
+                role=item.role or "member",
+                department_id=item.department_id,
+                invited_by_id=ctx.user_id,
+                token=secrets.token_urlsafe(32),
+                expires_at=now_utc() + timedelta(days=7),
+                status="pending",
+                created_at=now_utc(),
+                updated_at=now_utc(),
+            )
+            
+            session.add(invitation)
+            
+            # Send invitation email in background
+            background.add_task(
+                send_invitation_email,
+                item.email,
+                invitation.token,
+                org_id
+            )
+            
+            results["created"].append({
+                "invitation_id": str(invitation.id),
+                "email": item.email,
+                "role": item.role or "member"
+            })
+            
+        except Exception as e:
+            logger.error(f"Failed to create invitation for {item.email}: {e}")
+            results["errors"].append({
+                "index": i,
+                "email": item.email,
+                "error": str(e)
+            })
+    
+    try:
+        await session.commit()
+    except IntegrityError as e:
+        await session.rollback()
+        logger.error(f"Bulk invitation creation failed: {e}")
+        problem(409, "urn:problem:bulk-integrity-error", "Bulk Operation Failed",
+                "Failed to create invitations due to data constraint violations")
+    
+    await AuditLogger.log_event(
+        session, ctx.user_id, "invitation.bulk_create", True,
+        request.client.host if request.client else "unknown",
+        request.headers.get("user-agent", "unknown"),
+        {"org_id": str(org_id), "results": results},
+    )
+    
+    return results
+
+
 # ----------------- update -----------------
 @router.patch("/{membership_id}", response_model=MembershipRead)
 async def update_membership(

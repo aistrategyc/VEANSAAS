@@ -174,6 +174,25 @@ class MembershipBulkCreateRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
+class MembershipBulkInviteItem(BaseModel):
+    """Элемент для пакетного приглашения по email."""
+    email: EmailStr
+    role: Optional[Role] = "member"
+    department_id: Optional[UUID] = None
+    title: Optional[str] = Field(default=None, max_length=120)
+
+    @field_validator("title")
+    @classmethod
+    def _title_strip(cls, v: Optional[str]) -> Optional[str]:
+        return v.strip() if isinstance(v, str) else v
+
+
+class MembershipBulkInviteRequest(BaseModel):
+    memberships: List[MembershipBulkInviteItem] = Field(..., min_items=1, max_items=100)
+
+    model_config = ConfigDict(extra="forbid")
+
+
 class MembershipStatsResponse(BaseModel):
     total_members: int
     role_distribution: Dict[str, int] = Field(default_factory=dict)
@@ -197,6 +216,8 @@ __all__ = [
     "MembershipListQuery",
     "MembershipInviteRequest",
     "MembershipBulkCreateItem",
+    "MembershipBulkInviteItem",
+    "MembershipBulkInviteRequest",
     "MembershipBulkCreateRequest",
     "MembershipStatsResponse",
 ]

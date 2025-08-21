@@ -8,7 +8,7 @@ class RegisterSchema(BaseModel):
     username: str = Field(..., min_length=3, max_length=50, description="Username (3-50 characters)")
     email: EmailStr = Field(..., description="Valid email address")
     password: str = Field(..., min_length=8, max_length=128, description="Password (8-128 characters)")
-    client_id: Optional[str] = Field(None, description="Client ID for tracking registration source")
+    client_id: Optional[UUID] = Field(None, description="Client ID for tracking registration source")
     terms_accepted: bool = Field(..., description="User must accept terms of service")
     
     @validator('username')

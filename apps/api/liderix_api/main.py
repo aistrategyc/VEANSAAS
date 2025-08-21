@@ -23,19 +23,41 @@ app = FastAPI(
     version=settings.PROJECT_VERSION,
     docs_url="/docs",
     redoc_url="/redoc",
+    openapi_url="/api/openapi.json",
 )
 
 # -----------------------------------------------------------------------------
-# CORS — strict, production-ready
+# CORS — production-ready with environment configuration
 # -----------------------------------------------------------------------------
-ALLOWED_ORIGINS = [
+# Default localhost origins for development
+DEFAULT_ORIGINS = [
     "http://localhost:3000",
-    "http://localhost:3001",
+    "http://localhost:3001", 
     "http://localhost:3002",
     "http://127.0.0.1:3000",
     "http://127.0.0.1:3001",
     "http://127.0.0.1:3002",
 ]
+
+# Use environment CORS_ALLOW_ORIGINS if available, otherwise fallback to defaults
+ALLOWED_ORIGINS = getattr(settings, 'CORS_ALLOW_ORIGINS', DEFAULT_ORIGINS)
+
+# If CORS_ALLOW_ORIGINS is a string, parse it appropriately
+if isinstance(ALLOWED_ORIGINS, str):
+    if ALLOWED_ORIGINS.strip() == "*":
+        ALLOWED_ORIGINS = ["*"]
+    else:
+        try:
+            import json
+            ALLOWED_ORIGINS = json.loads(ALLOWED_ORIGINS)
+        except (json.JSONDecodeError, TypeError):
+            # Try comma-separated format
+            ALLOWED_ORIGINS = [s.strip() for s in ALLOWED_ORIGINS.split(",") if s.strip()]
+            if not ALLOWED_ORIGINS:
+                logger.warning(f"Failed to parse CORS_ALLOW_ORIGINS: {ALLOWED_ORIGINS}, using defaults")
+                ALLOWED_ORIGINS = DEFAULT_ORIGINS
+
+logger.info(f"CORS allowed origins: {ALLOWED_ORIGINS}")
 
 app.add_middleware(
     CORSMiddleware,
@@ -431,20 +453,12 @@ async def get_me(request: Request):
             "last_login_at": str(getattr(current_user, "last_login_at", "")) if getattr(current_user, "last_login_at", None) else None,
         }
     except Exception as e:
-        logger.warning(f"Auth failed for /users/me, returning test user: {e}")
-        # Возвращаем тестового пользователя для разработки
-        return {
-            "id": "test-dev-user",
-            "email": "dev@test.com",
-            "username": "devuser",
-            "full_name": "Development User",
-            "is_active": True,
-            "is_verified": True,
-            "avatar_url": None,
-            "created_at": "2024-01-01T00:00:00Z",
-            "updated_at": None,
-            "last_login_at": None,
-        }
+        logger.warning(f"Auth failed for /users/me: {e}")
+        raise HTTPException(
+            status_code=401, 
+            detail="Authentication failed",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
 
 # -----------------------------------------------------------------------------
 # Клиентские роутеры с правильными зависимостями

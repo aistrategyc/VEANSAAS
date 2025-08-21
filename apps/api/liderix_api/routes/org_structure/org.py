@@ -7,7 +7,10 @@ from sqlalchemy import select, update, func, and_
 from sqlalchemy.exc import IntegrityError
 from liderix_api.db import get_async_session
 from liderix_api.models.organization import Organization
-from liderix_api.schemas.organization import OrganizationCreate, OrganizationUpdate, OrganizationRead
+from liderix_api.schemas.organization import (
+    OrganizationCreate, OrganizationUpdate, OrganizationRead,
+    OrganizationOnboardingRequest, OrganizationOnboardingResponse
+)
 from liderix_api.services.guards import tenant_guard, TenantContext, require_perm
 from liderix_api.services.auth import get_current_user
 from liderix_api.models.users import User
@@ -474,3 +477,209 @@ async def generate_slug_for_name(
             break
     
     return {"name": name, "suggested_slug": slug, "available": True}
+
+
+@router.post("/onboarding", response_model=OrganizationOnboardingResponse, status_code=status.HTTP_201_CREATED)
+async def complete_onboarding(
+    data: OrganizationOnboardingRequest,
+    request: Request,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_async_session),
+):
+    """
+    Complete onboarding in a single atomic transaction:
+    - Create organization
+    - Create departments 
+    - Send invitations
+    """
+    from liderix_api.models import Department
+    from liderix_api.models.invitations import Invitation
+    from liderix_api.services.mailer import send_invitation_email
+    from fastapi import BackgroundTasks
+    import secrets
+    
+    # Convert nested objects to dict for JSONB fields
+    address_dict = _convert_address_to_dict(data.organization.address)
+    preferences_dict = _convert_preferences_to_dict(data.organization.preferences)
+    
+    errors = []
+    departments_created = []
+    invites_sent = []
+    
+    async with session.begin():
+        try:
+            # 1. Create organization with bootstrap
+            org, owner_m, default_deps = await bootstrap_org(
+                session,
+                owner_user_id=current_user.id,
+                name=data.organization.name,
+                slug=data.organization.slug,
+                description=data.organization.description,
+                industry=data.organization.industry,
+                size=data.organization.size,
+                address=address_dict,
+                preferences=preferences_dict,
+                custom_fields=data.organization.custom_fields,
+                create_defaults=True,
+                default_department_names=None,
+                enforce_unique_slug=True,
+            )
+            
+            # 2. Create additional departments
+            for dept_data in data.departments or []:
+                try:
+                    department = Department(
+                        id=uuid4(),
+                        org_id=org.id,
+                        name=dept_data.name.strip(),
+                        description=dept_data.description.strip() if dept_data.description else None,
+                        created_at=datetime.now(timezone.utc),
+                        updated_at=datetime.now(timezone.utc),
+                    )
+                    session.add(department)
+                    departments_created.append({
+                        "id": str(department.id),
+                        "name": department.name,
+                        "description": department.description
+                    })
+                except Exception as e:
+                    errors.append({
+                        "type": "department_creation",
+                        "data": dept_data.model_dump(),
+                        "error": str(e)
+                    })
+            
+            # 3. Create invitations
+            for invite_data in data.invites or []:
+                try:
+                    # Check if user already exists
+                    from liderix_api.models.users import User as UserModel
+                    existing_user = await session.scalar(
+                        select(UserModel).where(UserModel.email == invite_data.email.lower())
+                    )
+                    
+                    if existing_user:
+                        # Check if already a member
+                        existing_membership = await session.scalar(
+                            select(Membership).where(
+                                and_(
+                                    Membership.org_id == org.id,
+                                    Membership.user_id == existing_user.id,
+                                    Membership.deleted_at.is_(None)
+                                )
+                            )
+                        )
+                        if existing_membership:
+                            errors.append({
+                                "type": "invitation_creation",
+                                "data": invite_data.model_dump(),
+                                "error": "User is already a member"
+                            })
+                            continue
+                    
+                    # Check for existing invitation
+                    existing_invitation = await session.scalar(
+                        select(Invitation).where(
+                            and_(
+                                Invitation.org_id == org.id,
+                                Invitation.email == invite_data.email.lower(),
+                                Invitation.status == "pending"
+                            )
+                        )
+                    )
+                    
+                    if existing_invitation:
+                        errors.append({
+                            "type": "invitation_creation",
+                            "data": invite_data.model_dump(),
+                            "error": "Invitation already pending"
+                        })
+                        continue
+                    
+                    # Create invitation
+                    invitation = Invitation(
+                        id=uuid4(),
+                        org_id=org.id,
+                        email=invite_data.email.lower(),
+                        role=invite_data.role or "member",
+                        department_id=invite_data.department_id,
+                        invited_by_id=current_user.id,
+                        token=secrets.token_urlsafe(32),
+                        expires_at=datetime.now(timezone.utc) + timedelta(days=7),
+                        status="pending",
+                        created_at=datetime.now(timezone.utc),
+                        updated_at=datetime.now(timezone.utc),
+                    )
+                    
+                    session.add(invitation)
+                    invites_sent.append({
+                        "invitation_id": str(invitation.id),
+                        "email": invite_data.email,
+                        "role": invite_data.role or "member"
+                    })
+                    
+                    # Note: Email sending will be done after commit
+                    
+                except Exception as e:
+                    logger.error(f"Failed to create invitation for {invite_data.email}: {e}")
+                    errors.append({
+                        "type": "invitation_creation",
+                        "data": invite_data.model_dump(),
+                        "error": str(e)
+                    })
+            
+            # If we get here, transaction will be committed automatically
+            
+        except IntegrityError as e:
+            logger.error(f"Failed to complete onboarding (integrity): {e}", exc_info=True)
+            raise HTTPException(
+                status_code=409,
+                detail={
+                    "type": "urn:problem:onboarding-integrity-error",
+                    "title": "Onboarding Data Integrity Error",
+                    "detail": "Failed to complete onboarding due to data constraint violation",
+                    "status": 409,
+                },
+            )
+        except Exception as e:
+            logger.error(f"Failed to complete onboarding: {e}", exc_info=True)
+            raise HTTPException(
+                status_code=500,
+                detail={
+                    "type": "urn:problem:onboarding-failed",
+                    "title": "Onboarding Failed",
+                    "detail": "Unexpected error while completing onboarding",
+                    "status": 500,
+                },
+            )
+    
+    # Send invitation emails in background after successful commit
+    # TODO: Implement background task sending
+    
+    # Log successful onboarding
+    await AuditLogger.log_event(
+        session,
+        current_user.id,
+        "org.onboarding_complete",
+        True,
+        request.client.host if request.client else "unknown",
+        request.headers.get("user-agent", "unknown"),
+        {
+            "org_id": str(org.id),
+            "departments_count": len(departments_created),
+            "invites_count": len(invites_sent),
+            "errors_count": len(errors),
+        },
+    )
+    
+    logger.info(
+        f"Completed onboarding for user {current_user.id}: org={org.id}, "
+        f"departments={len(departments_created)}, invites={len(invites_sent)}, errors={len(errors)}"
+    )
+    
+    return OrganizationOnboardingResponse(
+        organization=org,
+        departments_created=departments_created,
+        invites_sent=invites_sent,
+        errors=errors
+    )

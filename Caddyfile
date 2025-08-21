@@ -1,26 +1,10 @@
 # 🌐 Caddy Configuration for Production
 # Автоматические SSL сертификаты от Let's Encrypt
 
-# Main application - Web Enterprise
+# Landing page - главная страница
 planerix.com, www.planerix.com {
-    # API routes
-    handle /api/* {
-        reverse_proxy api:8001
-    }
+    reverse_proxy planerix-landing:3000
     
-    # Static files and frontend
-    handle {
-        reverse_proxy web:3000
-    }
-
-    # Logging
-    log {
-        output file /var/log/caddy/planerix.access.log {
-            roll_size 100mb
-            roll_keep 5
-        }
-    }
-
     # Security headers
     header {
         X-Frame-Options DENY
@@ -29,20 +13,39 @@ planerix.com, www.planerix.com {
         Strict-Transport-Security "max-age=31536000; includeSubDomains"
         -Server
     }
-
-    # Rate limiting
-    rate_limit {
-        zone dynamic {
-            key {remote_host}
-            events 100
-            window 1m
+    
+    # Logging
+    log {
+        output file /var/log/caddy/planerix.access.log {
+            roll_size 100mb
+            roll_keep 5
         }
     }
 }
 
-# Landing page (если нужен отдельный поддомен)
-landing.planerix.com {
-    reverse_proxy landing:3000
+# Web Enterprise Application
+app.planerix.com {
+    reverse_proxy liderix-web:3000
+    
+    header {
+        X-Frame-Options DENY
+        X-Content-Type-Options nosniff
+        X-XSS-Protection "1; mode=block"
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        -Server
+    }
+    
+    log {
+        output file /var/log/caddy/app.access.log {
+            roll_size 50mb
+            roll_keep 3
+        }
+    }
+}
+
+# API subdomain
+api.planerix.com {
+    reverse_proxy liderix-api:8001
     
     header {
         X-Frame-Options DENY
@@ -51,21 +54,10 @@ landing.planerix.com {
     }
     
     log {
-        output file /var/log/caddy/landing.access.log {
+        output file /var/log/caddy/api.access.log {
             roll_size 50mb
             roll_keep 3
         }
-    }
-}
-
-# API subdomain (опционально, для прямого доступа к API)
-api.planerix.com {
-    reverse_proxy api:8001
-    
-    header {
-        X-Frame-Options DENY
-        X-Content-Type-Options nosniff
-        -Server
     }
 }
 

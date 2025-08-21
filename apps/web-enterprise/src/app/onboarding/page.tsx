@@ -195,37 +195,76 @@ export default function OnboardingPage() {
 
     setFinishing(true)
     try {
-      const id = await handleCreateOrgIfNeeded()
+      // Подготовка данных для атомарного onboarding
+      const cleanCompanyData = {
+        name: company.name.trim(),
+        slug: generateSlug(company.name.trim()),
+        description: company.description?.trim() || undefined,
+        industry: company.industry || undefined,
+        size: company.size || 'small',
+        address: company.address && Object.values(company.address).some(v => v?.trim()) 
+          ? company.address 
+          : undefined,
+        preferences: company.preferences || undefined,
+        custom_fields: company.custom_fields || undefined
+      }
 
       // департаменты — только валидные
       const validDepartments = departments.filter(d => 
         d.name.trim().length >= 2 && d.name.trim().length <= 120
       )
-      
-      const deptPromises = validDepartments.map(d =>
-        OnboardingAPI.createDepartment(id, {
-          name: d.name.trim(),
-          description: d.description?.trim() || undefined,
-        })
-      )
-      await Promise.all(deptPromises)
 
       // инвайты — только валидные email
       const validInvites = invites.filter(i => 
         i.email.trim() && validateEmail(i.email.trim())
       )
-      
-      if (validInvites.length > 0) {
-        await OnboardingAPI.bulkInvite(id, validInvites.map(i => ({
-          ...i,
-          email: i.email.trim()
-        })))
+
+      // Выполняем весь onboarding в одной транзакции
+      const result = await OnboardingAPI.completeOnboarding(
+        cleanCompanyData,
+        validDepartments,
+        validInvites
+      )
+
+      console.log('Onboarding completed:', result)
+
+      if (result.errors && result.errors.length > 0) {
+        console.warn('Onboarding completed with some errors:', result.errors)
+        toast({ 
+          title: 'Готово с предупреждениями', 
+          description: `Профиль создан, но ${result.errors.length} операций не удались`,
+          variant: 'default'
+        })
+      } else {
+        toast({ title: 'Готово', description: 'Профиль компании создан успешно' })
       }
 
-      toast({ title: 'Готово', description: 'Профиль компании создан успешно' })
       router.replace('/dashboard')
-    } catch (error) {
+    } catch (error: any) {
       console.error('Onboarding completion error:', error)
+      
+      let errorMessage = 'Не удалось завершить настройку'
+      
+      if (error?.response?.data) {
+        const errorData = error.response.data
+        
+        if (Array.isArray(errorData.detail)) {
+          const validationErrors = errorData.detail
+            .map((err: any) => `${err.loc?.join('.')}: ${err.msg}`)
+            .join(', ')
+          errorMessage = `Ошибки валидации: ${validationErrors}`
+        }
+        else if (errorData.detail) {
+          errorMessage = typeof errorData.detail === 'string' 
+            ? errorData.detail 
+            : errorData.detail.title || errorData.detail.detail || errorMessage
+        }
+      }
+      else if (error?.message) {
+        errorMessage = error.message
+      }
+      
+      toast({ title: 'Ошибка', description: errorMessage, variant: 'destructive' })
     } finally {
       setFinishing(false)
     }

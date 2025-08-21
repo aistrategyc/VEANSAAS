@@ -1,6 +1,6 @@
 # apps/api/liderix_api/schemas/organization.py
 from __future__ import annotations
-from pydantic import BaseModel, Field, ConfigDict, field_validator
+from pydantic import BaseModel, Field, ConfigDict, field_validator, EmailStr
 from typing import Optional, Dict, Any, List, Literal, Generic, TypeVar
 from uuid import UUID
 from datetime import datetime
@@ -338,5 +338,47 @@ class OrganizationSearchResult(BaseModel):
     score: float
     highlights: List[SearchHighlight] = []
     data: OrganizationRead
+
+    model_config = ConfigDict(extra="forbid")
+
+
+# --------------------------------------
+# Onboarding Schemas
+# --------------------------------------
+class OnboardingDepartment(BaseModel):
+    name: str = Field(min_length=2, max_length=120)
+    description: Optional[str] = Field(default=None, max_length=500)
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+
+class OnboardingInvite(BaseModel):
+    email: EmailStr
+    role: Optional[str] = "member"
+    department_id: Optional[UUID] = None
+
+    model_config = ConfigDict(extra="forbid")
+
+
+class OrganizationOnboardingRequest(BaseModel):
+    """Complete onboarding request with organization, departments, and invites."""
+    # Organization data
+    organization: OrganizationCreate
+    
+    # Optional initial departments
+    departments: Optional[List[OnboardingDepartment]] = Field(default_factory=list)
+    
+    # Optional initial invites
+    invites: Optional[List[OnboardingInvite]] = Field(default_factory=list)
+
+    model_config = ConfigDict(extra="forbid")
+
+
+class OrganizationOnboardingResponse(BaseModel):
+    """Response for complete onboarding."""
+    organization: OrganizationRead
+    departments_created: List[Dict[str, Any]] = Field(default_factory=list)
+    invites_sent: List[Dict[str, Any]] = Field(default_factory=list)
+    errors: List[Dict[str, Any]] = Field(default_factory=list)
 
     model_config = ConfigDict(extra="forbid")
