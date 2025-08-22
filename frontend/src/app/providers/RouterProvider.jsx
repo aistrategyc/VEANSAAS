@@ -1,13 +1,16 @@
 import React from 'react'
 import { Route, Routes } from 'react-router'
 import { App } from '../../pages/App'
-import { Auth } from '../../pages/Auth'
+import { LoginPage } from '../../pages/Login/LoginPage'
+import { RegisterPage } from '../../pages/singUp/RegisterPage'
+import { HomePage } from '../../pages/home/HomePage'
 
 export const RouterProvider = () => {
 	return (
 		<Routes>
-			<Route path='/' element={<App />} />
-			<Route path='/auth' element={<Auth />} />
+			<Route exact path='/' element={<HomePage />} />
+			<Route path='/login' element={<LoginPage />} />
+			<Route path='/register' element={<RegisterPage />} />
 		</Routes>
 	)
 }
