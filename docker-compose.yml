@@ -6,7 +6,7 @@ services:
     env_file:
       - .env.postgres
     ports:
-      - "5432:5432"
+      - "5433:5432"  # Используем порт 5433 для избежания конфликтов
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -21,7 +21,7 @@ services:
     restart: unless-stopped
     command: ["redis-server","--save","","--appendonly","no"]
     ports:
-      - "6379:6379"
+      - "6380:6379"  # Используем порт 6380 для избежания конфликтов
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG || exit 1"]
       interval: 5s
@@ -29,7 +29,7 @@ services:
       retries: 10
 
   backend:
-    container_name: api-backend
+    container_name: veancrm-api
     build:
       context: ./apps/api
       dockerfile: Dockerfile
@@ -45,7 +45,7 @@ services:
       redis:
         condition: service_healthy
     ports:
-      - "8001:8001"
+      - "8002:8001"  # API на внешнем порту 8002
     stdin_open: true
     tty: true
     healthcheck:
@@ -65,52 +65,26 @@ services:
       retries: 12
       start_period: 20s
   frontend:
-    container_name: web-enterprise
+    container_name: veancrm-web
     build:
-      context: ./apps/web-enterprise
+      context: ./apps/web-crm
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_AI_AGENT_WEBHOOK_URL: ${NEXT_PUBLIC_AI_AGENT_WEBHOOK_URL}
     restart: unless-stopped
     env_file:
-      - ./apps/web-enterprise/.env.local
+      - ./apps/web-crm/.env.local
     depends_on:
       backend:
         condition: service_healthy
     ports:
-      - "3002:3000"          # web-enterprise на :3002
+      - "3001:3000"          # Frontend на внешнем порту 3001
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:3000 >/dev/null 2>&1 || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 10
 
-  landing:
-    container_name: planerix-landing
-    build:
-      context: ./apps/planerix
-      dockerfile: Dockerfile
-      args:
-        RESEND_API_KEY: ${RESEND_API_KEY}
-        RESEND_FROM: ${RESEND_FROM}
-        CONTACT_TO: ${CONTACT_TO}
-    restart: unless-stopped
-    env_file:
-      - ./apps/planerix/.env.local   # можешь убрать, если всё есть в корневом .env
-    environment:
-      - RESEND_API_KEY=${RESEND_API_KEY}
-      - RESEND_FROM=${RESEND_FROM}
-      - CONTACT_TO=${CONTACT_TO}
-    depends_on:
-      backend:
-        condition: service_healthy
-    ports:
-      - "3001:3000"
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:3000 >/dev/null 2>&1 || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
 
 volumes:
   postgres_data:

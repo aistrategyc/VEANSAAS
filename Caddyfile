@@ -1,9 +1,9 @@
 # 🌐 Caddy Configuration for Production
 # Автоматические SSL сертификаты от Let's Encrypt
 
-# Landing page - главная страница  
-liderix.ru, www.liderix.ru {
-    reverse_proxy planerix-landing:3000
+# Main domain redirects to app subdomain
+veancrm.com, www.veancrm.com {
+    redir https://app.veancrm.com{uri} permanent
     
     # Security headers
     header {
@@ -13,19 +13,11 @@ liderix.ru, www.liderix.ru {
         Strict-Transport-Security "max-age=31536000; includeSubDomains"
         -Server
     }
-    
-    # Logging
-    log {
-        output file /var/log/caddy/liderix.access.log {
-            roll_size 100mb
-            roll_keep 5
-        }
-    }
 }
 
-# Web Enterprise Application
-app.liderix.ru {
-    reverse_proxy liderix-web:3000
+# Web CRM Application
+app.veancrm.com {
+    reverse_proxy veancrm-web:3000
     
     header {
         X-Frame-Options DENY
@@ -44,8 +36,8 @@ app.liderix.ru {
 }
 
 # API subdomain
-api.liderix.ru {
-    reverse_proxy liderix-api:8001
+api.veancrm.com {
+    reverse_proxy veancrm-api:8001
     
     header {
         X-Frame-Options DENY

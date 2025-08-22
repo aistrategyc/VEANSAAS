@@ -1,0 +1,513 @@
+супер — уходим в глубину. Ниже — «боевое» ТЗ роутов FastAPI с полями, связями, побочными эффектами, последовательностями вызовов между сервисами и правилами доступа. Это можно класть прямо в OpenAPI-спеки/роутеры.
+
+⸻
+
+Техническое ТЗ по роутам (FastAPI) для SaaS CRM студий (тату/пирсинг/барбер/бьюти)
+
+0) Общие договорённости
+	•	Базовый префикс API: /api
+	•	Версионирование: /api/v1/*
+	•	Аутентификация: JWT Access + httpOnly Refresh cookie. Authorization: Bearer <token>.
+	•	Идемпотентность на write-методах: заголовок Idempotency-Key.
+	•	Пагинация: ?page=1&limit=50 (max limit=200). Метаданные в заголовках X-Total-Count, X-Page, X-Limit.
+	•	Сортировка: ?sort=created_at:desc,name:asc.
+	•	Фильтрация: плоские query-параметры + ?q= (full-text).
+	•	Часовые пояса: ISO 8601 + поле tz на уровне студии и пользователя.
+	•	Все даты/время — UTC в БД; отдаём со смещением для фронта по tz.
+	•	Роли: Owner, MasterOwner, Manager, Administrator (Receptionist), Master (Employee).
+	•	Ресурсная модель доступа: Owner → многие Organization; Organization → многие Studio; сотрудники и данные привязаны к Studio/Organization.
+	•	Аудит: любой POST/PUT/PATCH/DELETE журналируется в EventLog.
+
+⸻
+
+1) Auth & Sessions
+
+POST /v1/auth/register
+	•	Purpose: первичная регистрация (выбор роли Owner или MasterOwner).
+	•	Body: { email, password, role, invite_token? }
+	•	Side-effects:
+	•	если role=Owner → создаётся Organization (пустая) и базовая Studio по визарду (опционально).
+	•	если role=MasterOwner → создаётся Organization(type=single_studio) и одна Studio с владельцем = пользователь.
+	•	Returns: { access_token, user, organization?, studio? }
+	•	Calls: users.create, organizations.create, studios.create, event_logs.create.
+
+POST /v1/auth/login
+	•	Body: { email, password }
+	•	Returns: { access_token, user } + Set-Cookie refresh
+	•	Calls: none (кроме аудита).
+
+POST /v1/auth/refresh
+	•	Cookie: refresh
+	•	Returns: { access_token }
+	•	Errors: 401 если refresh невалиден/просрочен.
+
+POST /v1/auth/logout
+	•	Clears refresh cookie.
+	•	Returns: 204.
+
+⸻
+
+2) Users & Profiles
+
+GET /v1/users/me
+	•	Returns: { user, roles, organizations, studios, permissions }
+
+PUT /v1/users/me
+	•	Body: { first_name?, last_name?, phone?, tz?, preferred_language?, avatar_url? }
+
+GET /v1/users
+	•	Filters: ?org_id=&studio_id=&role=&q=&is_active=
+	•	Access:
+	•	Owner/Manager внутри своей орг.
+	•	MasterOwner — свои сотрудники (если есть).
+
+POST /v1/users/invite
+	•	Invite сотрудника/админа/мастера.
+	•	Body: { email, role, studio_id, note? }
+	•	Side-effects: письмо-приглашение; создаёт Employee (pending).
+	•	Calls: Email/SMS provider, employees.create.
+
+POST /v1/users/invite/accept
+	•	Body: { token, password, phone? }
+	•	Side-effects: активирует user и employee.
+
+⸻
+
+3) Organizations & Studios
+
+POST /v1/organizations
+	•	Only Owner. Body: { name, description?, type? }
+
+GET /v1/organizations/:id
+	•	Includes: studios summary, staff counts, settings.
+
+PUT /v1/organizations/:id/settings
+	•	Body: { currency, default_tz, taxation_schema, invoice_series_prefix, cancellation_policies, booking_policies }
+
+POST /v1/studios
+	•	Body: { org_id, name, address, city, country, tz, phone, email, working_hours (JSON: by weekday), manager_id? }
+	•	Side-effects: создаёт кассовую смену по умолчанию (опц.), ценообразование по умолчанию.
+
+GET /v1/studios
+	•	Filters: ?org_id=&city=&q=
+
+PUT /v1/studios/:id
+	•	Обновляет контакты, расписание, политика записей.
+
+⸻
+
+4) Employees (Masters, Admins, etc.)
+
+POST /v1/employees
+	•	Body: { user_id, studio_id, role_in_studio, hire_date?, salary_scheme }
+	•	salary_scheme пример:
+
+{
+  "type": "mixed",
+  "fixed": 3000,
+  "percent_from_services": 40,
+  "min_guarantee": 2500,
+  "tips_policy": "keep_master",
+  "split_rules": [
+    {"service_category": "tattoo", "percent": 45},
+    {"service_category": "piercing", "percent": 35}
+  ]
+}
+
+
+
+GET /v1/employees
+	•	Filters: ?studio_id=&role=&active=
+
+PUT /v1/employees/:id
+	•	Обновляет роль, график, зарплатные правила.
+
+GET /v1/employees/:id/availability
+	•	Query: ?from=2025-08-22T00:00:00Z&to=...
+	•	Возвращает слоты с учётом расписания, исключений, занятости.
+
+⸻
+
+5) Services & Pricing
+
+POST /v1/services
+	•	Body: { name, description, duration_minutes, base_price, category, is_active, studio_ids? }
+	•	Side-effects: связь М-М со студиями.
+
+GET /v1/services
+	•	Filters: ?studio_id=&category=&active=
+
+PUT /v1/services/:id
+	•	Обновляет параметры и публикации в студиях.
+
+POST /v1/services/:id/pricing-rules
+	•	Расширенное ценообразование:
+	•	Body:
+
+{
+  "studio_id": "uuid",
+  "effective_from": "2025-09-01",
+  "rules": [
+    {"days": ["Fri","Sat"], "time_range":"12:00-20:00", "price": 350},
+    {"tag":"senior_master", "modifier_percent": +15},
+    {"tag":"junior_master", "modifier_percent": -10}
+  ]
+}
+
+
+	•	Используется при расчёте цены записи.
+
+⸻
+
+6) Schedule & Availability
+
+POST /v1/schedule/blocks
+	•	Блокировки времени (отпуск, перерыв, обучение).
+	•	Body: { employee_id, studio_id, start, end, reason, type }
+
+GET /v1/schedule/blocks
+	•	Filters: ?employee_id=&studio_id=&from=&to=
+
+⸻
+
+7) Clients & Leads
+
+POST /v1/clients
+	•	Body: { full_name, phone, email?, birthday?, gender?, tags?, notes? }
+	•	Dedup: по телефону/email; merge-логика (опционально force=true).
+
+GET /v1/clients
+	•	Filters: ?studio_id=&q=&tag=&birthday_from=&birthday_to=
+
+PUT /v1/clients/:id
+	•	Обновляет профайл, дисконт, лояльность.
+
+POST /v1/leads
+	•	Body: { source, utm?, responsible_id?, client_id?, note? }
+
+GET /v1/leads
+	•	Filters: ?status=&responsible_id=&from=&to=&q=
+
+PUT /v1/leads/:id/status
+	•	Body: { status, reason? } (new→contacted→booked/won/lost).
+	•	Side-effects: при booked/won — создаётся Appointment черновик или полноценная.
+
+⸻
+
+8) Agreements & Files
+
+POST /v1/agreements/templates
+	•	Тексты шаблонов согласий/анкет per org/studio.
+
+GET /v1/agreements/templates
+	•	Filters: ?studio_id=&type=tattoo_consent
+
+POST /v1/agreements/sign
+	•	Электронное согласие клиента.
+	•	Body: { client_id, template_id, appointment_id?, method:'pad|sms|email', payload }
+	•	Side-effects: PDF-рендер, подпись, сохранение в file_assets.
+
+GET /v1/agreements?client_id=
+	•	Список подписанных согласий.
+
+⸻
+
+9) Appointments (записи)
+
+POST /v1/appointments
+	•	Body (минимум):
+
+{
+  "client_id": "uuid",
+  "studio_id": "uuid",
+  "service_id": "uuid",
+  "master_id": "uuid",
+  "start_time": "2025-08-25T12:00:00Z",
+  "notes": "скетч от клиента",
+  "discount_percent": 0,
+  "deposit": {"amount": 50, "method":"card"}
+}
+
+
+	•	Внутренние шаги:
+	1.	проверка доступности слота employees/:id/availability;
+	2.	расчёт цены pricing-rules + скидки + промокоды/лояльность;
+	3.	создание Appointment(status='scheduled');
+	4.	при депозите — создание Transaction(income, deposit) со связью;
+	5.	уведомления клиенту/мастеру; календарные webhooks (опц).
+
+GET /v1/appointments
+	•	Фильтры: ?studio_id=&master_id=&client_id=&status=&from=&to=
+
+GET /v1/appointments/:id
+	•	Включает: фин.операции, историю статусов, прикреплённые файлы, согласия.
+
+PATCH /v1/appointments/:id/status
+	•	Body: { status, reason? } (scheduled↔rescheduled, completed, canceled, no_show).
+	•	Side-effects:
+	•	canceled → политика удержания депозита (частично/полностью).
+	•	completed → возможность закрыть чек/пробить оплату; триггер расчёта зарплаты.
+
+POST /v1/appointments/:id/add-service
+	•	Добавление доп.услуг (апселл).
+	•	Body: { service_id, price_override?, duration_override? }
+	•	Side-effects: пролонгация слота, перерасчёт.
+
+⸻
+
+10) Payments, Transactions, Invoices
+
+POST /v1/transactions
+	•	Body:
+
+{
+  "studio_id":"uuid",
+  "type":"income|expense",
+  "category":"service_payment|materials|rent|marketing|salary|deposit|refund",
+  "amount": 200,
+  "currency":"PLN",
+  "payment_method":"cash|card|transfer|pos|online",
+  "appointment_id":"uuid?",
+  "note":""
+}
+
+
+
+GET /v1/transactions
+	•	Фильтры: ?studio_id=&type=&category=&from=&to=&payment_method=
+
+POST /v1/invoices
+	•	Выставление счета клиенту/юр.лицу.
+	•	Body: { client_id, appointment_id?, items:[{title, qty, price}], tax_rate, series?, issue_date?, due_date? }
+	•	Side-effects: PDF, нумерация, отправка клиенту.
+
+POST /v1/payments/capture
+	•	Проведение оплаты по счету/записи.
+	•	Body: { invoice_id?, appointment_id?, amount, method }
+	•	Side-effects: Transaction(income), закрытие invoice, обновление статуса appointment (если требуется).
+
+POST /v1/refunds
+	•	Возвраты (частичные/полные).
+	•	Body: { transaction_id, amount, reason }
+	•	Side-effects: Transaction(expense, category=refund).
+
+⸻
+
+11) Payroll (Зарплаты, проценты, чаевые)
+
+POST /v1/payroll/rules
+	•	Задание схем расчёта на уровне studio/employee.
+	•	Body: { scope: "studio|employee", scope_id, rules:{...} } (см. salary_scheme выше).
+
+POST /v1/payroll/calculate
+	•	Расчёт за период.
+	•	Body: { studio_id?, employee_id?, period_from, period_to, include_tips?:true }
+	•	Returns: { items:[{employee_id, base, percent_part, tips, bonuses, deductions, total}], meta }
+
+POST /v1/payroll/close
+	•	Фиксация и выплата.
+	•	Body: { payroll_id, pay_date, method, note? }
+	•	Side-effects: Transaction(expense, category=salary).
+
+GET /v1/payroll/:id
+	•	Детализация по сотруднику/студии.
+
+⸻
+
+12) Loyalty & Discounts & Promos
+
+POST /v1/loyalty/programs
+	•	Body: { studio_id, rules:{point_rate, earn_on, redeem_rate, caps...} }
+
+POST /v1/loyalty/adjust
+	•	Ручная корректировка баллов.
+	•	Body: { client_id, delta, reason }
+
+POST /v1/promocodes
+	•	Создание промокода: { code, discount_percent|amount, valid_from, valid_to, usage_limit, service_ids?, client_ids? }
+
+POST /v1/discounts/policies
+	•	Политики скидок (например, студент, постоянный клиент, happy hours).
+
+⸻
+
+13) Tasks / Goals / OKR
+
+POST /v1/tasks
+	•	Body: { title, description?, assigned_to, studio_id, due_date?, priority, tags?, linked_entity?:{type,id} }
+
+GET /v1/tasks
+	•	Фильтры: ?assigned_to=&studio_id=&status=&priority=&from=&to=&tag=
+
+PATCH /v1/tasks/:id/status
+	•	Body: { status, progress? }
+
+POST /v1/goals
+	•	OKR-цели: { studio_id, title, description?, target_metric, target_value, deadline, owners:[employee_id] }
+
+GET /v1/goals/progress
+	•	Автоподсчёт из аналитики (выручка, записи, конверсия лидов).
+
+⸻
+
+14) Notifications & Reminders
+
+GET /v1/notifications
+	•	Пользовательские уведомления (личные/по ролям).
+
+POST /v1/notifications/send
+	•	Системная рассылка (правами Manager/Owner).
+	•	Body: { channel:'push|email|sms', targets:'role|employee_ids|client_ids', template_id|content }
+
+PUT /v1/notifications/:id/read
+
+Webhooks /v1/webhooks/*
+	•	calendar.synced, payment.succeeded, sms.delivery, email.bounce, booking.reminder.
+
+⸻
+
+15) Analytics & Dashboards
+
+GET /v1/analytics/kpi
+	•	Params: ?scope=studio|org&id=&from=&to=
+	•	Returns: выручка, записи, средний чек, загрузка мастеров, no-show rate, LTV/Retention базовые.
+
+GET /v1/analytics/appointments/daily
+	•	Серия по дням: count, completed, canceled, no_show.
+
+GET /v1/analytics/revenue/by-service
+	•	Гистограмма/таблица по категориям/услугам.
+
+GET /v1/analytics/masters/utilization
+	•	Загрузка по мастерам (занятые/доступные слоты).
+
+⸻
+
+16) Search
+
+GET /v1/search
+	•	Единый поиск: ?q= по клиентам, записям, услугам, сотрудникам.
+	•	Returns: { clients, appointments, services, employees } порционно.
+
+⸻
+
+17) Event Logs & Audit
+
+GET /v1/events
+	•	Фильтры: ?studio_id=&entity_type=&user_id=&from=&to=
+	•	Каждое действие фиксируется с before/after (JSONB).
+
+⸻
+
+18) Settings (Org/Studio/User)
+
+GET/PUT /v1/settings/org/:id
+	•	Налоги, инвойс-серии, политика отмен, публичные ссылки записи.
+
+GET/PUT /v1/settings/studio/:id
+	•	Часы работы, тайм-слот (квант), буфер, max-overlap, депозит-политика.
+
+GET/PUT /v1/settings/user/:id
+	•	Нотификации, календарные интеграции (Google/Microsoft), персональные шаблоны.
+
+⸻
+
+Связи и «кросс-вызовы» между роутами
+
+A) Бронирование (lead → appointment → payment)
+	1.	POST /leads (создание лида)
+	2.	PUT /leads/:id/status → booked ⇒
+	3.	GET /employees/:id/availability (подбор времени)
+	4.	POST /appointments (создание записи, опционально deposit)
+	•	внутри: pricing-rules → рассчитать цену
+	•	если deposit → POST /transactions (income, deposit)
+	•	agreements/templates → отправить предзаполненное согласие клиенту
+	5.	PATCH /appointments/:id/status → completed
+	6.	POST /payments/capture (итоговая оплата; закрытие инвойса)
+	7.	POST /payroll/calculate (в закрытии смены/периода) → распределение по мастерам
+
+B) Отмена/перенос и удержание депозита
+	1.	PATCH /appointments/:id/status {canceled, reason}
+	2.	Сервис читает политику отмены settings.studio
+	3.	Начисляет удержание: POST /transactions {expense/refund} при возврате.
+
+C) Зарплаты
+	1.	Настройка правил: POST /payroll/rules
+	2.	Закрытие периода: POST /payroll/calculate
+	3.	Выплата: POST /payroll/close → транзакция expense:salary
+
+D) Лояльность/скидки
+	•	После completed записи:
+	•	начисление loyalty.adjust (delta=ceil(final_price*rate))
+	•	списание баллов при оплате: на этапе payments/capture.
+
+⸻
+
+Права доступа (матрица кратко)
+	•	Owner: всё в рамках своих организаций.
+	•	MasterOwner: всё в рамках своей организации/студии.
+	•	Manager: управление студиями org, финансы (просмотр/создание), расписание, сотрудники.
+	•	Administrator: клиенты, лиды, записи, платежи в кассе, но без изменения глобальных настроек и payroll-правил.
+	•	Master: видеть свою загрузку, свои записи/клиентов (ограничено), создавать черновики записей (если разрешено), закрывать свои работы (если разрешено), просматривать свои выплаты.
+
+⸻
+
+Схемы (Pydantic) — ключевые
+
+# AppointmentCreate
+class AppointmentCreate(BaseModel):
+    client_id: UUID
+    studio_id: UUID
+    service_id: UUID
+    master_id: UUID
+    start_time: datetime
+    notes: str | None = None
+    discount_percent: conint(ge=0, le=100) = 0
+    deposit: dict | None = None  # {"amount": Decimal, "method": "card|cash|online"}
+
+# TransactionCreate
+class TransactionCreate(BaseModel):
+    studio_id: UUID
+    type: Literal["income","expense"]
+    category: Literal["service_payment","materials","rent","marketing","salary","deposit","refund"]
+    amount: Decimal
+    currency: str = "PLN"
+    payment_method: Literal["cash","card","transfer","pos","online"]
+    appointment_id: UUID | None = None
+    note: str | None = None
+
+# PayrollCalculateRequest
+class PayrollCalculateRequest(BaseModel):
+    studio_id: UUID | None = None
+    employee_id: UUID | None = None
+    period_from: date
+    period_to: date
+    include_tips: bool = True
+
+
+⸻
+
+Валидации и бизнес-правила
+	•	Нельзя создавать запись вне рабочих часов студии/мастера (учитываем блоки/перерывы).
+	•	Нельзя пересекать записи (overlap) сверх политики max-overlap.
+	•	Изменение цены вручную требует роль Manager или флаг разрешений.
+	•	Отмена <N часов до визита — удержание депозита по политике.
+	•	Зарплата мастера по миксу правил: фикс (пропорционально сменам) + проценты по категориям услуг; чаевые — по политике.
+	•	KYC/налоги по инвойсам — валидируем реквизиты.
+
+⸻
+
+Ошибки (примеры)
+	•	400 validation_error: несоответствие схеме
+	•	401 unauthorized
+	•	403 forbidden: недостаточно прав / не принадлежит организации
+	•	404 not_found
+	•	409 conflict: слот занят / дубль клиента
+	•	422 rule_violation: нельзя отменить после начала/политика
+	•	429 rate_limited
+	•	500 internal_error
+
+⸻
+
+Идемпотентность (важно)
+	•	На POST (appointments, transactions, payroll/close) поддерживаем Idempotency-Key; повторные запросы с тем

@@ -1,65 +1,50 @@
-# ────────────────
-# Python
-# ────────────────
-.venv/
-*.venv/
-__pycache__/
-*.py[cod]
-*$py.class
-.pytest_cache/
-.mypy_cache/
-.coverage
-htmlcov/
+# Environment files
+.env
+.env.local
+.env.development
+.env.production
+.env.*.local
+.env.postgres
+*.env
 
-# IDE
-.vscode/
-.idea/
+# Docker
+docker-compose.override.yml
 
-# ────────────────
-# Node / Next.js
-# ────────────────
-node_modules/
-.pnpm-store/
-.next/
-dist/
-build/
+# Logs
+logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
 
-# ────────────────
-# Environments / Secrets
-# ────────────────
-.env
-.env.*
-!.env.example
+# Dependencies
+node_modules/
+venv/
+__pycache__/
 
-# 🔒 Дополнительная защита от случайного коммита секретов
-**/secrets/
-**/private/
-**/*_secret*
-**/*_private*
-**/*_key*
-*.pem
-*.key
-*.p12
-*.pfx
-*.jks
-config.json
-secrets.json
-private.json
-.credentials
-.secrets
+# Build outputs
+.next/
+out/
+build/
+dist/
 
-# ────────────────
-# Docker
-# ────────────────
-*.log
-docker-data/
+# Cache
+.cache/
+.pytest_cache/
+*.tsbuildinfo
 
-# ────────────────
-# OS / Misc
-# ────────────────
+# OS files
 .DS_Store
 Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Database
+postgres_data/
+
+# Production files
+*.prod
+*.production
