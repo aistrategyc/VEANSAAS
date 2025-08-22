@@ -21,6 +21,18 @@ export const SingUpForm = () => {
 		formState: { errors },
 	} = useForm({
 		mode: 'onChange,',
+		defaultValues: {
+			confirmPassword: '',
+			description: '',
+			firstName: '',
+			lastName: '',
+			nameOrganization: '',
+			password: '',
+			phoneNumber: '+',
+			planType: '',
+			studioName: '',
+			username: '',
+		},
 	})
 
 	const emailError = errors['email']?.message

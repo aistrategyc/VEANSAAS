@@ -5,7 +5,7 @@ export const Input = props => {
 		<div>
 			<label className='block text-gray-500 divider-text'>{props.title}</label>
 			<input
-				className=' border shadow text-neutral-600 text-sm rounded-md focus:ring-cyan-500 focus:border-cyan-500 block w-full p-2.5 mb-0'
+				className=' border shadow text-neutral-600 text-sm rounded-md block w-full p-2.5 mb-0'
 				{...props}
 			/>
 		</div>
