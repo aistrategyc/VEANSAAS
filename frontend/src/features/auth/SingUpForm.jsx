@@ -3,10 +3,20 @@ import { useForm } from 'react-hook-form'
 import { FormInput } from '../../shared/ui/input/FormInput'
 import { ErrorInput } from '../../shared/ui/validate/ErrorInput'
 import { Button } from '../../shared/ui/button/Button'
+import { Form } from '../../shared/ui/form/Form'
+import { Select } from '../../shared/ui/select/Select'
+import { TextArea } from '../../shared/ui/textArea/TextArea'
+
+const plans = [
+	{ value: 'low', label: 'low' },
+	{ value: 'high', label: 'high' },
+	{ value: 'medium', label: 'medium' },
+]
 
 export const SingUpForm = () => {
 	const {
 		register,
+		control,
 		handleSubmit,
 		formState: { errors },
 	} = useForm({
@@ -19,116 +29,91 @@ export const SingUpForm = () => {
 	}
 
 	return (
-		<form
-			className='flex flex-col justify-between h-[100%] w-95'
-			onSubmit={handleSubmit(onSubmit)}
-		>
-			<div className='flex justify-between'>
-				<FormInput
-					required
-					title='First Name'
-					placeholder='First name'
-					{...register('FirstName', {
-						required: true,
-					})}
-				/>
-				<FormInput
-					required
-					title='Last name'
-					placeholder='Last name'
-					{...register('LastName', {
-						required: true,
-					})}
-				/>
+		<Form onSubmit={handleSubmit(onSubmit)}>
+			<div className='flex justify-between bg-gray-100 rounded-2xl p-5'>
+				<div className='bg-fuchsia-100 mx-auto p-10 pt-3 shadow'>
+					<h2 className='text-gray-700 text-2xl font-bold text-center'>
+						Person
+					</h2>
+					<div className='flex justify-between'>
+						<FormInput
+							title='First name'
+							placeholder='First name'
+							type='text'
+							name='firstName'
+							control={control}
+						/>
+						<FormInput
+							title='Last name'
+							placeholder='Last name'
+							type='text'
+							name='lastName'
+							control={control}
+						/>
+					</div>
+					<FormInput
+						title='Username'
+						placeholder='Username'
+						type='text'
+						name='username'
+						control={control}
+					/>
+					<FormInput
+						title='Phone number'
+						placeholder='Number'
+						type='tel'
+						name='phoneNumber'
+						control={control}
+					/>
+					<FormInput
+						title='Password'
+						placeholder='Password'
+						type='password'
+						name='password'
+						control={control}
+					/>
+					<FormInput
+						title='Confirm password'
+						placeholder='Confirm password'
+						type='password'
+						name='confirmPassword'
+						control={control}
+					/>
+				</div>
+				<div className='max-w-xl h-185 bg-gray-100 mx-auto p-10 pt-3 shadow'>
+					<h2 className='text-gray-700 text-2xl font-bold text-center'>
+						Organization
+					</h2>
+					<FormInput
+						title='Name organization'
+						placeholder='Name organization'
+						type='text'
+						name='nameOrganization'
+						control={control}
+					/>
+					<Select
+						plans={plans}
+						title='Choose plan'
+						name='planType'
+						control={control}
+					/>
+					<FormInput
+						title='Description'
+						placeholder='Description'
+						type='text'
+						name='description'
+						control={control}
+					/>
+					<FormInput
+						title='Studio name'
+						placeholder='Studio name'
+						type='text'
+						name='studioName'
+						control={control}
+					/>
+				</div>
 			</div>
-			<FormInput
-				required
-				title='Username'
-				placeholder='Username'
-				{...register('Username', {
-					required: true,
-				})}
-			/>
-			<FormInput
-				required
-				title='Email'
-				type='text'
-				placeholder='Email'
-				{...register('email', {
-					required: 'Поле обязательное',
-					pattern: {
-						value: /^[A-Z0-9._%+-]+@[A-Z0-9. -]+\.[A-Z]{2,4}$/i,
-						message: 'Error',
-					},
-				})}
-			/>
-			{/* {emailError && <ErrorInput title={'Неверный email'} />} */}
-			<FormInput
-				required
-				type='tel'
-				title='Phone number'
-				placeholder='Phone number'
-				{...register('PhoneNumber', {
-					required: true,
-				})}
-			/>
-			<FormInput
-				required
-				title='Password'
-				type='password'
-				placeholder='Password'
-				{...register('password', {
-					required: true,
-				})}
-			/>
-			<FormInput
-				required
-				title='Confirm password'
-				type='password'
-				placeholder='Confirm Password'
-				{...register('confirmPassword', {
-					required: true,
-				})}
-			/>
-
-			<h2 className='m-auto mt-2 text-gray-700 text-xl font-bold text-center'>
-				Organization
-			</h2>
-
-			<FormInput
-				required
-				title='Name organization'
-				placeholder='Name organization'
-				{...register('NameOrganization', {
-					required: true,
-				})}
-			/>
-			<div>
-				<label htmlFor='category' className='block text-gray-500 divider-text'>
-					Plan
-				</label>
-				<select
-					id='category'
-					{...register('category', {
-						required: 'Пожалуйста, выберите категорию',
-					})}
-					className='border shadow text-neutral-600 text-sm rounded-md focus:ring-cyan-500 focus:border-cyan-500 block w-full p-2.5 mb-0'
-				>
-					<option value=''>Plan</option>
-					<option value='tech'>Технологии</option>
-					<option value='design'>Дизайн</option>
-					<option value='marketing'>Маркетинг</option>
-				</select>
-			</div>
-			<FormInput
-				required
-				title='Studio name'
-				placeholder='Studio name'
-				{...register('StudioName', {
-					required: true,
-				})}
-			/>
 			<Button>Отправить</Button>
-		</form>
+		</Form>
 	)
 }

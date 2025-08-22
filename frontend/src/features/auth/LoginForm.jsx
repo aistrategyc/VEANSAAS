@@ -8,12 +8,15 @@ import { Input } from '../../shared/ui/input/Input'
 
 export const LoginForm = () => {
 	const {
-		register,
 		handleSubmit,
 		formState: { errors },
 		control,
 	} = useForm({
 		mode: 'onChange,',
+		defaultValues: {
+			username: '',
+			password: '',
+		},
 	})
 
 	const emailError = errors['email']?.message
@@ -22,41 +25,17 @@ export const LoginForm = () => {
 	}
 
 	return (
-		// <form
-		// 	className='flex flex-col justify-between h-[100%]'
-		// 	onSubmit={handleSubmit(onSubmit)}
-		// >
-		// 	<FormInput
-		// 		required
-		// 		title='Email'
-		// 		type='text'
-		// 		placeholder='Email'
-		// 		{...register('email', {
-		// 			required: 'Поле обязательное',
-		// 			pattern: {
-		// 				value: /^[A-Z0-9._%+-]+@[A-Z0-9. -]+\.[A-Z]{2,4}$/i,
-		// 				message: 'Error',
-		// 			},
-		// 		})}
-		// 	/>
-		// 	{/* {emailError && <ErrorInput title={'Неверный email'} />} */}
-		// 	<FormInput
-		// 		required
-		// 		title='Password'
-		// 		type='password'
-		// 		placeholder='Password'
-		// 		{...register('password', {
-		// 			required: true,
-		// 		})}
-		// 	/>
-
-		// 	<FormButton>Отправить</FormButton>
-		// </form>
-
 		<Form onSubmit={handleSubmit(onSubmit)}>
-			<FormInput title='Email' type='email' name={'email'} control={control} />
+			<FormInput
+				title='Username'
+				placeholder='Username'
+				type='text'
+				name={'username'}
+				control={control}
+			/>
 			<FormInput
 				title='Password'
+				placeholder='Password'
 				type='password'
 				name={'password'}
 				control={control}

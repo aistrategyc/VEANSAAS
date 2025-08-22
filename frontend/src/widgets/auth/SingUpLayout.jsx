@@ -10,12 +10,8 @@ export const SingUpLayout = () => {
 					Sing Up
 				</h2>
 				<div className=' max-w-screen w-5xl flex justify-center'>
-					<div className='max-w-xl h-185 bg-gray-100 rounded-3xl mx-auto p-10 pt-3 shadow'>
-						<h2 className='text-gray-700 text-2xl font-bold text-center'>
-							Person
-						</h2>
-						<SingUpForm />
-						{/* <div className='text-sm'>
+					<SingUpForm />
+					{/* <div className='text-sm'>
 							<Link
 								to='/login'
 								className='font-medium text-blue-700 hover:text-blue-500'
@@ -23,7 +19,6 @@ export const SingUpLayout = () => {
 								You have an account?
 							</Link>
 						</div> */}
-					</div>
 				</div>
 			</div>
 		</div>

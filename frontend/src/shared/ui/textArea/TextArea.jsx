@@ -1,14 +1,13 @@
 import React from 'react'
-import { Input } from './Input'
 import { useController } from 'react-hook-form'
 
-export const FormInput = ({
+export const TextArea = ({
 	placeholder,
 	title,
-	type,
 	name,
 	control,
 	rules = { require: true },
+	rows = 3,
 }) => {
 	const {
 		field,
@@ -21,6 +20,14 @@ export const FormInput = ({
 	})
 
 	return (
-		<Input placeholder={placeholder} title={title} type={type} {...field} />
+		<div>
+			<label className='block text-gray-500 divider-text'>{title}</label>
+			<textarea
+				rows={rows}
+				placeholder={placeholder}
+				title={title}
+				{...field}
+			/>
+		</div>
 	)
 }
