@@ -1,7 +1,7 @@
 # 🌐 Caddy Configuration for Production
 # Автоматические SSL сертификаты от Let's Encrypt
 
-# Landing page - главная страница
+# Landing page - главная страница  
 liderix.ru, www.liderix.ru {
     reverse_proxy planerix-landing:3000
     

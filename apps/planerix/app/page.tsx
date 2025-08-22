@@ -40,30 +40,30 @@ export default function LandingPage() {
   ];
 
   const features = [
-    { icon: Target, title: 'OKR и Стратегия', description: 'Ставьте амбициозные цели и отслеживайте прогресс. Каскадируйте OKR на всех уровнях компании.', color: 'from-blue-500 to-indigo-600', bgColor: 'from-blue-100 to-indigo-100', items: ['Каскадирование целей', 'Визуализация прогресса', 'Квартальные циклы'] },
-    { icon: Briefcase, title: 'Проекты и Задачи', description: 'Управляйте проектами любой сложности. Kanban, Gantt, спринты — все в одном месте.', color: 'from-cyan-500 to-blue-600', bgColor: 'from-cyan-100 to-blue-100', items: ['Гибкие методологии', 'Автоматизация процессов', 'Шаблоны проектов'] },
-    { icon: Brain, title: 'ИИ Аналитика', description: 'ИИ анализирует ваши данные и предлагает действия для роста бизнеса.', color: 'from-indigo-500 to-violet-600', bgColor: 'from-indigo-100 to-violet-100', items: ['Прогнозирование трендов', 'Умные рекомендации', 'Анализ рисков'] },
-    { icon: Users, title: 'CRM и Продажи', description: 'Полный жизненный цикл клиента — от первого касания до повторных продаж.', color: 'from-sky-500 to-blue-600', bgColor: 'from-sky-100 to-blue-100', items: ['Воронки продаж', 'История взаимодействий', 'Автоматизация'] },
-    { icon: Award, title: 'HR и Команда', description: 'Управление талантами, развитие сотрудников и сильная корпоративная культура.', color: 'from-blue-500 to-cyan-600', bgColor: 'from-blue-100 to-cyan-100', items: ['Встречи 1-на-1', 'Оценка навыков', 'Карьерные треки'] },
-    { icon: BarChart3, title: 'Финансы и Бюджеты', description: 'Контролируйте денежные потоки, планируйте бюджеты и отслеживайте показатели.', color: 'from-sky-600 to-indigo-600', bgColor: 'from-sky-100 to-indigo-100', items: ['P&L в реальном времени', 'Бюджетирование', 'Финансовые отчеты'] },
+    { icon: Target, title: 'OKR и Стратегия', description: 'Ставьте амбициозные цели и отслеживайте прогресс. Каскадируйте OKR на всех уровнях компании.', color: 'from-purple-500 to-violet-600', bgColor: 'from-purple-100 to-violet-100', items: ['Каскадирование целей', 'Визуализация прогресса', 'Квартальные циклы'] },
+    { icon: Briefcase, title: 'Проекты и Задачи', description: 'Управляйте проектами любой сложности. Kanban, Gantt, спринты — все в одном месте.', color: 'from-emerald-500 to-teal-600', bgColor: 'from-emerald-100 to-teal-100', items: ['Гибкие методологии', 'Автоматизация процессов', 'Шаблоны проектов'] },
+    { icon: Brain, title: 'ИИ Аналитика', description: 'ИИ анализирует ваши данные и предлагает действия для роста бизнеса.', color: 'from-orange-500 to-red-600', bgColor: 'from-orange-100 to-red-100', items: ['Прогнозирование трендов', 'Умные рекомендации', 'Анализ рисков'] },
+    { icon: Users, title: 'CRM и Продажи', description: 'Полный жизненный цикл клиента — от первого касания до повторных продаж.', color: 'from-blue-500 to-indigo-600', bgColor: 'from-blue-100 to-indigo-100', items: ['Воронки продаж', 'История взаимодействий', 'Автоматизация'] },
+    { icon: Award, title: 'HR и Команда', description: 'Управление талантами, развитие сотрудников и сильная корпоративная культура.', color: 'from-rose-500 to-pink-600', bgColor: 'from-rose-100 to-pink-100', items: ['Встречи 1-на-1', 'Оценка навыков', 'Карьерные треки'] },
+    { icon: BarChart3, title: 'Финансы и Бюджеты', description: 'Контролируйте денежные потоки, планируйте бюджеты и отслеживайте показатели.', color: 'from-amber-500 to-yellow-600', bgColor: 'from-amber-100 to-yellow-100', items: ['P&L в реальном времени', 'Бюджетирование', 'Финансовые отчеты'] },
   ];
 
   const pricing = [
-    { name: 'Starter', price: '0', description: 'For small teams and startups', features: [
-      { name: 'Up to 5 users', included: true }, { name: 'Core modules (OKR, tasks)', included: true },
-      { name: '1 GB storage', included: true }, { name: 'Email support', included: true },
-      { name: 'AI analytics', included: false }, { name: 'API access', included: false },
-    ], cta: 'Start for free', popular: false },
-    { name: 'Team', price: '1,900', description: 'For growing companies', features: [
-      { name: 'Up to 50 users', included: true }, { name: 'All essential modules', included: true },
-      { name: '100 GB storage', included: true }, { name: 'Priority support', included: true },
-      { name: 'Basic AI analytics', included: true }, { name: 'API access', included: true },
-    ], cta: 'Try 14 days', popular: true },
-    { name: 'Premium', price: '4,900', description: 'For large organizations', features: [
-      { name: 'Unlimited users', included: true }, { name: 'All modules + customization', included: true },
-      { name: 'Unlimited storage', included: true }, { name: 'Dedicated success manager', included: true },
-      { name: 'Advanced AI analytics', included: true }, { name: 'White-label option', included: true },
-    ], cta: 'Contact sales', popular: false },
+    { name: 'Стартовый', price: '0', description: 'Для небольших команд и стартапов', features: [
+      { name: 'До 5 пользователей', included: true }, { name: 'Основные модули (OKR, задачи)', included: true },
+      { name: '1 ГБ хранилище', included: true }, { name: 'Поддержка по почте', included: true },
+      { name: 'ИИ аналитика', included: false }, { name: 'API доступ', included: false },
+    ], cta: 'Начать бесплатно', popular: false },
+    { name: 'Командный', price: '1,900', description: 'Для растущих компаний', features: [
+      { name: 'До 50 пользователей', included: true }, { name: 'Все основные модули', included: true },
+      { name: '100 ГБ хранилище', included: true }, { name: 'Приоритетная поддержка', included: true },
+      { name: 'Базовая ИИ аналитика', included: true }, { name: 'API доступ', included: true },
+    ], cta: 'Попробовать 14 дней', popular: true },
+    { name: 'Премиум', price: '4,900', description: 'Для крупных организаций', features: [
+      { name: 'Неограниченно пользователей', included: true }, { name: 'Все модули + настройка', included: true },
+      { name: 'Неограниченное хранилище', included: true }, { name: 'Выделенный менеджер', included: true },
+      { name: 'Продвинутая ИИ аналитика', included: true }, { name: 'Белый лейбл', included: true },
+    ], cta: 'Связаться с отделом продаж', popular: false },
   ];
 
   const testimonials = [
@@ -73,36 +73,36 @@ export default function LandingPage() {
   ];
 
   const faqs = [
-    { question: 'Can I try Liderix for free?', answer: 'Yes. The Starter plan is free forever. A 14-day trial is also available for the Team plan with no credit card required.' },
-    { question: 'How do I migrate data from other tools?', answer: 'We support imports from popular CRMs and project management systems. Our team will help with data transfer and integrations.' },
-    { question: 'How secure is my data?', answer: 'We use bank-grade encryption, regular backups, and comply with GDPR. Your data is stored in secure ISO 27001 certified data centers.' },
-    { question: 'Is there a mobile app?', answer: 'Yes — iOS and Android apps are available. They sync with the web app and support all core features on the go.' },
+    { question: 'Можно ли попробовать Liderix бесплатно?', answer: 'Да. Стартовый план бесплатен навсегда. Также доступна 14-дневная пробная версия для командного тарифа без указания карты.' },
+    { question: 'Как перенести данные из других инструментов?', answer: 'Мы поддерживаем импорт из популярных CRM и систем управления проектами. Наша команда поможет с переносом данных и интеграциями.' },
+    { question: 'Насколько безопасны мои данные?', answer: 'Мы используем банковское шифрование, регулярные резервные копии и соблюдаем GDPR. Данные хранятся в сертифицированных по ISO 27001 дата-центрах.' },
+    { question: 'Есть ли мобильное приложение?', answer: 'Да — доступны приложения для iOS и Android. Они синхронизируются с веб-версией и поддерживают все основные функции.' },
   ];
 
   const industries = [
-    { icon: ShoppingCart, name: 'Retail & E-commerce', description: 'Assortment management, sales analytics' },
-    { icon: Code2, name: 'IT & Software', description: 'Agile processes, engineering management' },
-    { icon: Megaphone, name: 'Marketing & PR', description: 'Campaigns, content calendars, metrics' },
-    { icon: GraduationCap, name: 'Education & Training', description: 'Courses, learning paths, progress' },
+    { icon: ShoppingCart, name: 'Ритейл и E-commerce', description: 'Управление ассортиментом, аналитика продаж' },
+    { icon: Code2, name: 'IT и Разработка', description: 'Agile процессы, управление инженерией' },
+    { icon: Megaphone, name: 'Маркетинг и PR', description: 'Кампании, контент-календари, метрики' },
+    { icon: GraduationCap, name: 'Образование и Обучение', description: 'Курсы, траектории обучения, прогресс' },
   ];
 
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="pt-10 pb-20 px-6 bg-blue-50 overflow-hidden">
+      <section className="pt-10 pb-20 px-6 bg-lime-50 overflow-hidden">
         <div className="container mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
-              <div className="inline-flex items-center px-4 py-2 bg-blue-100 rounded-full">
+              <div className="inline-flex items-center px-4 py-2 bg-lime-100 rounded-full">
                 <span className="relative flex h-2 w-2 mr-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-lime-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-lime-500"></span>
                 </span>
-                <span className="text-blue-800 text-sm font-medium">Новое: ИИ Аналитика доступна</span>
+                <span className="text-lime-800 text-sm font-medium">Новое: ИИ Аналитика доступна</span>
               </div>
               <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
                 Готовы ускорить
-                <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"> рост вашего бизнеса?</span>
+                <span className="bg-gradient-to-r from-lime-600 to-green-600 bg-clip-text text-transparent"> рост вашего бизнеса?</span>
               </h1>
               <p className="text-xl text-gray-600 leading-relaxed">Присоединитесь к сотням компаний, которые уже используют Liderix для достижения стратегических целей.</p>
               <div className="flex flex-col sm:flex-row gap-4">
@@ -118,10 +118,10 @@ export default function LandingPage() {
             </div>
             <div className="relative lg:pl-12">
               <div className="relative z-10 animate-float">
-                <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl shadow-2xl p-8 text-white">
+                <div className="bg-gradient-to-br from-lime-600 to-green-700 rounded-2xl shadow-2xl p-8 text-white">
                   <div className="text-center mb-6">
                     <h3 className="text-2xl font-bold mb-2">Предпросмотр дашборда</h3>
-                    <p className="text-blue-200">Ваш центр управления</p>
+                    <p className="text-lime-200">Ваш центр управления</p>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     {['Выручка: +34%', 'Проекты: 24', 'Команда: 48', 'ROI: 156%'].map((stat, i) => (
@@ -133,8 +133,8 @@ export default function LandingPage() {
                 </div>
                 <div className="absolute -top-6 -left-6 bg-white p-4 rounded-lg shadow-lg transform hover:scale-105 transition-transform">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <TrendingUp className="w-6 h-6 text-blue-600" />
+                    <div className="w-12 h-12 bg-lime-100 rounded-lg flex items-center justify-center">
+                      <TrendingUp className="w-6 h-6 text-lime-600" />
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Рост выручки</p>
@@ -144,8 +144,8 @@ export default function LandingPage() {
                 </div>
                 <div className="absolute -bottom-6 -right-6 bg-white p-4 rounded-lg shadow-lg transform hover:scale-105 transition-transform">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <Users className="w-6 h-6 text-blue-600" />
+                    <div className="w-12 h-12 bg-lime-100 rounded-lg flex items-center justify-center">
+                      <Users className="w-6 h-6 text-lime-600" />
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Active teams</p>
@@ -154,7 +154,7 @@ export default function LandingPage() {
                   </div>
                 </div>
               </div>
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-blue-100 to-blue-100 rounded-full blur-3xl opacity-50"></div>
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-lime-100 to-green-100 rounded-full blur-3xl opacity-50"></div>
             </div>
           </div>
         </div>
@@ -283,15 +283,15 @@ export default function LandingPage() {
             <h2 className="text-4xl font-bold mb-4">Transparent pricing</h2>
             <p className="text-xl text-gray-600">Choose a plan that fits your business</p>
             <div className="inline-flex items-center mt-6 bg-white rounded-lg p-1 shadow-md">
-              <button className="px-6 py-2 rounded-md bg-blue-600 text-white font-medium">Monthly</button>
-              <button className="px-6 py-2 rounded-md text-gray-600 font-medium">Yearly (-20%)</button>
+              <button className="px-6 py-2 rounded-md bg-lime-600 text-white font-medium">Месячно</button>
+              <button className="px-6 py-2 rounded-md text-gray-600 font-medium">Годовой (-20%)</button>
             </div>
           </div>
           <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {pricing.map((plan, index) => (
               <div key={index} className={`bg-white rounded-2xl shadow-lg p-8 relative transform hover:scale-105 transition-transform ${plan.popular ? 'border-2 border-blue-500' : ''}`}>
                 {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-1 rounded-full text-sm font-medium">Most popular</div>
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-lime-500 to-green-600 text-white px-4 py-1 rounded-full text-sm font-medium">Самый популярный</div>
                 )}
                 <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
                 <p className="text-gray-600 mb-6">{plan.description}</p>
@@ -299,13 +299,13 @@ export default function LandingPage() {
                   <span className="text-5xl font-bold">€{plan.price}</span>
                   <span className="text-gray-600">/month</span>
                 </div>
-                <button className={`w-full py-3 rounded-lg font-medium transition-all duration-300 ${plan.popular ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:shadow-lg transform hover:scale-105' : 'border-2 border-gray-300 hover:border-gray-400 text-gray-900'} mb-8`}>
+                <button className={`w-full py-3 rounded-lg font-medium transition-all duration-300 ${plan.popular ? 'bg-gradient-to-r from-lime-500 to-green-600 text-white hover:shadow-lg transform hover:scale-105' : 'border-2 border-gray-300 hover:border-gray-400 text-gray-900'} mb-8`}>
                   {plan.cta}
                 </button>
                 <ul className="space-y-4">
                   {plan.features.map((feature, i) => (
                     <li key={i} className="flex items-start">
-                      {feature.included ? <Check className="w-5 h-5 text-blue-500 mt-0.5 mr-3 flex-shrink-0" /> : <X className="w-5 h-5 text-gray-400 mt-0.5 mr-3 flex-shrink-0" />}
+                      {feature.included ? <Check className="w-5 h-5 text-lime-500 mt-0.5 mr-3 flex-shrink-0" /> : <X className="w-5 h-5 text-gray-400 mt-0.5 mr-3 flex-shrink-0" />}
                       <span className={feature.included ? '' : 'text-gray-400'}>{feature.name}</span>
                     </li>
                   ))}
@@ -315,7 +315,7 @@ export default function LandingPage() {
           </div>
           <div className="text-center mt-12">
             <p className="text-gray-600 mb-4">All plans include SSL encryption, daily backups, and updates</p>
-            <a href="#" className="text-blue-600 font-medium hover:text-blue-700 inline-flex items-center">Compare all features <ArrowRight className="w-4 h-4 ml-1" /></a>
+            <a href="#" className="text-lime-600 font-medium hover:text-lime-700 inline-flex items-center">Сравнить все функции <ArrowRight className="w-4 h-4 ml-1" /></a>
           </div>
         </div>
       </section>
@@ -335,7 +335,7 @@ export default function LandingPage() {
                 </div>
                 <p className="text-gray-700 mb-6 italic">"{t.text}"</p>
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold mr-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-lime-400 to-green-500 rounded-full flex items-center justify-center text-white font-bold mr-4">
                     {t.author.split(' ').map((n) => n[0]).join('')}
                   </div>
                   <div>
@@ -356,8 +356,8 @@ export default function LandingPage() {
             <select className="w-full md:w-auto px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors">
               <option>Training & Implementation</option>
             </select>
-            <input type="text" className="w-full md:w-1/3 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" placeholder="Get a quote for my project" />
-            <button className="w-full md:w-auto px-8 py-3 bg-blue-200 text-gray-900 rounded-lg font-medium hover:bg-blue-300 transition-colors">Get a quote for my project</button>
+            <input type="text" className="w-full md:w-1/3 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-lime-500 focus:ring-2 focus:ring-lime-200 transition-colors" placeholder="Получить котировку проекта" />
+            <button className="w-full md:w-auto px-8 py-3 bg-lime-200 text-gray-900 rounded-lg font-medium hover:bg-lime-300 transition-colors">Получить котировку проекта</button>
           </div>
           <p className="text-center text-gray-600 mt-6 text-lg">Tailored setup for your business. No hidden fees.</p>
         </div>
@@ -387,7 +387,7 @@ export default function LandingPage() {
       {/* CTA */}
       <section className="py-20 px-6 bg-gradient-to-br from-blue-600 to-indigo-700 text-white">
         <div className="container mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to reach the next level?</h2>
+          <h2 className="text-4xl md:text-5xl font-bold mb-6">Готовы выйти на новый уровень?</h2>
           <p className="text-xl mb-8 text-blue-100 max-w-2xl mx-auto">Join thousands of teams managing their business more effectively with Liderix</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button className="px-8 py-4 bg-white text-blue-600 rounded-lg font-bold hover:shadow-xl transition-all duration-300 transform hover:scale-105">Get started free</button>

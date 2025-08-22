@@ -8,7 +8,7 @@ set -e
 echo "🚀 Starting production deployment..."
 
 # Production server configuration
-SERVER_IP="65.108.220.33"
+SERVER_IP="92.242.60.211"
 SERVER_USER="root"
 PROJECT_DIR="/opt/liderix"
 COMPOSE_FILE="docker-compose.prod.yml"
@@ -34,7 +34,7 @@ log_error() {
 # Check if we have access to the server
 check_server_access() {
     log_info "Checking server access..."
-    if ssh -o ConnectTimeout=10 -q "$SERVER_USER@$SERVER_IP" exit; then
+    if ssh -i ~/.ssh/liderix_prod -o ConnectTimeout=10 -q "$SERVER_USER@$SERVER_IP" exit; then
         log_info "✅ Server access confirmed"
     else
         log_error "❌ Cannot access server $SERVER_IP"
@@ -49,7 +49,7 @@ check_server_access() {
 # Create project directory on server
 setup_server_directories() {
     log_info "Setting up server directories..."
-    ssh "$SERVER_USER@$SERVER_IP" << 'EOF'
+    ssh -i ~/.ssh/liderix_prod "$SERVER_USER@$SERVER_IP" << 'EOF'
         mkdir -p /opt/liderix
         mkdir -p /opt/liderix/logs
         mkdir -p /opt/liderix/backups
@@ -78,6 +78,7 @@ deploy_files() {
     
     # Copy to server
     rsync -avz --delete \
+        -e "ssh -i ~/.ssh/liderix_prod" \
         --exclude='.git' \
         --exclude='node_modules' \
         --exclude='.next' \
@@ -91,7 +92,7 @@ deploy_files() {
 # Setup Docker and dependencies on server
 setup_docker() {
     log_info "Setting up Docker environment..."
-    ssh "$SERVER_USER@$SERVER_IP" << 'EOF'
+    ssh -i ~/.ssh/liderix_prod "$SERVER_USER@$SERVER_IP" << 'EOF'
         # Update system
         apt-get update
         
@@ -117,7 +118,7 @@ EOF
 # Deploy application
 deploy_application() {
     log_info "Deploying application containers..."
-    ssh "$SERVER_USER@$SERVER_IP" << EOF
+    ssh -i ~/.ssh/liderix_prod "$SERVER_USER@$SERVER_IP" << EOF
         cd $PROJECT_DIR
         
         # Stop existing containers
@@ -142,7 +143,7 @@ check_health() {
     # Wait for services to start
     sleep 30
     
-    ssh "$SERVER_USER@$SERVER_IP" << 'EOF'
+    ssh -i ~/.ssh/liderix_prod "$SERVER_USER@$SERVER_IP" << 'EOF'
         cd /opt/liderix
         
         # Check container status
@@ -175,7 +176,7 @@ EOF
 # Setup monitoring
 setup_monitoring() {
     log_info "Setting up monitoring..."
-    ssh "$SERVER_USER@$SERVER_IP" << 'EOF'
+    ssh -i ~/.ssh/liderix_prod "$SERVER_USER@$SERVER_IP" << 'EOF'
         # Create monitoring script
         cat > /opt/liderix/monitor.sh << 'MONITOR_SCRIPT'
 #!/bin/bash
