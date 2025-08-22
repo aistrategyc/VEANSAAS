@@ -25,4 +25,4 @@ COPY . /app
 EXPOSE 8001
 
 # 5) Стартуем приложение напрямую с uvicorn
-CMD ["uvicorn", "liderix_api.main:app", "--host", "0.0.0.0", "--port", "8001", "--log-level", "info"]
+CMD ["uvicorn", "veancrm_api.main:app", "--host", "0.0.0.0", "--port", "8001", "--log-level", "info"]
