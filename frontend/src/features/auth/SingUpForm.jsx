@@ -4,11 +4,12 @@ import { FormInput } from '../../shared/ui/input/FormInput'
 import { Button } from '../../shared/ui/button/Button'
 import { Form } from '../../shared/ui/form/Form'
 import { Select } from '../../shared/ui/select/Select'
+import { useAuth } from '../../shared/hooks/useAuth'
+import { useNavigate } from 'react-router'
 
 const plans = [
-	{ value: 'low', label: 'low' },
-	{ value: 'high', label: 'high' },
-	{ value: 'medium', label: 'medium' },
+	{ value: 'solo', label: 'solo' },
+	{ value: 'network', label: 'network' },
 ]
 
 export const SingUpForm = () => {
@@ -17,24 +18,37 @@ export const SingUpForm = () => {
 		handleSubmit,
 		formState: { errors },
 	} = useForm({
-		mode: 'onChange,',
+		mode: 'onChange',
 		defaultValues: {
-			confirmPassword: '',
-			description: '',
-			firstName: '',
-			lastName: '',
-			nameOrganization: '',
-			password: '',
-			phoneNumber: '',
-			planType: '',
-			studioName: '',
-			username: '',
+			user: {
+				username: '',
+				email: '',
+				first_name: '',
+				last_name: '',
+				phone_number: '',
+				password: '',
+			},
+			organization: {
+				name: '',
+				description: '',
+				plan_type: '',
+				studio: {
+					name: '',
+				},
+			},
 		},
 	})
 
-	const emailError = errors['email']?.message
+	const navigate = useNavigate()
+	const { register, registerSuccess } = useAuth()
+
+	// const emailError = errors['email']?.message
 	const onSubmit = data => {
-		console.log(data)
+		register(data)
+			.unwrap()
+			.then(() => {
+				navigate('/')
+			})
 	}
 
 	return (
@@ -50,14 +64,14 @@ export const SingUpForm = () => {
 								title='First name'
 								placeholder='First name'
 								type='text'
-								name='firstName'
+								name='user.first_name'
 								control={control}
 							/>
 							<FormInput
 								title='Last name'
 								placeholder='Last name'
 								type='text'
-								name='lastName'
+								name='user.last_name'
 								control={control}
 							/>
 						</div>
@@ -65,28 +79,28 @@ export const SingUpForm = () => {
 							title='Username'
 							placeholder='Username'
 							type='text'
-							name='username'
+							name='user.username'
+							control={control}
+						/>
+						<FormInput
+							title='Email'
+							placeholder='Email'
+							type='text'
+							name='user.email'
 							control={control}
 						/>
 						<FormInput
 							title='Phone number'
 							placeholder='Number'
 							type='tel'
-							name='phoneNumber'
+							name='user.phone_number'
 							control={control}
 						/>
 						<FormInput
 							title='Password'
 							placeholder='Password'
 							type='password'
-							name='password'
-							control={control}
-						/>
-						<FormInput
-							title='Confirm password'
-							placeholder='Confirm password'
-							type='password'
-							name='confirmPassword'
+							name='user.password'
 							control={control}
 						/>
 					</div>
@@ -98,27 +112,27 @@ export const SingUpForm = () => {
 							title='Name organization'
 							placeholder='Name organization'
 							type='text'
-							name='nameOrganization'
+							name='organization.name'
 							control={control}
 						/>
 						<Select
 							plans={plans}
 							title='Choose plan'
-							name='planType'
+							name='organization.plan_type'
 							control={control}
 						/>
 						<FormInput
 							title='Description'
 							placeholder='Description'
 							type='text'
-							name='description'
+							name='organization.description'
 							control={control}
 						/>
 						<FormInput
 							title='Studio name'
 							placeholder='Studio name'
 							type='text'
-							name='studioName'
+							name='organization.studio.name'
 							control={control}
 						/>
 					</div>

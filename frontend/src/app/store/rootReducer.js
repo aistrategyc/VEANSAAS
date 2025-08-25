@@ -1,10 +1,10 @@
 import { combineReducers } from '@reduxjs/toolkit'
 import counterReducer from '../../shared/redux/slices/counterSlice'
-import userReducer from '../../shared/redux/slices/userSlice'
+import authReducer from '../../shared/redux/slices/authSlice'
 
 const rootReducer = combineReducers({
 	counter: counterReducer,
-	user: userReducer,
+	auth: authReducer,
 })
 
 export default rootReducer
