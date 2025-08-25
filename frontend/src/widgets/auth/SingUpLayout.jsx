@@ -9,7 +9,7 @@ export const SingUpLayout = () => {
 				<h2 className='text-gray-700 text-4xl font-bold text-center mb-4 md:mb-6'>
 					Sing Up
 				</h2>
-				<div className=' max-w-screen w-5xl flex justify-center'>
+				<div className=' max-w-screen h-100 w-5xl flex justify-center'>
 					<SingUpForm />
 					{/* <div className='text-sm'>
 							<Link

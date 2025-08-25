@@ -50,10 +50,10 @@ consumers:
         secret: test_key_4354345
         algorithm: HS256
 
-plugins:
-  - name: cors
-    config:
-      origins: ['*']
-      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
-      headers: ['Content-Type', 'Authorization']
-      credentials: true
+# plugins:
+#   - name: cors
+#     config:
+#       origins: ['*']
+#       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+#       headers: ['Content-Type', 'Authorization']
+#       credentials: true

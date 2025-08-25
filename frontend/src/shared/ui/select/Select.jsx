@@ -23,7 +23,7 @@ export const Select = ({
 			<label className='block text-gray-500 divider-text'>{title}</label>
 			<select
 				{...field}
-				className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+				className='w-full px-3 text-gray-500 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
 			>
 				<option value=''>Choose plan</option>
 				{plans.map(plan => (
