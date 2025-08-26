@@ -97,6 +97,23 @@ services:
       - ./backend/.env
       - ./backend/services/notification/.env
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - '5173:5173'
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - WDS_SOCKET_HOST=0.0.0.0
+      - FAST_REFRESH=true
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+
   postgres:
     image: postgres:latest
     ports:
