@@ -12,7 +12,7 @@ const AuthContext = createContext()
 export const useAuth = () => {
 	return useContext(AuthContext)
 }
-
+//переписать !!!
 export const AuthProvider = ({ children }) => {
 	const [isAuthenticated, setIsAuthenticated] = useState(false)
 	const [loading, setLoading] = useState(true)
@@ -53,7 +53,6 @@ export const AuthProvider = ({ children }) => {
 
 				// Опционально: проверка валидности токена на сервере
 				try {
-					
 					if (isMounted) {
 						setAxiosAuthHeader(token)
 						setIsAuthenticated(true)

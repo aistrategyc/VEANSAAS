@@ -4,8 +4,8 @@ import { Button } from 'shared/ui/button/Button'
 import { Form } from 'shared/ui/form/Form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { schemaLogin } from 'shared/schema/schema'
-import { useApi } from '../../shared/hooks/useApi'
 import { useAuth } from '../../app/contexts/AuthProviderContext'
+import { api } from 'shared/api/api'
 
 export const LoginForm = () => {
 	const {
@@ -23,17 +23,15 @@ export const LoginForm = () => {
 	})
 
 	const { login } = useAuth()
-	const { post, error, loading } = useApi()
-
-	const onSubmit = async data => {
+	const onSubmit = data => {
 		reset()
-		try {
-			const response = await post('auth/login', data)
-			console.log(response)
-			login(response.access_token, { expires: 7 })
-		} catch (err) {
-			console.error('login', err)
-		}
+		api
+			.post('auth/login', data)
+
+			.then(response => {
+				login(response.access_token, { expires: 7 })
+			})
+			.catch()
 	}
 
 	return (

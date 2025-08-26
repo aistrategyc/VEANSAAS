@@ -1,4 +1,3 @@
-import React from 'react'
 import { useForm } from 'react-hook-form'
 import { FormInput } from 'shared/ui/input/FormInput'
 import { Button } from 'shared/ui/button/Button'
@@ -7,7 +6,7 @@ import { Select } from 'shared/ui/select/Select'
 import { useNavigate } from 'react-router'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { schemaRegister } from 'shared/schema/schema'
-import { useApi } from '../../shared/hooks/useApi'
+import { api } from 'shared/api/api'
 
 const plans = [
 	{ value: 'solo', label: 'solo' },
@@ -18,6 +17,7 @@ export const SingUpForm = () => {
 	const {
 		control,
 		handleSubmit,
+		reset,
 		formState: { errors },
 	} = useForm({
 		mode: 'onChange',
@@ -43,15 +43,15 @@ export const SingUpForm = () => {
 	})
 
 	const navigate = useNavigate()
-	const { post, loading, error } = useApi()
 
-	const onSubmit = async data => {
-		try {
-			await post('auth/register', data)
-			navigate('/login')
-		} catch (err) {
-			console.error('reg', err)
-		}
+	const onSubmit = data => {
+		reset()
+		api
+			.post('auth/register', data)
+			.then(() => {
+				navigate('/login')
+			})
+			.catch()
 	}
 
 	return (
