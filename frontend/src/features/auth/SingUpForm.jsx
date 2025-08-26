@@ -4,10 +4,10 @@ import { FormInput } from 'shared/ui/input/FormInput'
 import { Button } from 'shared/ui/button/Button'
 import { Form } from 'shared/ui/form/Form'
 import { Select } from 'shared/ui/select/Select'
-import { useAuth } from 'shared/hooks/useAuth'
 import { useNavigate } from 'react-router'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { schemaRegister } from 'shared/schema/schema'
+import { useApi } from '../../shared/hooks/useApi'
 
 const plans = [
 	{ value: 'solo', label: 'solo' },
@@ -43,15 +43,15 @@ export const SingUpForm = () => {
 	})
 
 	const navigate = useNavigate()
-	const { register, registerSuccess } = useAuth()
+	const { post, loading, error } = useApi()
 
-	// const emailError = errors['email']?.message
-	const onSubmit = data => {
-		register(data)
-			.unwrap()
-			.then(() => {
-				navigate('/')
-			})
+	const onSubmit = async data => {
+		try {
+			await post('auth/register', data)
+			navigate('/login')
+		} catch (err) {
+			console.error('reg', err)
+		}
 	}
 
 	return (

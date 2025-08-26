@@ -1,5 +1,5 @@
 import { Navigate, useLocation } from 'react-router-dom'
-import { useAuthContext } from './AuthProviderContext'
+import { useAuth } from '../contexts/AuthProviderContext'
 import { Loader } from '../../shared/ui/loader/Loader'
 
 export const ProtectedRoute = ({
@@ -7,7 +7,7 @@ export const ProtectedRoute = ({
 	redirectTo = '/login',
 	showLoader = true,
 }) => {
-	const { isAuthenticated, loading } = useAuthContext()
+	const { isAuthenticated, loading } = useAuth()
 	const location = useLocation()
 
 	if (loading && showLoader) {
