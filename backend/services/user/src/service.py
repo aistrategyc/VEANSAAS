@@ -10,12 +10,17 @@ from shared.schemas.user import (
     UserCreateInternal,
     UserUniquenessCheckRequest,
     UserUniquenessCheckResponse,
+    UserVerificationEmail,
 )
 
 
 async def get_user_for_auth(request: Request, username: str, db: AsyncSession):
     result = await db.execute(
-        select(User).filter(User.username == username, User.is_active.is_(True))
+        select(User).filter(
+            User.username == username,
+            User.is_active.is_(True),
+            User.is_verified.is_(True),
+        )
     )
     user = result.scalar_one_or_none()
     if not user:
@@ -68,7 +73,7 @@ async def create_user(request: Request, user: UserCreateInternal, db: AsyncSessi
             detail=ValidationError(errors=errors).model_dump(),
         )
 
-    db_user = User(**user.model_dump())
+    db_user = User(**user.model_dump(), is_verified=False)
     db.add(db_user)
     await db.commit()
     return db_user
@@ -98,3 +103,24 @@ async def get_my_user(request: Request, current_user: dict, db: AsyncSession):
             status_code=status.HTTP_404_NOT_FOUND, detail='User not found'
         )
     return user
+
+
+async def verification_email(
+    request: Request, data: UserVerificationEmail, db: AsyncSession
+):
+    result = await db.execute(
+        select(User).filter(
+            User.uuid == data.user_uuid,
+            User.email == data.email,
+            User.is_active.is_(True),
+        )
+    )
+    db_user = result.scalar_one_or_none()
+    if not db_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail='User not found'
+        )
+    db_user.is_verified = True
+    await db.commit()
+
+    return Response(status_code=status.HTTP_200_OK)

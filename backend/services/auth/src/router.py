@@ -1,11 +1,10 @@
 from fastapi import APIRouter, Depends, Request, status
 from schemas import LoginUserRequest, RegisterUserRequest, TokenResponse
-from service import login, register
+from service import login, register, verify_email
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.database import get_db
 from shared.dependencies import get_company_units_service, get_user_service
-from shared.rabbitmq import rabbitmq
 from shared.service_clients.company_units import CompanyUnitsServiceClient
 from shared.service_clients.user import UserServiceClient
 
@@ -38,10 +37,10 @@ async def login_route(
     return await login(request=request, data=data, user_service=user_service)
 
 
-@router.get('/test-rabbit')
-async def test_rabbit():
-    test_msg = {'test': 'Hello RabbitMQ zela!', 'action': 'test.message'}
-
-    await rabbitmq.publish(routing_key='user.created', message=test_msg)
-
-    return {'message': 'ok'}
+@router.get('/verify-email')
+async def verify_email_route(
+    request: Request,
+    token,
+    user_service: UserServiceClient = Depends(get_user_service),
+):
+    return await verify_email(request=request, token=token, user_service=user_service)

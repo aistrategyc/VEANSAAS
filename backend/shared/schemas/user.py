@@ -92,3 +92,8 @@ class UserUniquenessCheckResponse(BaseModel):
     is_valid: bool = Field(default=False)
     username_exists: bool = Field(default=False)
     email_exists: bool = Field(default=False)
+
+
+class UserVerificationEmail(BaseModel):
+    user_uuid: UUID | str
+    email: str

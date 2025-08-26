@@ -4,12 +4,13 @@ from security import pwd_context
 from sqlalchemy.ext.asyncio import AsyncSession
 from utils import (
     create_access_token,
+    create_verification_token,
+    get_verification_token,
     verify_password,
 )
 
-from shared.schemas.user import (
-    UserCreateInternal,
-)
+from shared.rabbitmq import rabbitmq
+from shared.schemas.user import UserCreateInternal, UserVerificationEmail
 from shared.service_clients.company_units import CompanyUnitsServiceClient
 from shared.service_clients.user import UserServiceClient
 
@@ -35,6 +36,20 @@ async def register(
         organization.created_by_uuid = str(user_created.uuid)
 
         await units_service.create_organization(request_data=organization)
+
+        verification_token = await create_verification_token(
+            data={
+                'sub': 'email',
+                'email': user_created.email,
+                'user_uuid': str(user_created.uuid),
+                'type': 'verification',
+            }
+        )
+
+        await rabbitmq.publish(
+            routing_key='user.verification_email',
+            message={'token': verification_token, 'email': user_created.email},
+        )
 
         await db.commit()
         return {
@@ -71,3 +86,18 @@ async def login(
     )
 
     return TokenResponse(access_token=access_token)
+
+
+async def verify_email(request: Request, token: str, user_service: UserServiceClient):
+    data = await get_verification_token(token=token)
+    email = data.get('email')
+    user_uuid = data.get('user_uuid')
+
+    if not email or not user_uuid:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Invalid token',
+        )
+    await user_service.verification_email(
+        request_data=UserVerificationEmail(user_uuid=str(user_uuid), email=email)
+    )

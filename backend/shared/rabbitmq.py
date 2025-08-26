@@ -80,7 +80,7 @@ rabbitmq = RabbitMQ()
 def create_lifespan(
     queue_name: str,
     routing_keys: list[str],
-    handlers: dict[str, Callable[[Dict[str, Any]], Awaitable[None]]],
+    handlers: Dict[str, Callable[[Dict[str, Any]], Awaitable[None]]],
 ):
     @asynccontextmanager
     async def lifespan(app: FastAPI):

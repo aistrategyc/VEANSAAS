@@ -9,6 +9,7 @@ from shared.schemas.user import (
     UserResponse,
     UserUniquenessCheckRequest,
     UserUniquenessCheckResponse,
+    UserVerificationEmail,
 )
 from shared.service_clients.base import BaseServiceClient
 
@@ -62,3 +63,10 @@ class UserServiceClient(BaseServiceClient):
 
     async def delete_user(self, user_uuid: UUID):
         await self._make_request(method='DELETE', endpoint=str(user_uuid))
+
+    async def verification_email(self, request_data: UserVerificationEmail):
+        await self._make_request(
+            'POST',
+            'verification_email',
+            payload=request_data.model_dump(),
+        )

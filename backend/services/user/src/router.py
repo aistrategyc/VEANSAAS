@@ -7,6 +7,7 @@ from service import (
     delete_user,
     get_my_user,
     get_user_for_auth,
+    verification_email,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -18,6 +19,7 @@ from shared.schemas.user import (
     UserResponse,
     UserUniquenessCheckRequest,
     UserUniquenessCheckResponse,
+    UserVerificationEmail,
 )
 
 router = APIRouter(prefix='/users', tags=['User'])
@@ -71,3 +73,10 @@ async def check_uniqueness_user_route(
     db: AsyncSession = Depends(get_db),
 ):
     return await check_uniqueness_user(request=request, data=data, db=db)
+
+
+@router.post('/verification_email', status_code=status.HTTP_200_OK)
+async def verification_email_route(
+    request: Request, data: UserVerificationEmail, db: AsyncSession = Depends(get_db)
+):
+    return await verification_email(request=request, data=data, db=db)
