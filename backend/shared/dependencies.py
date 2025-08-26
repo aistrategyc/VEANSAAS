@@ -19,9 +19,41 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 
         return payload
     except JWTError:
-        return None
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='Invalid user token',
+            headers={'WWW-Authenticate': 'Bearer'},
+        )
     except Exception:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Error')
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid token type'
+        )
+
+
+async def get_service_token(token: str = Depends(oauth2_scheme)):
+    try:
+        payload = jwt.decode(
+            token,
+            settings.SECRET_KEY_SERVICE,
+            algorithms=[settings.ALGORITHM],
+        )
+
+        if payload.get('sub') != 'service':
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail='Invalid token type'
+            )
+
+        return payload
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='Invalid service token',
+            headers={'WWW-Authenticate': 'Bearer'},
+        )
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid token type'
+        )
 
 
 async def get_user_service():

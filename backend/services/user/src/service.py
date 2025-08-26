@@ -84,3 +84,17 @@ async def delete_user(request: Request, user_uuid: UUID, db: AsyncSession):
     await db.commit()
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+async def get_my_user(request: Request, current_user: dict, db: AsyncSession):
+    user_uuid = current_user.get('user_uuid')
+    if not user_uuid:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail='User not found'
+        )
+    user = await db.get(User, user_uuid)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail='User not found'
+        )
+    return user
