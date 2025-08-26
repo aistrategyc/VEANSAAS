@@ -29,7 +29,9 @@ export const RouterProvider = () => {
 			/>
 			<Route
 				path='/register'
-				element={isAuthenticated ? <Navigate to='/' replace /> : <LoginPage />}
+				element={
+					isAuthenticated ? <Navigate to='/' replace /> : <RegisterPage />
+				}
 			/>
 		</Routes>
 	)
