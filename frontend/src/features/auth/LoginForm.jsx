@@ -55,7 +55,6 @@ export const LoginForm = () => {
 				error={errors.password?.message}
 			/>
 			<Button>Send</Button>
-			<Loader />
 		</Form>
 	)
 }
