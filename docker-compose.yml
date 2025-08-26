@@ -5,7 +5,7 @@ services:
     build:
       context: ./backend
       dockerfile: services/admin-panel/Dockerfile
-    entrypoint: ['/bin/sh', '/app/services/admin-panel/entrypoint.sh']
+    entrypoint: /app/services/admin-panel/entrypoint.sh
     container_name: admin-panel-svc
     ports:
       - '9000:9000'
@@ -24,7 +24,7 @@ services:
     build:
       context: ./backend
       dockerfile: services/auth/Dockerfile
-    entrypoint: ['/bin/sh', '/app/services/auth/entrypoint.sh']
+    entrypoint: /app/services/auth/entrypoint.sh
     container_name: auth-svc
     ports:
       - '9001:9001'
@@ -44,7 +44,7 @@ services:
     build:
       context: ./backend
       dockerfile: services/user/Dockerfile
-    entrypoint: ['/bin/sh', '/app/services/user/entrypoint.sh']
+    entrypoint: /app/services/user/entrypoint.sh
     container_name: user-svc
     ports:
       - '9002:9002'
@@ -64,7 +64,7 @@ services:
     build:
       context: ./backend
       dockerfile: services/company-units/Dockerfile
-    entrypoint: ['/bin/sh', '/app/services/company-units/entrypoint.sh']
+    entrypoint: /app/services/company-units/entrypoint.sh
     container_name: company-units-svc
     ports:
       - '9003:9003'
@@ -84,7 +84,7 @@ services:
     build:
       context: ./backend
       dockerfile: services/notification/Dockerfile
-    entrypoint: ['/bin/sh', '/app/services/notification/entrypoint.sh']
+    entrypoint: /app/services/notification/entrypoint.sh
     container_name: notification-svc
     ports:
       - '9004:9004'
