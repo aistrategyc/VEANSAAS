@@ -1,4 +1,3 @@
-import React from 'react'
 import { useController } from 'react-hook-form'
 
 export const Select = ({
@@ -7,6 +6,7 @@ export const Select = ({
 	name,
 	control,
 	rules = { require: 'Choose plan' },
+	error,
 }) => {
 	const {
 		field,
@@ -32,6 +32,7 @@ export const Select = ({
 					</option>
 				))}
 			</select>
+			<p className='text-red-500 text-sm h-5'>{error}</p>
 		</>
 	)
 }

@@ -9,6 +9,7 @@ export const FormInput = ({
 	name,
 	control,
 	rules = { require: true },
+	error,
 }) => {
 	const {
 		field,
@@ -21,6 +22,6 @@ export const FormInput = ({
 	})
 
 	return (
-		<Input placeholder={placeholder} title={title} type={type} {...field} />
+		<Input error={error} placeholder={placeholder} title={title} type={type} {...field} />
 	)
 }

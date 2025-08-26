@@ -6,6 +6,8 @@ import { Form } from '../../shared/ui/form/Form'
 import { Select } from '../../shared/ui/select/Select'
 import { useAuth } from '../../shared/hooks/useAuth'
 import { useNavigate } from 'react-router'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { schemaRegister } from '../../shared/schema/schema'
 
 const plans = [
 	{ value: 'solo', label: 'solo' },
@@ -37,6 +39,7 @@ export const SingUpForm = () => {
 				},
 			},
 		},
+		resolver: yupResolver(schemaRegister),
 	})
 
 	const navigate = useNavigate()
@@ -66,6 +69,7 @@ export const SingUpForm = () => {
 								type='text'
 								name='user.first_name'
 								control={control}
+								error={errors.user?.first_name?.message}
 							/>
 							<FormInput
 								title='Last name'
@@ -73,6 +77,7 @@ export const SingUpForm = () => {
 								type='text'
 								name='user.last_name'
 								control={control}
+								error={errors.user?.last_name?.message}
 							/>
 						</div>
 						<FormInput
@@ -81,6 +86,7 @@ export const SingUpForm = () => {
 							type='text'
 							name='user.username'
 							control={control}
+							error={errors.user?.username?.message}
 						/>
 						<FormInput
 							title='Email'
@@ -88,6 +94,7 @@ export const SingUpForm = () => {
 							type='text'
 							name='user.email'
 							control={control}
+							error={errors.user?.email?.message}
 						/>
 						<FormInput
 							title='Phone number'
@@ -95,6 +102,7 @@ export const SingUpForm = () => {
 							type='tel'
 							name='user.phone_number'
 							control={control}
+							error={errors.user?.phone_number?.message}
 						/>
 						<FormInput
 							title='Password'
@@ -102,6 +110,7 @@ export const SingUpForm = () => {
 							type='password'
 							name='user.password'
 							control={control}
+							error={errors.user?.password?.message}
 						/>
 					</div>
 					<div className='max-w-xl h- bg-gray-100 mx-auto p-10 pt-3 shadow'>
@@ -114,12 +123,14 @@ export const SingUpForm = () => {
 							type='text'
 							name='organization.name'
 							control={control}
+							error={errors.organization?.name?.message}
 						/>
 						<Select
 							plans={plans}
 							title='Choose plan'
 							name='organization.plan_type'
 							control={control}
+							error={errors.organization?.plan_type?.message}
 						/>
 						<FormInput
 							title='Description'
@@ -127,6 +138,7 @@ export const SingUpForm = () => {
 							type='text'
 							name='organization.description'
 							control={control}
+							error={errors.organization?.description?.message}
 						/>
 						<FormInput
 							title='Studio name'
@@ -134,6 +146,7 @@ export const SingUpForm = () => {
 							type='text'
 							name='organization.studio.name'
 							control={control}
+							error={errors.organization?.studio?.name?.message}
 						/>
 					</div>
 				</div>

@@ -4,6 +4,8 @@ import { Button } from '../../shared/ui/button/Button'
 import { Form } from '../../shared/ui/form/Form'
 import { useAuth } from '../../shared/hooks/useAuth'
 import { useNavigate } from 'react-router'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { schemaLogin } from '../../shared/schema/schema'
 
 // redux - token хранить
 // хук для запросов
@@ -20,6 +22,7 @@ export const LoginForm = () => {
 			username: '',
 			password: '',
 		},
+		resolver: yupResolver(schemaLogin),
 	})
 
 	const navigate = useNavigate()
@@ -44,6 +47,7 @@ export const LoginForm = () => {
 				type='text'
 				name={'username'}
 				control={control}
+				error={errors.username?.message}
 			/>
 			<FormInput
 				title='Password'
@@ -51,8 +55,9 @@ export const LoginForm = () => {
 				type='password'
 				name={'password'}
 				control={control}
+				error={errors.password?.message}
 			/>
-			<Button>Отправить</Button>
+			<Button>Send</Button>
 		</Form>
 	)
 }
