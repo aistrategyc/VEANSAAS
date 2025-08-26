@@ -1,13 +1,13 @@
 import React from 'react'
 import { useForm } from 'react-hook-form'
-import { FormInput } from '../../shared/ui/input/FormInput'
-import { Button } from '../../shared/ui/button/Button'
-import { Form } from '../../shared/ui/form/Form'
-import { Select } from '../../shared/ui/select/Select'
-import { useAuth } from '../../shared/hooks/useAuth'
+import { FormInput } from 'shared/ui/input/FormInput'
+import { Button } from 'shared/ui/button/Button'
+import { Form } from 'shared/ui/form/Form'
+import { Select } from 'shared/ui/select/Select'
+import { useAuth } from 'shared/hooks/useAuth'
 import { useNavigate } from 'react-router'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { schemaRegister } from '../../shared/schema/schema'
+import { schemaRegister } from 'shared/schema/schema'
 
 const plans = [
 	{ value: 'solo', label: 'solo' },

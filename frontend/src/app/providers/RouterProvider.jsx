@@ -1,16 +1,36 @@
-import React from 'react'
-import { Route, Routes } from 'react-router'
-import { App } from '../../pages/App'
+import { Navigate, Route, Routes } from 'react-router'
 import { LoginPage } from '../../pages/Login/LoginPage'
 import { RegisterPage } from '../../pages/singUp/RegisterPage'
 import { HomePage } from '../../pages/home/HomePage'
+import { useAuthContext } from './AuthProviderContext'
+import { ProtectedRoute } from './ProtectedRoute'
+import { Loader } from '../../shared/ui/loader/Loader'
 
 export const RouterProvider = () => {
+	const { isAuthenticated, loading } = useAuthContext()
+
+	if (loading) {
+		return <Loader />
+	}
 	return (
 		<Routes>
-			<Route exact path='/' element={<HomePage />} />
-			<Route path='/login' element={<LoginPage />} />
-			<Route path='/register' element={<RegisterPage />} />
+			<Route
+				exact
+				path='/'
+				element={
+					<ProtectedRoute>
+						<HomePage />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path='/login'
+				element={isAuthenticated ? <Navigate to='/' replace /> : <LoginPage />}
+			/>
+			<Route
+				path='/register'
+				element={isAuthenticated ? <Navigate to='/' replace /> : <LoginPage />}
+			/>
 		</Routes>
 	)
 }
