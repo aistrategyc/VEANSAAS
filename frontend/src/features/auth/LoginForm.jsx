@@ -1,67 +1,58 @@
-import React from 'react'
 import { useForm } from 'react-hook-form'
-import { FormInput } from '../../shared/ui/input/FormInput'
-import { ErrorInput } from '../../shared/ui/validate/ErrorInput'
-import { Button } from '../../shared/ui/button/Button'
-import { Form } from '../../shared/ui/form/Form'
-import { Input } from '../../shared/ui/input/Input'
+import { FormInput } from 'shared/ui/input/FormInput'
+import { Button } from 'shared/ui/button/Button'
+import { Form } from 'shared/ui/form/Form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { schemaLogin } from 'shared/schema/schema'
+import { useAuth } from '../../app/contexts/AuthProviderContext'
+import { api } from 'shared/api/api'
 
 export const LoginForm = () => {
 	const {
-		register,
 		handleSubmit,
 		formState: { errors },
 		control,
+		reset,
 	} = useForm({
 		mode: 'onChange,',
+		defaultValues: {
+			username: '',
+			password: '',
+		},
+		resolver: yupResolver(schemaLogin),
 	})
 
-	const emailError = errors['email']?.message
+	const { login } = useAuth()
 	const onSubmit = data => {
-		console.log(data)
+		reset()
+		api
+			.post('auth/login', data)
+
+			.then(response => {
+				login(response.access_token, { expires: 7 })
+			})
+			.catch()
 	}
 
 	return (
-		// <form
-		// 	className='flex flex-col justify-between h-[100%]'
-		// 	onSubmit={handleSubmit(onSubmit)}
-		// >
-		// 	<FormInput
-		// 		required
-		// 		title='Email'
-		// 		type='text'
-		// 		placeholder='Email'
-		// 		{...register('email', {
-		// 			required: 'Поле обязательное',
-		// 			pattern: {
-		// 				value: /^[A-Z0-9._%+-]+@[A-Z0-9. -]+\.[A-Z]{2,4}$/i,
-		// 				message: 'Error',
-		// 			},
-		// 		})}
-		// 	/>
-		// 	{/* {emailError && <ErrorInput title={'Неверный email'} />} */}
-		// 	<FormInput
-		// 		required
-		// 		title='Password'
-		// 		type='password'
-		// 		placeholder='Password'
-		// 		{...register('password', {
-		// 			required: true,
-		// 		})}
-		// 	/>
-
-		// 	<FormButton>Отправить</FormButton>
-		// </form>
-
 		<Form onSubmit={handleSubmit(onSubmit)}>
-			<FormInput title='Email' type='email' name={'email'} control={control} />
+			<FormInput
+				title='Username'
+				placeholder='Username'
+				type='text'
+				name={'username'}
+				control={control}
+				error={errors.username?.message}
+			/>
 			<FormInput
 				title='Password'
+				placeholder='Password'
 				type='password'
 				name={'password'}
 				control={control}
+				error={errors.password?.message}
 			/>
-			<Button>Отправить</Button>
+			<Button>Send</Button>
 		</Form>
 	)
 }
