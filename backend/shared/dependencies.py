@@ -38,7 +38,7 @@ async def get_service_token(token: str = Depends(oauth2_scheme)):
             algorithms=[settings.ALGORITHM],
         )
 
-        if payload.get('sub') != 'service':
+        if payload.get('type') != 'service':
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN, detail='Invalid token type'
             )
@@ -56,9 +56,32 @@ async def get_service_token(token: str = Depends(oauth2_scheme)):
         )
 
 
+async def get_current_principal(token: str = Depends(oauth2_scheme)) -> dict:
+    try:
+        service_payload = await get_service_token(token)
+        return service_payload
+    except HTTPException:
+        pass
+
+    try:
+        user_payload = await get_current_user(token)
+        return user_payload
+    except HTTPException:
+        pass
+
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail='No valid authentication token provided',
+    )
+
+
 async def get_user_service():
-    return UserServiceClient(service_url=settings.USER_SERVICE_URL)
+    return UserServiceClient(
+        service_url=settings.USER_SERVICE_URL, service_name=' user'
+    )
 
 
 async def get_company_units_service():
-    return CompanyUnitsServiceClient(service_url=settings.COMPANY_UNITS_SERVICE_URL)
+    return CompanyUnitsServiceClient(
+        service_url=settings.COMPANY_UNITS_SERVICE_URL, service_name='company_units'
+    )

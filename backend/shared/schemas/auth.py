@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr, Field
 
 
 class UserAuth(BaseModel):
@@ -11,7 +11,8 @@ class UserAuth(BaseModel):
 class AuthUserResponse(BaseModel):
     uuid: UUID | str
     username: str
-    email: str
+    email: EmailStr | str
+    roles: dict
     hashed_password: str
 
     class Config:

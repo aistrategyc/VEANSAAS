@@ -12,7 +12,11 @@ from service import (
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.database import get_db
-from shared.dependencies import get_current_user, get_service_token
+from shared.dependencies import (
+    get_current_principal,
+    get_current_user,
+    get_service_token,
+)
 from shared.schemas.auth import AuthUserResponse
 from shared.schemas.user import (
     UserCreateInternal,
@@ -27,7 +31,10 @@ router = APIRouter(prefix='/users', tags=['User'])
 
 @router.post('/', status_code=status.HTTP_201_CREATED)
 async def create_user_route(
-    request: Request, user: UserCreateInternal, db: AsyncSession = Depends(get_db)
+    request: Request,
+    user: UserCreateInternal,
+    db: AsyncSession = Depends(get_db),
+    identity: dict = Depends(get_current_principal),
 ):
     return await create_user(request=request, user=user, db=db)
 
@@ -57,6 +64,7 @@ async def get_my_user_router(
 async def get_user_for_auth_route(
     request: Request,
     username: str,
+    identity: dict = Depends(get_current_principal),
     db: AsyncSession = Depends(get_db),
 ):
     return await get_user_for_auth(request=request, username=username, db=db)
@@ -71,12 +79,16 @@ async def check_uniqueness_user_route(
     request: Request,
     data: UserUniquenessCheckRequest,
     db: AsyncSession = Depends(get_db),
+    identity: dict = Depends(get_current_principal),
 ):
     return await check_uniqueness_user(request=request, data=data, db=db)
 
 
 @router.post('/verification_email', status_code=status.HTTP_200_OK)
 async def verification_email_route(
-    request: Request, data: UserVerificationEmail, db: AsyncSession = Depends(get_db)
+    request: Request,
+    data: UserVerificationEmail,
+    db: AsyncSession = Depends(get_db),
+    identity: dict = Depends(get_current_principal),
 ):
     return await verification_email(request=request, data=data, db=db)

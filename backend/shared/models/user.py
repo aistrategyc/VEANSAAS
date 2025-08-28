@@ -1,5 +1,5 @@
 from sqlalchemy import Boolean, String, true
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from shared.database import Base
 from shared.models.base import created_at, updated_at, uuid_primary_key
@@ -20,6 +20,18 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, server_default=true())
     is_verified: Mapped[bool] = mapped_column(Boolean, server_default=true())
     hashed_password: Mapped[str] = mapped_column(String(255))
+    studio_memberships: Mapped[list['StudioMember']] = relationship(
+        back_populates='user',
+        lazy='selectin',
+        foreign_keys='StudioMember.user_uuid',
+        passive_deletes=True,
+    )
+    organization_memberships: Mapped[list['OrganizationMember']] = relationship(
+        back_populates='user',
+        lazy='selectin',
+        foreign_keys='OrganizationMember.user_uuid',
+        passive_deletes=True,
+    )
     created_at: Mapped[created_at]
     updated_at: Mapped[updated_at]
 

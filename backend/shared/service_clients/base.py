@@ -6,8 +6,9 @@ from shared.security import create_service_access_token
 
 
 class BaseServiceClient:
-    def __init__(self, service_url: str):
+    def __init__(self, service_url: str, service_name: str):
         self.service_url = service_url
+        self.service_name = service_name
 
     async def _make_request(
         self,
@@ -16,7 +17,7 @@ class BaseServiceClient:
         payload: dict | None = None,
         params: dict | None = None,
     ) -> dict:
-        token = await create_service_access_token()
+        token = await create_service_access_token(service_name=self.service_name)
         url = f'{self.service_url}/{endpoint}'
 
         async with aiohttp.ClientSession() as session:

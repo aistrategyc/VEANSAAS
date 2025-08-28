@@ -3,8 +3,10 @@ from uuid import UUID
 from fastapi import HTTPException, Request, Response, status
 from sqlalchemy import exists, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from shared.models.user import User
+from shared.schemas.auth import AuthUserResponse
 from shared.schemas.error import FieldError, ValidationError
 from shared.schemas.user import (
     UserCreateInternal,
@@ -22,12 +24,38 @@ async def get_user_for_auth(request: Request, username: str, db: AsyncSession):
             User.is_verified.is_(True),
         )
     )
-    user = result.scalar_one_or_none()
-    if not user:
+
+    result = await db.execute(
+        select(User)
+        .filter(
+            User.username == username,
+            User.is_active.is_(True),
+            User.is_verified.is_(True),
+        )
+        .options(
+            selectinload(User.studio_memberships),
+            selectinload(User.organization_memberships),
+        )
+    )
+    db_user = result.scalar_one_or_none()
+    if not db_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail='User not found'
         )
-    return user
+    studios_role = {m.studio_uuid: m.roles for m in db_user.studio_memberships}
+    organizations_role = {
+        m.organization_uuid: m.roles for m in db_user.organization_memberships
+    }
+
+    auth_user_response = AuthUserResponse(
+        uuid=db_user.uuid,
+        username=db_user.username,
+        email=str(db_user.email),
+        hashed_password=db_user.hashed_password,
+        roles={'studios': studios_role, 'orgs': organizations_role},
+    )
+
+    return auth_user_response
 
 
 async def check_uniqueness_user(

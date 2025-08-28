@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from sqlalchemy import JSON, Boolean, ForeignKey, String, Uuid, true
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from shared.database import Base
 from shared.models.base import created_at, created_by_uuid, updated_at, uuid_primary_key
@@ -36,10 +36,16 @@ class StudioMember(Base):
         Uuid(as_uuid=True),
         ForeignKey('user_service.users.uuid', ondelete='CASCADE'),
     )
+    user: Mapped['User'] = relationship(
+        back_populates='studio_memberships',
+        foreign_keys=[user_uuid],
+        passive_deletes=True,
+    )
     studio_uuid: Mapped[UUID] = mapped_column(
         Uuid(as_uuid=True),
         ForeignKey('organization_service.studios.uuid', ondelete='CASCADE'),
     )
+
     roles: Mapped[list[StudioRole]] = mapped_column(JSON)
     created_by_uuid: Mapped[created_by_uuid]
     created_at: Mapped[created_at]

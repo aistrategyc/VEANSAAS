@@ -5,10 +5,11 @@ from jose import jwt
 from shared.config import settings
 
 
-async def create_service_access_token(service_name: str | None = ''):
+async def create_service_access_token(service_name: str):
     expire = datetime.now(timezone.utc) + timedelta(minutes=5)
     data = {
-        'sub': 'service',
+        'sub': f'service_{service_name}',
+        'type': 'service',
         'iss': 'iss-auth-service-vean-saas-v1',
         'exp': expire,
     }

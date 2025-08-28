@@ -18,6 +18,7 @@ async def create_access_token(data: Dict[str, Union[str, datetime | UUID]]):
     )
     data.update(
         {
+            'type': 'user',
             'iss': 'iss-auth-user-vean-saas-v1',
             'exp': expire,
         }

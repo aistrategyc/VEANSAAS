@@ -78,7 +78,7 @@ async def login(
 
     access_token = await create_access_token(
         data={
-            'sub': 'user',
+            'sub': user.uuid,
             'user_uuid': user.uuid,
             'username': user.username,
             'email': user.email,

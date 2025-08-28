@@ -7,6 +7,7 @@ from shared.schemas.company_units.org import (
     OrganizationCreateRequest,
     OrganizationResponse,
 )
+from shared.dependencies import get_current_principal
 
 router = APIRouter(prefix='/orgs', tags=['Orgs'])
 
@@ -18,5 +19,6 @@ async def create_organization_route(
     request: Request,
     data: OrganizationCreateRequest,
     db: AsyncSession = Depends(get_db),
+    identity: dict = Depends(get_current_principal),
 ):
     return await create_organization(request=request, data=data, db=db)

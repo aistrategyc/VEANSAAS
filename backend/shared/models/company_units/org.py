@@ -1,11 +1,11 @@
 from uuid import UUID
 
-from shared.schemas.company_units.org import OrganizationPlanType, OrganizationRole
 from sqlalchemy import JSON, Boolean, ForeignKey, String, Text, Uuid, true
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from shared.database import Base
 from shared.models.base import created_at, created_by_uuid, updated_at, uuid_primary_key
+from shared.schemas.company_units.org import OrganizationPlanType, OrganizationRole
 
 
 class Organization(Base):
@@ -34,6 +34,11 @@ class OrganizationMember(Base):
     user_uuid: Mapped[UUID] = mapped_column(
         Uuid(as_uuid=True),
         ForeignKey('user_service.users.uuid', ondelete='CASCADE'),
+    )
+    user: Mapped['User'] = relationship(
+        back_populates='organization_memberships',
+        foreign_keys=[user_uuid],
+        passive_deletes=True,
     )
     organization_uuid: Mapped[UUID] = mapped_column(
         Uuid(as_uuid=True),
