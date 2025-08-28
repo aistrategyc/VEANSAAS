@@ -3,6 +3,12 @@ import { NavItem } from '../navigationItem/NavItem'
 
 const menuItems = [
 	{
+		id: 'Main',
+		text: 'Главная',
+		icon: '📅',
+		path: '/',
+	},
+	{
 		id: 'records',
 		text: 'Записи',
 		icon: '📅',
@@ -43,7 +49,7 @@ export const NavMenu = () => {
 	}
 
 	const handleItemClick = itemId => {
-		console.log(`Clicked on item: ${itemId}`)
+		//
 	}
 
 	return (

@@ -5,9 +5,12 @@ import {
 	setCookie,
 } from '../../shared/helper/authHelper'
 import { AuthContext } from './AuthContext'
+import { useUser } from '../../shared/hooks/useUser'
 export const AuthProvider = ({ children }) => {
 	const [isAuthenticated, setIsAuthenticated] = useState(false)
 	const [loading, setLoading] = useState(true)
+
+	const { fetchUser } = useUser()
 
 	const login = useCallback((token, options = {}) => {
 		const { expires = 7 } = options
@@ -27,6 +30,7 @@ export const AuthProvider = ({ children }) => {
 
 		if (token) {
 			setIsAuthenticated(true)
+			fetchUser()
 		} else {
 			setIsAuthenticated(false)
 		}

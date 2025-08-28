@@ -51,7 +51,6 @@ export const useApi = () => {
 		[executeRequest]
 	)
 
-	// Сброс состояния
 	const reset = useCallback(() => {
 		setData(null)
 		setError(null)

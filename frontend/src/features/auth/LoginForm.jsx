@@ -9,6 +9,8 @@ import { useApi } from '../../shared/hooks/useApi'
 import { Loader } from '../../shared/ui/loader/Loader'
 import { useEffect } from 'react'
 import { showAlert } from '../../shared/ui/alert/Alerts'
+import { useDispatch } from 'react-redux'
+import { fetchUserData } from '../../shared/slices/userSlice'
 
 export const LoginForm = () => {
 	const {
@@ -27,11 +29,14 @@ export const LoginForm = () => {
 
 	const { login } = useAuth()
 	const { loading, error, post, reset: resetApi } = useApi()
+	const dispatch = useDispatch()
+
 	const onSubmit = data => {
 		reset()
 		post('auth/login', data)
 			.then(response => {
 				login(response.data.access_token, { expires: 7 })
+				dispatch(fetchUserData()).unwrap()
 				showAlert.success('Welcome')
 			})
 			.catch({})
