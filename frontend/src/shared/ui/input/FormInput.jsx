@@ -22,6 +22,12 @@ export const FormInput = ({
 	})
 
 	return (
-		<Input error={error} placeholder={placeholder} title={title} type={type} {...field} />
+		<Input
+			error={error}
+			placeholder={placeholder}
+			title={title}
+			type={type}
+			{...field}
+		/>
 	)
 }

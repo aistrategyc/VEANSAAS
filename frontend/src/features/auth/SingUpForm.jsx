@@ -6,7 +6,10 @@ import { Select } from 'shared/ui/select/Select'
 import { useNavigate } from 'react-router'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { schemaRegister } from 'shared/schema/schema'
-import { api } from 'shared/api/api'
+import { showAlert } from '../../shared/ui/alert/Alerts'
+import { useEffect } from 'react'
+import { useApi } from '../../shared/hooks/useApi'
+import { Loader } from '../../shared/ui/loader/Loader'
 
 const plans = [
 	{ value: 'solo', label: 'solo' },
@@ -43,17 +46,28 @@ export const SingUpForm = () => {
 	})
 
 	const navigate = useNavigate()
+	const { loading, error, post, reset: resetApi } = useApi()
 
 	const onSubmit = data => {
 		reset()
-		api
-			.post('auth/register', data)
+
+		post('auth/register', data)
 			.then(() => {
-				navigate('/login')
+				showAlert.successRegister().then(() => navigate('/login'))
 			})
 			.catch()
 	}
+	useEffect(() => {
+		if (error) {
+			showAlert.error('Error', 'error').then(() => {
+				resetApi()
+			})
+		}
+	}, [error, resetApi])
 
+	if (loading) {
+		return <Loader />
+	}
 	return (
 		<Form onSubmit={handleSubmit(onSubmit)}>
 			<div className='flex flex-col items-center bg-gray-100 rounded-2xl p-5'>

@@ -3,11 +3,11 @@ import { ProtectedRoute } from './ProtectedRoute'
 import { RecordsPage } from '../../pages/records/RecordsPage'
 import { LoginPage } from '../../pages/login/LoginPage'
 import { RegisterPage } from '../../pages/singUp/RegisterPage'
-import { useAuth } from '../contexts/AuthProviderContext'
 import { Loader } from '../../shared/ui/loader/Loader'
 import { Layout } from '../../widgets/layout/Layout'
 import { ClientsPage } from '../../pages/clients/ClientsPage'
 import { DashboardPage } from '../../pages/dashboard/DashboardPage'
+import { useAuth } from '../../shared/hooks/useAuth'
 
 export const RouterProvider = () => {
 	const { isAuthenticated, loading } = useAuth()

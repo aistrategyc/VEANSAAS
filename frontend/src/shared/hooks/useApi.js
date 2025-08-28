@@ -1,82 +1,77 @@
-// import { useState, useCallback } from 'react'
-// import axios from 'axios'
+import { useCallback, useState } from 'react'
+import { api } from '../api/api'
 
-// // Базовый URL вашего API
-// const API_BASE_URL = 'http://localhost:8000/api/v1/'
+export const useApi = () => {
+	const [data, setData] = useState(null)
+	const [error, setError] = useState(null)
+	const [loading, setLoading] = useState(false)
 
-// export const useApi = () => {
-// 	const [loading, setLoading] = useState(false)
-// 	const [error, setError] = useState(null)
+	const executeRequest = useCallback(async (requestFn, ...args) => {
+		setLoading(true)
+		setError(null)
 
-// 	const apiRequest = useCallback(async (endpoint, options = {}) => {
-// 		const {
-// 			method = 'GET',
-// 			data = null,
-// 			headers = {},
-// 			...restOptions
-// 		} = options
+		try {
+			const response = await requestFn(...args)
+			setData(response.data)
+			return response
+		} catch (err) {
+			const errorMessage =
+				err.response?.data?.detail || err.message || 'Unknown error'
+			setError(errorMessage)
+			throw err
+		} finally {
+			setLoading(false)
+		}
+	}, [])
 
-// 		setLoading(true)
-// 		setError(null)
+	const get = useCallback(
+		(endpoint, config) => executeRequest(api.get, endpoint, config),
+		[executeRequest]
+	)
 
-// 		try {
-// 			const url = `${API_BASE_URL}${endpoint}`
+	const post = useCallback(
+		(endpoint, data, config) =>
+			executeRequest(api.post, endpoint, data, config),
+		[executeRequest]
+	)
 
-// 			const response = await axios({
-// 				url,
-// 				method,
-// 				data,
-// 				headers: {
-// 					'Content-Type': 'application/json',
-// 					...headers,
-// 				},
-// 				...restOptions,
-// 			})
+	const put = useCallback(
+		(endpoint, data, config) => executeRequest(api.put, endpoint, data, config),
+		[executeRequest]
+	)
 
-// 			return response.data
-// 		} catch (err) {
-// 			const errorMessage =
-// 				err.response?.data?.message || err.message || 'Произошла ошибка'
-// 			setError(errorMessage)
-// 			throw new Error(errorMessage)
-// 		} finally {
-// 			setLoading(false)
-// 		}
-// 	}, [])
+	const patch = useCallback(
+		(endpoint, data, config) =>
+			executeRequest(api.patch, endpoint, data, config),
+		[executeRequest]
+	)
 
-// 	// Специализированные методы
-// 	const get = useCallback(
-// 		(endpoint, options = {}) =>
-// 			apiRequest(endpoint, { method: 'GET', ...options }),
-// 		[apiRequest]
-// 	)
+	const deleteRequest = useCallback(
+		(endpoint, config) => executeRequest(api.delete, endpoint, config),
+		[executeRequest]
+	)
 
-// 	const post = useCallback(
-// 		(endpoint, data, options = {}) =>
-// 			apiRequest(endpoint, { method: 'POST', data, ...options }),
-// 		[apiRequest]
-// 	)
+	// Сброс состояния
+	const reset = useCallback(() => {
+		setData(null)
+		setError(null)
+		setLoading(false)
+	}, [])
 
-// 	const put = useCallback(
-// 		(endpoint, data, options = {}) =>
-// 			apiRequest(endpoint, { method: 'PUT', data, ...options }),
-// 		[apiRequest]
-// 	)
+	return {
+		
+		data,
+		error,
+		loading,
 
-// 	const del = useCallback(
-// 		(endpoint, options = {}) =>
-// 			apiRequest(endpoint, { method: 'DELETE', ...options }),
-// 		[apiRequest]
-// 	)
+		get,
+		post,
+		put,
+		patch,
+		delete: deleteRequest,
 
-// 	return {
-// 		loading,
-// 		error,
-// 		apiRequest,
-// 		get,
-// 		post,
-// 		put,
-// 		delete: del,
-// 		clearError: () => setError(null),
-// 	}
-// }
+		reset,
+		hasError: error !== null,
+		isSuccess: data !== null && error === null,
+	}
+}

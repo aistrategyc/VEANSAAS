@@ -1,6 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthProviderContext'
 import { Loader } from '../../shared/ui/loader/Loader'
+import { useAuth } from '../../shared/hooks/useAuth'
 
 export const ProtectedRoute = ({
 	children,

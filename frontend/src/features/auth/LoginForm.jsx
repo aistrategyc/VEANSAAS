@@ -4,8 +4,11 @@ import { Button } from 'shared/ui/button/Button'
 import { Form } from 'shared/ui/form/Form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { schemaLogin } from 'shared/schema/schema'
-import { useAuth } from '../../app/contexts/AuthProviderContext'
-import { api } from 'shared/api/api'
+import { useAuth } from '../../shared/hooks/useAuth'
+import { useApi } from '../../shared/hooks/useApi'
+import { Loader } from '../../shared/ui/loader/Loader'
+import { useEffect } from 'react'
+import { showAlert } from '../../shared/ui/alert/Alerts'
 
 export const LoginForm = () => {
 	const {
@@ -23,17 +26,28 @@ export const LoginForm = () => {
 	})
 
 	const { login } = useAuth()
+	const { loading, error, post, reset: resetApi } = useApi()
 	const onSubmit = data => {
 		reset()
-		api
-			.post('auth/login', data)
-
+		post('auth/login', data)
 			.then(response => {
-				login(response.access_token, { expires: 7 })
+				login(response.data.access_token, { expires: 7 })
+				showAlert.success('Welcome')
 			})
-			.catch()
+			.catch({})
 	}
 
+	useEffect(() => {
+		if (error) {
+			showAlert.error('Error', error).then(() => {
+				resetApi()
+			})
+		}
+	}, [error, resetApi])
+
+	if (loading) {
+		return <Loader />
+	}
 	return (
 		<Form onSubmit={handleSubmit(onSubmit)}>
 			<FormInput
