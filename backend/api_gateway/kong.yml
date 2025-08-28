@@ -2,20 +2,53 @@ _format_version: '3.0'
 
 services:
   - name: auth-service
-    url: http://backend-auth:9001
+    url: http://backend-auth:9001/api/v1/auth
     routes:
       - name: auth-route
-        paths: ['/auth']
-        methods: ['POST', 'GET']
+        paths: ['/api/v1/auth']
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
         strip_path: true
 
   - name: user-service
-    url: http://backend-user:9002
+    url: http://backend-user:9002/api/v1/users
     routes:
       - name: user-route
-        paths: ['/users']
-        methods: ['GET', 'POST', 'PUT', 'DELETE']
+        paths: ['/api/v1/users']
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
         strip_path: true
+        plugins:
+          - name: jwt
+            config:
+              run_on_preflight: true
+              claims_to_verify: ['exp']
+              key_claim_name: 'iss'
+              secret_is_base64: false
+              anonymous: null
+
+  - name: company-units-service
+    url: http://backend-company-units:9003/api/v1/orgs
+    routes:
+      - name: company-units-route
+        paths: ['/api/v1/orgs']
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+        strip_path: true
+        plugins:
+          - name: jwt
+            config:
+              run_on_preflight: true
+              claims_to_verify: ['exp']
+              key_claim_name: 'iss'
+              secret_is_base64: false
+
+consumers:
+  - username: my-app
+    jwt_secrets:
+      - key: iss-auth-user-vean-saas-v1
+        secret: test_key_KIQ20UE_Geeb8zpk5LYRBnLanYQjAdvyUbxh50CDuQb4HvztZMQxiJpuhup2U1lfkYQ
+        algorithm: HS256
+      - key: iss-auth-service-vean-saas-v1
+        secret: test_key_4354345
+        algorithm: HS256
 
 plugins:
   - name: cors

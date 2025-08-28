@@ -3,7 +3,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from shared.logger import logger
-from shared.schemas.base import ErrorResponse
+from shared.schemas.error import ErrorResponse
 
 
 async def validation_exception_handler(

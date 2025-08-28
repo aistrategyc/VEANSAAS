@@ -7,7 +7,10 @@ build:
 
 
 migrate:
-	docker compose exec backend-auth alembic upgrade head
+	docker compose exec admin-panel alembic upgrade head
 
 create-migration:
-	docker compose exec backend-auth alembic revision --autogenerate
+	docker compose exec admin-panel alembic revision --autogenerate
+
+history:
+	docker compose exec admin-panel alembic history
