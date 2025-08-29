@@ -154,6 +154,15 @@ services:
       timeout: 10s
       retries: 5
 
+  redis:
+    image: redis:alpine
+    ports:
+      - 6380:6379
+    env_file:
+      - ./backend/.env
+    volumes:
+      - redis_data:/data
 volumes:
   postgres_data:
   rabbitmq_data:
+  redis_data:
