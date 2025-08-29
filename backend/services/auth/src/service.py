@@ -4,6 +4,7 @@ from security import pwd_context
 from sqlalchemy.ext.asyncio import AsyncSession
 from utils import (
     create_access_token,
+    create_refresh_token,
     create_verification_token,
     get_verification_token,
     verify_password,
@@ -76,16 +77,19 @@ async def login(
             headers={'WWW-Authenticate': 'Bearer'},
         )
 
-    access_token = await create_access_token(
-        data={
-            'sub': user.uuid,
-            'user_uuid': user.uuid,
-            'username': user.username,
-            'email': user.email,
-        }
-    )
+    user_date = {
+        'sub': user.uuid,
+        'user_uuid': user.uuid,
+        'username': user.username,
+        'email': user.email,
+        'roles': user.roles,
+    }
 
-    return TokenResponse(access_token=access_token)
+    access_token = await create_access_token(data=user_date)
+
+    refresh_token = await create_refresh_token(data=user_date)
+
+    return TokenResponse(access_token=access_token, refresh_token=refresh_token)
 
 
 async def verify_email(request: Request, token: str, user_service: UserServiceClient):
@@ -100,4 +104,13 @@ async def verify_email(request: Request, token: str, user_service: UserServiceCl
         )
     await user_service.verification_email(
         request_data=UserVerificationEmail(user_uuid=str(user_uuid), email=email)
+    )
+
+
+async def refresh_access_token(request: Request, payload: dict):
+    access_token = await create_access_token(data=payload)
+
+    return TokenResponse(
+        access_token=access_token,
+        token_type='bearer',
     )

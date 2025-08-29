@@ -22,4 +22,5 @@ class LoginUserRequest(BaseModel):
 
 class TokenResponse(BaseModel):
     access_token: str
+    refresh_token: str | None = Field(default=None)
     token_type: str = Field(default='bearer')

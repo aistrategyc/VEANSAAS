@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, timezone
-from typing import Dict, Union
+from typing import Any, Dict, Union
 from uuid import UUID
 
 from config import auth_settings
@@ -12,7 +12,7 @@ async def verify_password(password: str, hashed_password: str):
     return pwd_context.verify(password, hashed_password)
 
 
-async def create_access_token(data: Dict[str, Union[str, datetime | UUID]]):
+async def create_access_token(data: Dict[str, Any]) -> str:
     expire = datetime.now(timezone.utc) + timedelta(
         minutes=auth_settings.ACCESS_TOKEN_EXPIRE_MINUTES
     )
@@ -23,6 +23,24 @@ async def create_access_token(data: Dict[str, Union[str, datetime | UUID]]):
             'exp': expire,
         }
     )
+    encoded_jwt = jwt.encode(
+        data, auth_settings.SECRET_KEY, algorithm=auth_settings.ALGORITHM
+    )
+    return encoded_jwt
+
+
+async def create_refresh_token(data: Dict[str, Any]) -> str:
+    expire = datetime.now(timezone.utc) + timedelta(
+        hours=auth_settings.REFRESH_TOKEN_EXPIRE_HOURS
+    )
+    data.update(
+        {
+            'type': 'refresh',
+            'iss': 'iss-auth-user-vean-saas-v1',
+            'exp': expire,
+        }
+    )
+
     encoded_jwt = jwt.encode(
         data, auth_settings.SECRET_KEY, algorithm=auth_settings.ALGORITHM
     )
