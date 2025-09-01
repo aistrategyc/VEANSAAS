@@ -1,6 +1,7 @@
 import React from 'react'
 import { Input } from './Input'
 import { useController } from 'react-hook-form'
+import { Label } from '@/components/ui/label'
 
 export const FormInput = ({
 	placeholder,
@@ -22,12 +23,13 @@ export const FormInput = ({
 	})
 
 	return (
-		<Input
-			error={error}
-			placeholder={placeholder}
-			title={title}
-			type={type}
-			{...field}
-		/>
+		<div className='space-y-2'>
+			<div className='flex items-center'>
+				<Label htmlFor='login-email'>{title}</Label>{' '}
+				<p className='text-red-500 text-sm h-5 ml-2'>{error}</p>
+			</div>
+
+			<Input error={error} placeholder={placeholder} type={type} {...field} />
+		</div>
 	)
 }

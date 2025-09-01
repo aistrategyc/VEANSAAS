@@ -1,15 +1,16 @@
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { FormInput } from 'shared/ui/input/FormInput'
-import { Button } from 'shared/ui/button/Button'
 import { Form } from 'shared/ui/form/Form'
-import { Select } from 'shared/ui/select/Select'
 import { useNavigate } from 'react-router'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { schemaRegister } from 'shared/schema/schema'
 import { showAlert } from '../../shared/ui/alert/Alerts'
-import { useEffect } from 'react'
 import { useApi } from '../../shared/hooks/useApi'
 import { Loader } from '../../shared/ui/loader/Loader'
+import { Button } from '@/components/ui/button'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { cn } from '@/lib/utils'
+import { SelectForm } from '@/shared/ui/select/Select'
 
 const plans = [
 	{ value: 'solo', label: 'solo' },
@@ -36,7 +37,7 @@ export const SingUpForm = () => {
 			organization: {
 				name: '',
 				description: '',
-				plan_type: '',
+				plan_type: 'solo',
 				studio: {
 					name: '',
 				},
@@ -45,129 +46,131 @@ export const SingUpForm = () => {
 		resolver: yupResolver(schemaRegister),
 	})
 
+	const hasPersonErrors =
+		errors.user?.first_name ||
+		errors.user?.last_name ||
+		errors.user?.username ||
+		errors.user?.email ||
+		errors.user?.phone_number ||
+		errors.user?.password
+
+	const hasOrgErrors =
+		errors.organization?.name ||
+		errors.organization?.plan_type ||
+		errors.organization?.description ||
+		errors.organization?.studio?.name
+
 	const navigate = useNavigate()
 	const { loading, error, post, reset: resetApi } = useApi()
 
 	const onSubmit = data => {
-		reset()
-
 		post('auth/register', data)
 			.then(() => {
 				showAlert.successRegister().then(() => navigate('/login'))
+				reset()
 			})
 			.catch()
 	}
-	useEffect(() => {
-		if (error) {
-			showAlert.error('Error', 'error').then(() => {
-				resetApi()
-			})
-		}
-	}, [error, resetApi])
 
 	if (loading) {
 		return <Loader />
 	}
 	return (
-		<Form onSubmit={handleSubmit(onSubmit)}>
-			<div className='flex flex-col items-center bg-gray-100 rounded-2xl p-5'>
-				<div className='flex justify-between'>
-					<div className='bg-fuchsia-100 mx-auto p-10 pt-3 shadow'>
-						<h2 className='text-gray-700 text-2xl font-bold text-center'>
-							Person
-						</h2>
-						<div className='flex justify-between w-95'>
-							<FormInput
-								title='First name'
-								placeholder='First name'
-								type='text'
-								name='user.first_name'
-								control={control}
-								error={errors.user?.first_name?.message}
-							/>
-							<FormInput
-								title='Last name'
-								placeholder='Last name'
-								type='text'
-								name='user.last_name'
-								control={control}
-								error={errors.user?.last_name?.message}
-							/>
-						</div>
-						<FormInput
-							title='Username'
-							placeholder='Username'
-							type='text'
-							name='user.username'
-							control={control}
-							error={errors.user?.username?.message}
-						/>
-						<FormInput
-							title='Email'
-							placeholder='Email'
-							type='text'
-							name='user.email'
-							control={control}
-							error={errors.user?.email?.message}
-						/>
-						<FormInput
-							title='Phone number'
-							placeholder='Number'
-							type='tel'
-							name='user.phone_number'
-							control={control}
-							error={errors.user?.phone_number?.message}
-						/>
-						<FormInput
-							title='Password'
-							placeholder='Password'
-							type='password'
-							name='user.password'
-							control={control}
-							error={errors.user?.password?.message}
-						/>
-					</div>
-					<div className='max-w-xl h- bg-gray-100 mx-auto p-10 pt-3 shadow'>
-						<h2 className='text-gray-700 text-2xl font-bold text-center'>
-							Organization
-						</h2>
-						<FormInput
-							title='Name organization'
-							placeholder='Name organization'
-							type='text'
-							name='organization.name'
-							control={control}
-							error={errors.organization?.name?.message}
-						/>
-						<Select
-							plans={plans}
-							title='Choose plan'
-							name='organization.plan_type'
-							control={control}
-							error={errors.organization?.plan_type?.message}
-						/>
-						<FormInput
-							title='Description'
-							placeholder='Description'
-							type='text'
-							name='organization.description'
-							control={control}
-							error={errors.organization?.description?.message}
-						/>
-						<FormInput
-							title='Studio name'
-							placeholder='Studio name'
-							type='text'
-							name='organization.studio.name'
-							control={control}
-							error={errors.organization?.studio?.name?.message}
-						/>
-					</div>
-				</div>
-				<div className='w-60 mt-4'>
-					<Button>Send</Button>
-				</div>
-			</div>
-		</Form>
+		<Tabs defaultValue='person' className='w-full'>
+			<TabsList className='grid w-full grid-cols-2 p-0'>
+				<TabsTrigger
+					value='person'
+					className={cn(hasPersonErrors && 'border-destructive border-2')}
+				>
+					Person
+				</TabsTrigger>
+				<TabsTrigger
+					value='organization'
+					className={cn(hasOrgErrors && ' border-destructive border-2')}
+				>
+					Organization
+				</TabsTrigger>
+			</TabsList>
+
+			<Form onSubmit={handleSubmit(onSubmit)}>
+				<TabsContent value='person'>
+					<FormInput
+						title='First name'
+						type='text'
+						name='user.first_name'
+						control={control}
+						error={errors.user?.first_name?.message}
+					/>
+					<FormInput
+						title='Last name'
+						type='text'
+						name='user.last_name'
+						control={control}
+						error={errors.user?.last_name?.message}
+					/>
+					<FormInput
+						title='Username'
+						type='text'
+						name='user.username'
+						control={control}
+						error={errors.user?.username?.message}
+					/>
+					<FormInput
+						title='Email'
+						type='text'
+						name='user.email'
+						control={control}
+						error={errors.user?.email?.message}
+					/>
+					<FormInput
+						title='Phone number'
+						type='tel'
+						name='user.phone_number'
+						control={control}
+						error={errors.user?.phone_number?.message}
+					/>
+					<FormInput
+						title='Password'
+						type='password'
+						name='user.password'
+						control={control}
+						error={errors.user?.password?.message}
+					/>
+				</TabsContent>
+				<TabsContent value='organization'>
+					<FormInput
+						title='Name organization'
+						type='text'
+						name='organization.name'
+						control={control}
+						error={errors.organization?.name?.message}
+					/>
+					<SelectForm
+						plans={plans}
+						title='Choose plan'
+						name='organization.plan_type'
+						control={control}
+						error={errors.organization?.plan_type?.message}
+					/>
+					<FormInput
+						title='Description'
+						type='text'
+						name='organization.description'
+						control={control}
+						error={errors.organization?.description?.message}
+					/>
+					<FormInput
+						title='Studio name'
+						type='text'
+						name='organization.studio.name'
+						control={control}
+						error={errors.organization?.studio?.name?.message}
+					/>
+				</TabsContent>
+				<Button type='submit' className='w-full mt-2'>
+					Send
+				</Button>
+			</Form>
+		</Tabs>
 	)
 }
