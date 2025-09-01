@@ -21,11 +21,11 @@ export default function ServicesPage() {
 			name: 'Женская стрижка',
 			category: 'Парикмахерские услуги',
 			duration: '60 мин',
-			price: '₽2,500',
+			price: '$2,500',
 			description: 'Стрижка любой сложности с укладкой',
 			masters: ['Елена Кузнецова', 'Мария Петрова'],
 			bookingsThisMonth: 45,
-			revenue: '₽112,500',
+			revenue: '$112,500',
 			status: 'active',
 		},
 		{
@@ -33,11 +33,11 @@ export default function ServicesPage() {
 			name: 'Окрашивание волос',
 			category: 'Парикмахерские услуги',
 			duration: '180 мин',
-			price: '₽4,500',
+			price: '$4,500',
 			description: 'Окрашивание в один тон или сложные техники',
 			masters: ['Елена Кузнецова'],
 			bookingsThisMonth: 32,
-			revenue: '₽144,000',
+			revenue: '$144,000',
 			status: 'active',
 		},
 		{
@@ -45,11 +45,11 @@ export default function ServicesPage() {
 			name: 'Маникюр классический',
 			category: 'Ногтевой сервис',
 			duration: '90 мин',
-			price: '₽1,800',
+			price: '$1,800',
 			description: 'Классический маникюр с покрытием гель-лак',
 			masters: ['Ольга Морозова', 'Анна Смирнова'],
 			bookingsThisMonth: 67,
-			revenue: '₽120,600',
+			revenue: '$120,600',
 			status: 'active',
 		},
 		{
@@ -57,11 +57,11 @@ export default function ServicesPage() {
 			name: 'Татуировка малая',
 			category: 'Татуировки',
 			duration: '120 мин',
-			price: '₽8,000',
+			price: '$8,000',
 			description: 'Татуировка размером до 10x10 см',
 			masters: ['Дмитрий Волков'],
 			bookingsThisMonth: 15,
-			revenue: '₽120,000',
+			revenue: '$120,000',
 			status: 'active',
 		},
 		{
@@ -69,11 +69,11 @@ export default function ServicesPage() {
 			name: 'Пирсинг уха',
 			category: 'Пирсинг',
 			duration: '30 мин',
-			price: '₽2,000',
+			price: '$2,000',
 			description: 'Прокол мочки или хряща уха с украшением',
 			masters: ['Анна Лебедева'],
 			bookingsThisMonth: 28,
-			revenue: '₽56,000',
+			revenue: '$56,000',
 			status: 'active',
 		},
 		{
@@ -81,11 +81,11 @@ export default function ServicesPage() {
 			name: 'Лазерная эпиляция ног',
 			category: 'Лазерные процедуры',
 			duration: '60 мин',
-			price: '₽3,500',
+			price: '$3,500',
 			description: 'Лазерная эпиляция ног полностью',
 			masters: ['Светлана Козлова'],
 			bookingsThisMonth: 22,
-			revenue: '₽77,000',
+			revenue: '$77,000',
 			status: 'active',
 		},
 	]
@@ -174,7 +174,7 @@ export default function ServicesPage() {
 							<DollarSign className='h-4 w-4 text-primary' />
 							<div>
 								<p className='text-2xl font-bold text-card-foreground'>
-									₽3,200
+									$3,200
 								</p>
 								<p className='text-sm text-muted-foreground'>
 									Средняя стоимость

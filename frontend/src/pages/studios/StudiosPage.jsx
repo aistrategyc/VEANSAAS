@@ -27,8 +27,8 @@ export default function StudiosPage() {
 			manager: 'Елена Петрова',
 			staff: 12,
 			rooms: 8,
-			todayRevenue: '₽67,500',
-			monthRevenue: '₽1,250,000',
+			todayRevenue: '$67,500',
+			monthRevenue: '$1,250,000',
 			occupancy: 85,
 			status: 'active',
 			services: ['Парикмахерские', 'Маникюр', 'Косметология'],
@@ -41,8 +41,8 @@ export default function StudiosPage() {
 			manager: 'Дмитрий Волков',
 			staff: 6,
 			rooms: 4,
-			todayRevenue: '₽45,000',
-			monthRevenue: '₽890,000',
+			todayRevenue: '$45,000',
+			monthRevenue: '$890,000',
 			occupancy: 92,
 			status: 'active',
 			services: ['Татуировки', 'Пирсинг'],
@@ -55,8 +55,8 @@ export default function StudiosPage() {
 			manager: 'Анна Сидорова',
 			staff: 8,
 			rooms: 6,
-			todayRevenue: '₽52,300',
-			monthRevenue: '₽980,000',
+			todayRevenue: '$52,300',
+			monthRevenue: '$980,000',
 			occupancy: 78,
 			status: 'active',
 			services: ['Лазерная эпиляция', 'Косметология'],
@@ -69,8 +69,8 @@ export default function StudiosPage() {
 			manager: 'Михаил Козлов',
 			staff: 5,
 			rooms: 3,
-			todayRevenue: '₽28,900',
-			monthRevenue: '₽560,000',
+			todayRevenue: '$28,900',
+			monthRevenue: '$560,000',
 			occupancy: 95,
 			status: 'maintenance',
 			services: ['Мужские стрижки', 'Бритье'],
@@ -125,7 +125,7 @@ export default function StudiosPage() {
 							<DollarSign className='h-4 w-4 text-purple-500' />
 							<div>
 								<p className='text-2xl font-bold text-card-foreground'>
-									₽193,700
+									$193,700
 								</p>
 								<p className='text-sm text-muted-foreground'>Выручка сегодня</p>
 							</div>

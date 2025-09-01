@@ -32,7 +32,7 @@ export default function StaffPage() {
 			experience: '8 лет',
 			specializations: ['Стрижки', 'Окрашивание', 'Укладки'],
 			todayAppointments: 8,
-			monthRevenue: '₽125,000',
+			monthRevenue: '$125,000',
 			status: 'active',
 		},
 		{
@@ -45,7 +45,7 @@ export default function StaffPage() {
 			experience: '5 лет',
 			specializations: ['Маникюр', 'Педикюр', 'Наращивание'],
 			todayAppointments: 6,
-			monthRevenue: '₽89,000',
+			monthRevenue: '$89,000',
 			status: 'active',
 		},
 		{
@@ -58,7 +58,7 @@ export default function StaffPage() {
 			experience: '12 лет',
 			specializations: ['Татуировки', 'Эскизы', 'Реализм'],
 			todayAppointments: 3,
-			monthRevenue: '₽180,000',
+			monthRevenue: '$180,000',
 			status: 'active',
 		},
 		{
@@ -71,7 +71,7 @@ export default function StaffPage() {
 			experience: '6 лет',
 			specializations: ['Пирсинг', 'Украшения', 'Консультации'],
 			todayAppointments: 4,
-			monthRevenue: '₽67,000',
+			monthRevenue: '$67,000',
 			status: 'vacation',
 		},
 	]

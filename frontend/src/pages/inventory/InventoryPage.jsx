@@ -25,7 +25,7 @@ export default function InventoryPage() {
 			minStock: 10,
 			maxStock: 50,
 			unit: 'шт',
-			price: '₽1,200',
+			price: '$1,200',
 			supplier: 'Beauty Supply Co',
 			lastRestocked: '2024-01-10',
 			status: 'in-stock',
@@ -39,7 +39,7 @@ export default function InventoryPage() {
 			minStock: 15,
 			maxStock: 100,
 			unit: 'шт',
-			price: '₽850',
+			price: '$850',
 			supplier: 'Nail Pro',
 			lastRestocked: '2024-01-05',
 			status: 'low-stock',
@@ -53,7 +53,7 @@ export default function InventoryPage() {
 			minStock: 5,
 			maxStock: 30,
 			unit: 'мл',
-			price: '₽2,500',
+			price: '$2,500',
 			supplier: 'Tattoo Supplies',
 			lastRestocked: '2024-01-08',
 			status: 'in-stock',
@@ -67,7 +67,7 @@ export default function InventoryPage() {
 			minStock: 20,
 			maxStock: 100,
 			unit: 'шт',
-			price: '₽150',
+			price: '$150',
 			supplier: 'Medical Supply',
 			lastRestocked: '2023-12-28',
 			status: 'out-of-stock',
@@ -81,7 +81,7 @@ export default function InventoryPage() {
 			minStock: 5,
 			maxStock: 20,
 			unit: 'л',
-			price: '₽3,200',
+			price: '$3,200',
 			supplier: 'Laser Tech',
 			lastRestocked: '2024-01-12',
 			status: 'in-stock',
@@ -153,7 +153,7 @@ export default function InventoryPage() {
 							<TrendingUp className='h-4 w-4 text-purple-500' />
 							<div>
 								<p className='text-2xl font-bold text-card-foreground'>
-									₽245,600
+									$245,600
 								</p>
 								<p className='text-sm text-muted-foreground'>
 									Стоимость запасов

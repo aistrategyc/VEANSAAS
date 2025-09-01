@@ -21,7 +21,7 @@ export default function FinancesPage() {
 			id: 1,
 			type: 'income',
 			description: 'Оплата услуг - Анна Петрова',
-			amount: '₽4,500',
+			amount: '$4,500',
 			method: 'Карта',
 			date: '2024-01-15 14:30',
 			category: 'Парикмахерские услуги',
@@ -31,7 +31,7 @@ export default function FinancesPage() {
 			id: 2,
 			type: 'income',
 			description: 'Оплата услуг - Мария Сидорова',
-			amount: '₽2,000',
+			amount: '$2,000',
 			method: 'Наличные',
 			date: '2024-01-15 12:15',
 			category: 'Маникюр',
@@ -41,7 +41,7 @@ export default function FinancesPage() {
 			id: 3,
 			type: 'expense',
 			description: 'Закупка материалов - Beauty Supply',
-			amount: '₽15,000',
+			amount: '$15,000',
 			method: 'Перевод',
 			date: '2024-01-15 10:00',
 			category: 'Расходные материалы',
@@ -51,7 +51,7 @@ export default function FinancesPage() {
 			id: 4,
 			type: 'income',
 			description: 'Оплата услуг - Екатерина Иванова',
-			amount: '₽15,000',
+			amount: '$15,000',
 			method: 'Карта',
 			date: '2024-01-15 09:45',
 			category: 'Татуировка',
@@ -61,7 +61,7 @@ export default function FinancesPage() {
 			id: 5,
 			type: 'expense',
 			description: 'Аренда помещения',
-			amount: '₽85,000',
+			amount: '$85,000',
 			method: 'Перевод',
 			date: '2024-01-15 09:00',
 			category: 'Аренда',
@@ -103,7 +103,7 @@ export default function FinancesPage() {
 								<TrendingUp className='h-4 w-4 text-green-500' />
 								<div>
 									<p className='text-2xl font-bold text-card-foreground'>
-										₽650,000
+										$650,000
 									</p>
 									<p className='text-sm text-muted-foreground'>
 										Доходы за месяц
@@ -127,7 +127,7 @@ export default function FinancesPage() {
 								<TrendingDown className='h-4 w-4 text-red-500' />
 								<div>
 									<p className='text-2xl font-bold text-card-foreground'>
-										₽380,000
+										$380,000
 									</p>
 									<p className='text-sm text-muted-foreground'>
 										Расходы за месяц
@@ -150,7 +150,7 @@ export default function FinancesPage() {
 							<DollarSign className='h-4 w-4 text-blue-500' />
 							<div>
 								<p className='text-2xl font-bold text-card-foreground'>
-									₽270,000
+									$270,000
 								</p>
 								<p className='text-sm text-muted-foreground'>
 									Прибыль за месяц
@@ -172,7 +172,7 @@ export default function FinancesPage() {
 							<Wallet className='h-4 w-4 text-purple-500' />
 							<div>
 								<p className='text-2xl font-bold text-card-foreground'>
-									₽45,230
+									$45,230
 								</p>
 								<p className='text-sm text-muted-foreground'>Выручка сегодня</p>
 							</div>
@@ -213,7 +213,7 @@ export default function FinancesPage() {
 													Доходы
 												</span>
 												<span className='font-medium text-foreground'>
-													₽{stat.income.toLocaleString()}
+													${stat.income.toLocaleString()}
 												</span>
 											</div>
 											<div className='flex items-center gap-2'>
@@ -222,7 +222,7 @@ export default function FinancesPage() {
 													Расходы
 												</span>
 												<span className='font-medium text-foreground'>
-													₽{stat.expenses.toLocaleString()}
+													${stat.expenses.toLocaleString()}
 												</span>
 											</div>
 										</div>
@@ -230,7 +230,7 @@ export default function FinancesPage() {
 								</div>
 								<div className='text-right'>
 									<p className='font-medium text-foreground'>
-										₽{(stat.income - stat.expenses).toLocaleString()}
+										${(stat.income - stat.expenses).toLocaleString()}
 									</p>
 									<p className='text-xs text-muted-foreground'>Прибыль</p>
 								</div>
