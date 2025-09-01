@@ -3,13 +3,13 @@ from service import create_organization
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.database import get_db
+from shared.dependencies import get_auth_context, AuthContext
 from shared.schemas.company_units.org import (
     OrganizationCreateRequest,
     OrganizationResponse,
 )
-from shared.dependencies import get_current_principal
 
-router = APIRouter(prefix='/orgs', tags=['Orgs'])
+router = APIRouter(prefix='/orgs', tags=['Organizations'])
 
 
 @router.post(
@@ -19,6 +19,6 @@ async def create_organization_route(
     request: Request,
     data: OrganizationCreateRequest,
     db: AsyncSession = Depends(get_db),
-    identity: dict = Depends(get_current_principal),
+    auth: AuthContext = Depends(get_auth_context),
 ):
     return await create_organization(request=request, data=data, db=db)

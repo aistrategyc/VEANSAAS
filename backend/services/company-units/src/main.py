@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from routers.org import router as router_organization
+from routers.studio import router as studio_organization
 
 from shared.config import settings
 from shared.exceptions import validation_exception_handler
@@ -17,10 +18,12 @@ app = FastAPI(
 
 if not settings.DEBUG:
     app.middleware('http')(error_handler)
-    app.add_exception_handler(RequestValidationError, validation_exception_handler)
+
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
 
 
 app.include_router(router=router_organization, prefix='/api/v1')
+app.include_router(router=studio_organization, prefix='/api/v1')
 
 app.add_middleware(
     CORSMiddleware,

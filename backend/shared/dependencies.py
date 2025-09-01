@@ -12,6 +12,28 @@ from shared.service_clients.user import UserServiceClient
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 
 
+class AuthContext:
+    def __init__(self, payload: dict):
+        self._payload = payload
+        self._type = payload.get('type')
+
+    @property
+    def is_service(self) -> bool:
+        return self._type == 'service'
+
+    @property
+    def is_user(self) -> bool:
+        return self._type == 'user'
+
+    @property
+    def user(self):
+        return self._payload.get('user') if self.is_user else None
+
+    @property
+    def raw_payload(self):
+        return self._payload
+
+
 async def get_current_user(
     token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
 ):
@@ -89,18 +111,20 @@ async def get_service_token(token: str = Depends(oauth2_scheme)):
         )
 
 
-async def get_current_principal(
+async def get_auth_context(
     token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
-) -> dict:
+) -> AuthContext:
     try:
         service_payload = await get_service_token(token)
-        return service_payload
+        return AuthContext(payload=service_payload)
+
     except HTTPException:
         pass
 
     try:
         user_payload = await get_current_user(token=token, db=db)
-        return user_payload
+        return AuthContext(payload=user_payload)
+
     except HTTPException:
         pass
 

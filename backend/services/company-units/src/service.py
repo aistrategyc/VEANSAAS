@@ -1,6 +1,7 @@
 from fastapi import Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from shared.dependencies import AuthContext
 from shared.models.company_units.org import Organization, OrganizationMember
 from shared.models.company_units.studio import Studio, StudioMember
 from shared.schemas.company_units.org import (
@@ -11,6 +12,7 @@ from shared.schemas.company_units.org import (
     OrganizationRole,
 )
 from shared.schemas.company_units.studio import (
+    StudioInviteCreate,
     StudioMemberCreateRequest,
     StudioResponse,
     StudioRole,
@@ -66,3 +68,15 @@ async def create_organization(
         studio_response = StudioResponse.model_validate(db_studio)
         organization_response.studio = studio_response
         return organization_response
+
+
+async def create_studio_invite(
+    request: Request,
+    studio_uuid: str,
+    data: StudioInviteCreate,
+    db: AsyncSession,
+    auth: AuthContext,
+):
+    print(auth.user, 'auth')
+    print(data, 'data')
+    print(studio_uuid, 'studio_uuid')

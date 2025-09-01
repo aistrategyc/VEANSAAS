@@ -4,6 +4,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
+from shared.schemas.company_units.base import BaseInviteCreate
 from shared.schemas.company_units.enum import StudioRole
 
 
@@ -34,3 +35,7 @@ class StudioResponse(StudioBase):
 
 class StudioMemberCreateRequest(StudioMemberBase):
     created_by_uuid: UUID | str
+
+
+class StudioInviteCreate(BaseInviteCreate):
+    roles: List[StudioRole]
