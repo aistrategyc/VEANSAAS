@@ -1,13 +1,20 @@
 import { useRoutes, Navigate, Outlet } from 'react-router-dom'
 import { ProtectedRoute } from './ProtectedRoute'
-import { RecordsPage } from '../../pages/records/RecordsPage'
-import { LoginPage } from '../../pages/login/LoginPage'
-import { RegisterPage } from '../../pages/singUp/RegisterPage'
 import { Loader } from '../../shared/ui/loader/Loader'
 import { Layout } from '../../widgets/layout/Layout'
-import { ClientsPage } from '../../pages/clients/ClientsPage'
-import { DashboardPage } from '../../pages/dashboard/DashboardPage'
 import { useAuth } from '../../shared/hooks/useAuth'
+import DashboardPage from '@/pages/dashboard/DashboardPage'
+import ClientsPage from '@/pages/clients/ClientsPage'
+import CalendarPage from '@/pages/calendar/CalendarPage'
+import AppointmentsPage from '@/pages/appointments/AppointmentsPage'
+import StaffPage from '@/pages/staff/StaffPage'
+import ServicesPage from '@/pages/services/ServicesPage'
+import StudiosPage from '@/pages/studios/StudiosPage'
+import InventoryPage from '@/pages/inventory/InventoryPage'
+import LoyaltyPage from '@/pages/loyalty/LoyaltyPage'
+import FinancesPage from '@/pages/finances/FinancesPage'
+import AnalyticsPage from '@/pages/analytics/AnalyticsPage'
+import { AuthPage } from '@/pages/auth/AuthPage'
 
 export const RouterProvider = () => {
 	const { isAuthenticated, loading } = useAuth()
@@ -15,11 +22,7 @@ export const RouterProvider = () => {
 	const routes = useRoutes([
 		{
 			path: '/login',
-			element: isAuthenticated ? <Navigate to='/' replace /> : <LoginPage />,
-		},
-		{
-			path: '/register',
-			element: isAuthenticated ? <Navigate to='/' replace /> : <RegisterPage />,
+			element: isAuthenticated ? <Navigate to='/' replace /> : <AuthPage />,
 		},
 		{
 			path: '/*',
@@ -32,8 +35,16 @@ export const RouterProvider = () => {
 			),
 			children: [
 				{ index: true, element: <DashboardPage /> },
-				{ path: 'records', element: <RecordsPage /> },
 				{ path: 'clients', element: <ClientsPage /> },
+				{ path: 'calendar', element: <CalendarPage /> },
+				{ path: 'records', element: <AppointmentsPage /> },
+				{ path: 'staff', element: <StaffPage /> },
+				{ path: 'services', element: <ServicesPage /> },
+				{ path: 'studios', element: <StudiosPage /> },
+				{ path: 'inventory', element: <InventoryPage /> },
+				{ path: 'loyalty', element: <LoyaltyPage /> },
+				{ path: 'finance', element: <FinancesPage /> },
+				{ path: 'analytics', element: <AnalyticsPage /> },
 				{ path: '*', element: <Navigate to='/' replace /> },
 			],
 		},

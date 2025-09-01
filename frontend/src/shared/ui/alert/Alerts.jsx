@@ -16,6 +16,13 @@ export const showAlert = {
 		})
 	},
 
+
+	// Нихуя не понимаю 
+	// роли посмотреть и разобраться
+	// клиент
+	//
+
+
 	success: (title = 'Success', text = '') => {
 		return Swal.fire({
 			title,

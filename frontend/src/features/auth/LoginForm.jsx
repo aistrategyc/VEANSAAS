@@ -1,16 +1,16 @@
 import { useForm } from 'react-hook-form'
 import { FormInput } from 'shared/ui/input/FormInput'
-import { Button } from 'shared/ui/button/Button'
 import { Form } from 'shared/ui/form/Form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { schemaLogin } from 'shared/schema/schema'
 import { useAuth } from '../../shared/hooks/useAuth'
 import { useApi } from '../../shared/hooks/useApi'
 import { Loader } from '../../shared/ui/loader/Loader'
-import { useEffect } from 'react'
 import { showAlert } from '../../shared/ui/alert/Alerts'
 import { useDispatch } from 'react-redux'
 import { fetchUserData } from '../../shared/slices/userSlice'
+import { Link } from 'react-router'
+import { Button } from '@/components/ui/button'
 
 export const LoginForm = () => {
 	const {
@@ -32,32 +32,21 @@ export const LoginForm = () => {
 	const dispatch = useDispatch()
 
 	const onSubmit = data => {
-		reset()
 		post('auth/login', data)
 			.then(response => {
 				login(response.data.access_token, { expires: 7 })
 				dispatch(fetchUserData()).unwrap()
-				showAlert.success('Welcome')
+				reset()
 			})
 			.catch({})
 	}
-
-	useEffect(() => {
-		if (error) {
-			showAlert.error('Error', error).then(() => {
-				resetApi()
-			})
-		}
-	}, [error, resetApi])
-
 	if (loading) {
 		return <Loader />
 	}
 	return (
-		<Form onSubmit={handleSubmit(onSubmit)}>
+		<Form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
 			<FormInput
 				title='Username'
-				placeholder='Username'
 				type='text'
 				name={'username'}
 				control={control}
@@ -65,13 +54,22 @@ export const LoginForm = () => {
 			/>
 			<FormInput
 				title='Password'
-				placeholder='Password'
 				type='password'
 				name={'password'}
 				control={control}
 				error={errors.password?.message}
 			/>
-			<Button>Send</Button>
+			<div className='flex items-center justify-between pb-2'>
+				<Link
+					to='/forgot-password'
+					className='text-sm text-primary hover:underline'
+				>
+					Забыли пароль?
+				</Link>
+			</div>
+			<Button type='submit' className='w-full'>
+				Send
+			</Button>
 		</Form>
 	)
 }
