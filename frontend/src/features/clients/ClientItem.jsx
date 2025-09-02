@@ -6,10 +6,12 @@ export const ClientItem = ({
 	name,
 	phone,
 	email,
-	totalVisits,
-	totalSpent,
-	lastVisit,
+	totalVisits = null,
+	totalSpent = null,
+	lastVisit = null,
 	status,
+	services,
+	notes,
 }) => {
 	return (
 		<div className='flex items-center justify-between p-4 rounded-lg bg-muted/20 hover:bg-muted/30 transition-colors'>
@@ -33,6 +35,14 @@ export const ClientItem = ({
 							<Mail className='h-3 w-3' />
 							{email}
 						</div>
+					</div>
+					<div className='mt-1'>
+						<p className='text-xs text-muted-foreground'>
+							Услуги: {services.join(', ')}
+						</p>
+						{notes && (
+							<p className='text-xs text-muted-foreground italic'>{notes}</p>
+						)}
 					</div>
 				</div>
 			</div>

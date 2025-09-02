@@ -13,11 +13,11 @@ export const ProfileCard = ({ isCollapsed }) => {
 				{!isCollapsed && (
 					<div className='flex-1 min-w-0'>
 						<p className='text-sm font-medium text-sidebar-foreground truncate'>
-							{!loading ? user.first_name : 'user '}
-							{!loading ? user.last : 'user'}
+							{loading ? user.first_name : 'user '}
+							{loading ? user.last : 'user'}
 						</p>
 						<p className='text-xs text-muted-foreground truncate'>
-							{!loading ? user.email : 'email'}
+							{loading ? user.email : 'email'}
 						</p>
 					</div>
 				)}
