@@ -1,9 +1,21 @@
-from fastapi import Request
+import secrets
+from datetime import datetime, timedelta, timezone
+
+from shared.schemas.company_units.common import BaseInviteResponse
+from fastapi import HTTPException, Request, status
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from shared.config import settings
 from shared.dependencies import AuthContext
-from shared.models.company_units.org import Organization, OrganizationMember
-from shared.models.company_units.studio import Studio, StudioMember
+from shared.models.company_units.org import (
+    Organization,
+    OrganizationInvite,
+    OrganizationMember,
+)
+from shared.models.company_units.studio import Studio, StudioInvite, StudioMember
+from shared.rabbitmq import rabbitmq
+from shared.schemas.company_units.common import BaseInviteValidateResponse
 from shared.schemas.company_units.org import (
     OrganizationCreateRequest,
     OrganizationMemberCreateRequest,
@@ -12,7 +24,8 @@ from shared.schemas.company_units.org import (
     OrganizationRole,
 )
 from shared.schemas.company_units.studio import (
-    StudioInviteCreate,
+    StudioInviteCreateDB,
+    StudioInviteCreateRequest,
     StudioMemberCreateRequest,
     StudioResponse,
     StudioRole,
@@ -73,10 +86,83 @@ async def create_organization(
 async def create_studio_invite(
     request: Request,
     studio_uuid: str,
-    data: StudioInviteCreate,
+    data: StudioInviteCreateRequest,
     db: AsyncSession,
     auth: AuthContext,
 ):
-    print(auth.user, 'auth')
-    print(data, 'data')
-    print(studio_uuid, 'studio_uuid')
+    expire = datetime.now(timezone.utc) + timedelta(days=7)
+    invite_data_db = StudioInviteCreateDB(
+        email=data.email,
+        token=secrets.token_hex(16),
+        created_by_uuid=auth.user.uuid if auth.user else None,
+        studio_uuid=studio_uuid,
+        roles=data.roles,
+        expires_at=expire,
+    )
+    db_invite = StudioInvite(**invite_data_db.model_dump())
+    db.add(db_invite)
+    await db.commit()
+
+    url = f'{settings.CLIENT_URL}/signup?token={db_invite.token}'
+
+    await rabbitmq.publish(
+        routing_key='user.send_invite',
+        message={'url': url, 'email': db_invite.email},
+    )
+
+    return BaseInviteResponse(
+        email=db_invite.email,
+        token=db_invite.token,
+        url=f'{settings.CLIENT_URL}/signup?token={db_invite.token}',
+    )
+
+
+async def invite_validate(request: Request, token: str, db: AsyncSession):
+    db_organization_invite = await db.execute(
+        select(OrganizationInvite).filter(
+            OrganizationInvite.token == token,
+            OrganizationInvite.is_cancelled.is_(False),
+            OrganizationInvite.is_used.is_(False),
+        )
+    )
+
+    db_organization_invite = db_organization_invite.scalar_one_or_none()
+
+    db_studio_invite = await db.execute(
+        select(StudioInvite).filter(
+            StudioInvite.token == token,
+            StudioInvite.is_cancelled.is_(False),
+            StudioInvite.is_used.is_(False),
+        )
+    )
+
+    db_studio_invite = db_studio_invite.scalar_one_or_none()
+
+    if db_organization_invite:
+        if db_organization_invite.expires_at < datetime.now(timezone.utc):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='The invitation has expired. Ask the administrator to send you a new invitation.',
+            )
+        return BaseInviteValidateResponse(
+            uuid=db_organization_invite.uuid,
+            email=db_organization_invite.email,
+            type='organization',
+        )
+
+    if db_studio_invite:
+        if db_studio_invite.expires_at < datetime.now(timezone.utc):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='The invitation has expired. Ask the administrator to send you a new invitation.',
+            )
+        return BaseInviteValidateResponse(
+            uuid=db_studio_invite.uuid,
+            email=db_studio_invite.email,
+            type='studio',
+        )
+
+    if not db_organization_invite and not db_studio_invite:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail='Invite not found'
+        )

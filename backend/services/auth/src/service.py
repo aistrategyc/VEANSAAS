@@ -1,7 +1,11 @@
 from fastapi import HTTPException, Request, status
-from schemas import LoginUserRequest, RegisterUserRequest, TokenResponse
+from schemas import (
+    LoginUserRequest,
+    RegisterByInviterUserRequest,
+    RegisterUserRequest,
+    TokenResponse,
+)
 from security import pwd_context
-from sqlalchemy.ext.asyncio import AsyncSession
 from utils import (
     create_access_token,
     create_refresh_token,
@@ -12,16 +16,18 @@ from utils import (
 
 from shared.rabbitmq import rabbitmq
 from shared.schemas.user import UserCreateInternal, UserVerificationEmail
-from shared.service_clients.company_units import CompanyUnitsServiceClient
+from shared.service_clients.company_units import (
+    CompanyUnitsInviteServiceClient,
+    CompanyUnitsOrganizationServiceClient,
+)
 from shared.service_clients.user import UserServiceClient
 
 
 async def register(
     request: Request,
     data: RegisterUserRequest,
-    db: AsyncSession,
     user_service: UserServiceClient,
-    units_service: CompanyUnitsServiceClient,
+    units_service: CompanyUnitsOrganizationServiceClient,
 ):
     user_created = None
     try:
@@ -52,7 +58,6 @@ async def register(
             message={'token': verification_token, 'email': user_created.email},
         )
 
-        await db.commit()
         return {
             'status': 'success',
             'message': 'User registered. Check your email for confirmation.',
@@ -61,6 +66,44 @@ async def register(
         if user_created:
             await user_service.delete_user(user_created.uuid)
         raise
+
+
+async def register_by_invite(
+    request: Request,
+    data: RegisterByInviterUserRequest,
+    user_service: UserServiceClient,
+    invite_service: CompanyUnitsInviteServiceClient,
+):
+    invite_token = data.invite_token
+    invite_data = await invite_service.validate(invite_token=invite_token)
+
+    hashed_password = pwd_context.hash(data.password)
+    user_internal = UserCreateInternal(
+        **data.model_dump(exclude={'password'}),
+        hashed_password=hashed_password,
+        email=invite_data.email,
+    )
+
+    user_created = await user_service.create_user(request_data=user_internal)
+
+    # verification_token = await create_verification_token(
+    #     data={
+    #         'sub': 'email',
+    #         'email': user_created.email,
+    #         'user_uuid': str(user_created.uuid),
+    #         'type': 'verification',
+    #     }
+    # )
+
+    # await rabbitmq.publish(
+    #     routing_key='user.verification_email',
+    #     message={'token': verification_token, 'email': user_created.email},
+    # )
+
+    return {
+        'status': 'success',
+        'message': 'User registered. Check your email for confirmation.',
+    }
 
 
 async def login(

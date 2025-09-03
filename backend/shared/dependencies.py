@@ -6,7 +6,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from shared.config import settings
 from shared.database import get_db
 from shared.models.user import User
-from shared.service_clients.company_units import CompanyUnitsServiceClient
+from shared.service_clients.company_units import (
+    CompanyUnitsInviteServiceClient,
+    CompanyUnitsOrganizationServiceClient,
+)
 from shared.service_clients.user import UserServiceClient
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
@@ -140,7 +143,15 @@ async def get_user_service():
     )
 
 
-async def get_company_units_service():
-    return CompanyUnitsServiceClient(
-        service_url=settings.COMPANY_UNITS_SERVICE_URL, service_name='company_units'
+async def get_company_units_organization_service():
+    return CompanyUnitsOrganizationServiceClient(
+        service_url=settings.COMPANY_UNITS_SERVICE_ORGANIZATION_URL,
+        service_name='company_units_organization',
+    )
+
+
+async def get_company_units_invite_service():
+    return CompanyUnitsInviteServiceClient(
+        service_url=settings.COMPANY_UNITS_SERVICE_INVITE_URL,
+        service_name='company_units_invite',
     )

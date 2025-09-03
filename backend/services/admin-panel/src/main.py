@@ -1,10 +1,4 @@
-from admin import (
-    OrganizationAdmin,
-    OrganizationMemberAdmin,
-    StudioAdmin,
-    StudioMemberAdmin,
-    UserAdmin,
-)
+import admin as admin_view
 from fastapi import FastAPI
 from sqladmin import Admin
 
@@ -24,8 +18,10 @@ admin = Admin(
 )
 
 
-admin.add_view(UserAdmin)
-admin.add_view(OrganizationAdmin)
-admin.add_view(OrganizationMemberAdmin)
-admin.add_view(StudioAdmin)
-admin.add_view(StudioMemberAdmin)
+admin.add_view(admin_view.UserAdmin)
+admin.add_view(admin_view.OrganizationAdmin)
+admin.add_view(admin_view.OrganizationMemberAdmin)
+admin.add_view(admin_view.StudioAdmin)
+admin.add_view(admin_view.StudioMemberAdmin)
+admin.add_view(admin_view.OrganizationInviteAdmin)
+admin.add_view(admin_view.StudioInviteAdmin)

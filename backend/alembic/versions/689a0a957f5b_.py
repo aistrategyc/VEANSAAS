@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 5d181bee6ecb
+Revision ID: 689a0a957f5b
 Revises: 1782e1490361
-Create Date: 2025-08-30 10:25:34.837319
+Create Date: 2025-09-02 14:58:11.031987
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '5d181bee6ecb'
+revision: str = '689a0a957f5b'
 down_revision: Union[str, Sequence[str], None] = '1782e1490361'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -29,7 +29,7 @@ def upgrade() -> None:
         sa.Column('uuid', sa.Uuid(), nullable=False),
         sa.Column('email', sa.String(length=255), nullable=False),
         sa.Column('token', sa.String(length=64), nullable=False),
-        sa.Column('expires_at', sa.DateTime(), nullable=False),
+        sa.Column('expires_at', sa.DateTime(timezone=True), nullable=False),
         sa.Column(
             'is_used', sa.Boolean(), server_default=sa.text('false'), nullable=False
         ),
@@ -84,7 +84,7 @@ def upgrade() -> None:
         sa.Column('uuid', sa.Uuid(), nullable=False),
         sa.Column('email', sa.String(length=255), nullable=False),
         sa.Column('token', sa.String(length=64), nullable=False),
-        sa.Column('expires_at', sa.DateTime(), nullable=False),
+        sa.Column('expires_at', sa.DateTime(timezone=True), nullable=False),
         sa.Column(
             'is_used', sa.Boolean(), server_default=sa.text('false'), nullable=False
         ),

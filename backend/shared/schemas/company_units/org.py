@@ -4,7 +4,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from shared.schemas.company_units.base import BaseInviteCreate
+from shared.schemas.company_units.common import BaseInviteCreateRequest
 from shared.schemas.company_units.enum import OrganizationPlanType, OrganizationRole
 from shared.schemas.company_units.studio import StudioCreateRequest, StudioResponse
 
@@ -41,6 +41,6 @@ class OrganizationResponse(OrganizationBase):
         from_attributes = True
 
 
-class OrganizationInviteCreate(BaseInviteCreate):
+class OrganizationInviteCreate(BaseInviteCreateRequest):
     organization_uuid: UUID | str
     roles: List[OrganizationRole]

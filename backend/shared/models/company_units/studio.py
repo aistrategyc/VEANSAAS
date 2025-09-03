@@ -5,12 +5,12 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from shared.database import Base
 from shared.models.base import (
-    BaseInvite,
     created_at,
     created_by_uuid,
     updated_at,
     uuid_primary_key,
 )
+from shared.models.company_units.common import BaseInvite
 from shared.schemas.company_units.studio import StudioRole
 
 
