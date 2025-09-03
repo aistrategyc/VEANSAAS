@@ -6,10 +6,35 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from shared.config import settings
 from shared.database import get_db
 from shared.models.user import User
-from shared.service_clients.company_units import CompanyUnitsServiceClient
+from shared.service_clients.company_units import (
+    CompanyUnitsInviteServiceClient,
+    CompanyUnitsOrganizationServiceClient,
+)
 from shared.service_clients.user import UserServiceClient
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
+
+
+class AuthContext:
+    def __init__(self, payload: dict):
+        self._payload = payload
+        self._type = payload.get('type')
+
+    @property
+    def is_service(self) -> bool:
+        return self._type == 'service'
+
+    @property
+    def is_user(self) -> bool:
+        return self._type == 'user'
+
+    @property
+    def user(self):
+        return self._payload.get('user') if self.is_user else None
+
+    @property
+    def raw_payload(self):
+        return self._payload
 
 
 async def get_current_user(
@@ -89,18 +114,20 @@ async def get_service_token(token: str = Depends(oauth2_scheme)):
         )
 
 
-async def get_current_principal(
+async def get_auth_context(
     token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
-) -> dict:
+) -> AuthContext:
     try:
         service_payload = await get_service_token(token)
-        return service_payload
+        return AuthContext(payload=service_payload)
+
     except HTTPException:
         pass
 
     try:
         user_payload = await get_current_user(token=token, db=db)
-        return user_payload
+        return AuthContext(payload=user_payload)
+
     except HTTPException:
         pass
 
@@ -116,7 +143,15 @@ async def get_user_service():
     )
 
 
-async def get_company_units_service():
-    return CompanyUnitsServiceClient(
-        service_url=settings.COMPANY_UNITS_SERVICE_URL, service_name='company_units'
+async def get_company_units_organization_service():
+    return CompanyUnitsOrganizationServiceClient(
+        service_url=settings.COMPANY_UNITS_SERVICE_ORGANIZATION_URL,
+        service_name='company_units_organization',
+    )
+
+
+async def get_company_units_invite_service():
+    return CompanyUnitsInviteServiceClient(
+        service_url=settings.COMPANY_UNITS_SERVICE_INVITE_URL,
+        service_name='company_units_invite',
     )

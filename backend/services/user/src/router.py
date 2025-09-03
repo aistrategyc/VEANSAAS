@@ -15,7 +15,8 @@ from shared.cache.decorators import redis_cache
 from shared.cache.key_builders import user_me_key_builder
 from shared.database import get_db
 from shared.dependencies import (
-    get_current_principal,
+    AuthContext,
+    get_auth_context,
     get_current_user,
     get_service_token,
 )
@@ -36,7 +37,7 @@ async def create_user_route(
     request: Request,
     user: UserCreateInternal,
     db: AsyncSession = Depends(get_db),
-    identity: dict = Depends(get_current_principal),
+    auth: AuthContext = Depends(get_auth_context),
 ):
     return await create_user(request=request, user=user, db=db)
 
@@ -68,7 +69,7 @@ async def get_my_user_router(
 async def get_user_for_auth_route(
     request: Request,
     username: str,
-    identity: dict = Depends(get_current_principal),
+    auth: AuthContext = Depends(get_auth_context),
     db: AsyncSession = Depends(get_db),
 ):
     return await get_user_for_auth(request=request, username=username, db=db)
@@ -83,7 +84,7 @@ async def check_uniqueness_user_route(
     request: Request,
     data: UserUniquenessCheckRequest,
     db: AsyncSession = Depends(get_db),
-    identity: dict = Depends(get_current_principal),
+    auth: AuthContext = Depends(get_auth_context),
 ):
     return await check_uniqueness_user(request=request, data=data, db=db)
 
@@ -93,6 +94,6 @@ async def verification_email_route(
     request: Request,
     data: UserVerificationEmail,
     db: AsyncSession = Depends(get_db),
-    identity: dict = Depends(get_current_principal),
+    auth: AuthContext = Depends(get_auth_context),
 ):
     return await verification_email(request=request, data=data, db=db)

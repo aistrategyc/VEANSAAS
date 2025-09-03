@@ -22,7 +22,10 @@ class Config(BaseSettings):
     API_DEFAULT_VERSION: str = 'v1'
     AUTH_SERVICE_ROUTE: str = '/auth'
     USER_SERVICE_ROUTE: str = '/users'
-    COMPANY_UNITS_SERVICE_ROUTE: str = '/orgs'
+    COMPANY_UNITS_SERVICE_ORGANIZATION_ROUTE: str = '/orgs'
+    COMPANY_UNITS_SERVICE_STUDIO_ROUTE: str = '/studios'
+    COMPANY_UNITS_SERVICE_INVITE_ROUTE: str = '/invites'
+    CLIENT_URL: str = ''
 
     @property
     def REDIS_URL(self):
@@ -47,8 +50,16 @@ class Config(BaseSettings):
         return f'{self.BASE_API_URL}{self.USER_SERVICE_ROUTE}'
 
     @property
-    def COMPANY_UNITS_SERVICE_URL(self) -> str:
-        return f'{self.BASE_API_URL}{self.COMPANY_UNITS_SERVICE_ROUTE}'
+    def COMPANY_UNITS_SERVICE_ORGANIZATION_URL(self) -> str:
+        return f'{self.BASE_API_URL}{self.COMPANY_UNITS_SERVICE_ORGANIZATION_ROUTE}'
+
+    @property
+    def COMPANY_UNITS_SERVICE_STUDIO_URL(self) -> str:
+        return f'{self.BASE_API_URL}{self.COMPANY_UNITS_SERVICE_STUDIO_ROUTE}'
+
+    @property
+    def COMPANY_UNITS_SERVICE_INVITE_URL(self) -> str:
+        return f'{self.BASE_API_URL}{self.COMPANY_UNITS_SERVICE_INVITE_ROUTE}'
 
     class Config:
         env_file = '../.env'
