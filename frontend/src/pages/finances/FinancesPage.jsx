@@ -16,6 +16,7 @@ export default function FinancesPage() {
 
 	return (
 		<div className='space-y-6 animate-in fade-in-0 duration-500'>
+
 			<HeaderPages
 				description='Управление доходами и расходами'
 				nameButton='Добавить операцию'

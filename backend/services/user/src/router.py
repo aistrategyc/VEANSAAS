@@ -11,6 +11,8 @@ from service import (
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from shared.cache.decorators import redis_cache
+from shared.cache.key_builders import user_me_key_builder
 from shared.database import get_db
 from shared.dependencies import (
     get_current_principal,
@@ -50,6 +52,7 @@ async def delete_user_route(
 
 
 @router.get('/me', response_model=UserResponse, status_code=status.HTTP_200_OK)
+@redis_cache(expire=180, key_builder=user_me_key_builder)
 async def get_my_user_router(
     request: Request,
     current_user: dict = Depends(get_current_user),
@@ -61,6 +64,7 @@ async def get_my_user_router(
 @router.get(
     '/{username}/auth', response_model=AuthUserResponse, status_code=status.HTTP_200_OK
 )
+@redis_cache(expire=180, use_kwargs=['username'])
 async def get_user_for_auth_route(
     request: Request,
     username: str,

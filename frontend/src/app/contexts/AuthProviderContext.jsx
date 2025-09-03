@@ -29,8 +29,7 @@ export const AuthProvider = ({ children }) => {
 
 		if (token) {
 			setIsAuthenticated(true)
-			// fetchUser()
-			console.log(1)
+			fetchUser()
 		} else {
 			setIsAuthenticated(false)
 		}

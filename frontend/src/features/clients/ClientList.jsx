@@ -1,7 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ClientItem } from './ClientItem'
 
+
 export const ClientList = ({ clients }) => {
+
 	return (
 		<Card className='bg-card border-border'>
 			<CardHeader>

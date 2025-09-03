@@ -1,23 +1,56 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.config import settings
+from shared.database import get_db
+from shared.models.user import User
 from shared.service_clients.company_units import CompanyUnitsServiceClient
 from shared.service_clients.user import UserServiceClient
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)):
+async def get_current_user(
+    token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
+):
     try:
         payload = jwt.decode(
             token,
             settings.SECRET_KEY,
             algorithms=[settings.ALGORITHM],
         )
+        if payload.get('type') != 'user':
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail='Invalid token type'
+            )
+        user_uuid = payload.get('user_uuid')
+        if not user_uuid:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid token payload'
+            )
 
-        return payload
+        user = await db.get(User, user_uuid)
+
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail='User not found'
+            )
+
+        if not user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail='User account is deactivated',
+            )
+
+        if not user.is_verified:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail='User account is not verified',
+            )
+
+        return {**payload, 'user': user}
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -26,7 +59,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         )
     except Exception:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid token type'
+            status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid token'
         )
 
 
@@ -56,7 +89,9 @@ async def get_service_token(token: str = Depends(oauth2_scheme)):
         )
 
 
-async def get_current_principal(token: str = Depends(oauth2_scheme)) -> dict:
+async def get_current_principal(
+    token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
+) -> dict:
     try:
         service_payload = await get_service_token(token)
         return service_payload
@@ -64,7 +99,7 @@ async def get_current_principal(token: str = Depends(oauth2_scheme)) -> dict:
         pass
 
     try:
-        user_payload = await get_current_user(token)
+        user_payload = await get_current_user(token=token, db=db)
         return user_payload
     except HTTPException:
         pass

@@ -14,11 +14,11 @@ export default function LoyaltyPage() {
 			name: 'Beauty VIP',
 			type: 'Накопительная',
 			description: 'Скидка от суммы покупок',
-			minSpend: '₽50,000',
+			minSpend: '$50,000',
 			discount: '15%',
 			members: 156,
 			activeMembers: 142,
-			totalRevenue: '₽2,450,000',
+			totalRevenue: '$2,450,000',
 			status: 'active',
 		},
 		{
@@ -26,11 +26,11 @@ export default function LoyaltyPage() {
 			name: 'Постоянный клиент',
 			type: 'Бонусная',
 			description: 'Бонусы за каждую покупку',
-			minSpend: '₽10,000',
+			minSpend: '$10,000',
 			discount: '5%',
 			members: 847,
 			activeMembers: 623,
-			totalRevenue: '₽1,890,000',
+			totalRevenue: '$1,890,000',
 			status: 'active',
 		},
 		{
@@ -38,11 +38,11 @@ export default function LoyaltyPage() {
 			name: 'Друг салона',
 			type: 'Реферальная',
 			description: 'Бонусы за приведенных друзей',
-			minSpend: '₽0',
+			minSpend: '$0',
 			discount: '10%',
 			members: 234,
 			activeMembers: 189,
-			totalRevenue: '₽567,000',
+			totalRevenue: '$567,000',
 			status: 'active',
 		},
 	]
@@ -52,9 +52,9 @@ export default function LoyaltyPage() {
 			id: 1,
 			name: 'Анна Петрова',
 			program: 'Beauty VIP',
-			totalSpent: '₽125,000',
+			totalSpent: '$125,000',
 			visits: 45,
-			bonuses: '₽12,500',
+			bonuses: '$12,500',
 			lastVisit: '2024-01-14',
 			tier: 'platinum',
 		},
@@ -62,9 +62,9 @@ export default function LoyaltyPage() {
 			id: 2,
 			name: 'Мария Сидорова',
 			program: 'Beauty VIP',
-			totalSpent: '₽89,000',
+			totalSpent: '$89,000',
 			visits: 32,
-			bonuses: '₽8,900',
+			bonuses: '$8,900',
 			lastVisit: '2024-01-13',
 			tier: 'gold',
 		},
@@ -72,9 +72,9 @@ export default function LoyaltyPage() {
 			id: 3,
 			name: 'Екатерина Иванова',
 			program: 'Постоянный клиент',
-			totalSpent: '₽67,000',
+			totalSpent: '$67,000',
 			visits: 28,
-			bonuses: '₽3,350',
+			bonuses: '$3,350',
 			lastVisit: '2024-01-12',
 			tier: 'silver',
 		},
@@ -82,9 +82,9 @@ export default function LoyaltyPage() {
 			id: 4,
 			name: 'Светлана Козлова',
 			program: 'Друг салона',
-			totalSpent: '₽45,000',
+			totalSpent: '$45,000',
 			visits: 22,
-			bonuses: '₽4,500',
+			bonuses: '$4,500',
 			lastVisit: '2024-01-11',
 			tier: 'bronze',
 		},
@@ -98,6 +98,7 @@ export default function LoyaltyPage() {
 
 	return (
 		<div className='space-y-6 animate-in fade-in-0 duration-500'>
+
 			<HeaderPages
 				description='Программы лояльности и бонусы'
 				nameButton='Новая программа'
@@ -106,6 +107,7 @@ export default function LoyaltyPage() {
 			<StatsList stats={statsLoyaltyList} />
 			<LoyaltyProgram loyaltyPrograms={loyaltyPrograms} />
 			<LoyaltyClients topClients={topClients} />
+
 		</div>
 	)
 }
