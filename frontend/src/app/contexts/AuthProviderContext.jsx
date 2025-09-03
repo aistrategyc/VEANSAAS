@@ -14,7 +14,6 @@ export const AuthProvider = ({ children }) => {
 
 	const login = useCallback((token, options = {}) => {
 		const { expires = 7 } = options
-		console.log('token', token)
 
 		setCookie('authToken', token, expires)
 		setIsAuthenticated(true)

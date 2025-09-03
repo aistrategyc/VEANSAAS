@@ -3,7 +3,6 @@ import { ProtectedRoute } from './ProtectedRoute'
 import { Loader } from '../../shared/ui/loader/Loader'
 import { Layout } from '../../widgets/layout/Layout'
 import { useAuth } from '../../shared/hooks/useAuth'
-import DashboardPage from '@/pages/dashboard/DashboardPage'
 import ClientsPage from '@/pages/clients/ClientsPage'
 import CalendarPage from '@/pages/calendar/CalendarPage'
 import AppointmentsPage from '@/pages/appointments/AppointmentsPage'
@@ -15,6 +14,7 @@ import LoyaltyPage from '@/pages/loyalty/LoyaltyPage'
 import FinancesPage from '@/pages/finances/FinancesPage'
 import AnalyticsPage from '@/pages/analytics/AnalyticsPage'
 import { AuthPage } from '@/pages/auth/AuthPage'
+import MainPage from '@/pages/main/MainPage'
 
 export const RouterProvider = () => {
 	const { isAuthenticated, loading } = useAuth()
@@ -34,7 +34,7 @@ export const RouterProvider = () => {
 				</ProtectedRoute>
 			),
 			children: [
-				{ index: true, element: <DashboardPage /> },
+				{ index: true, element: <MainPage /> },
 				{ path: 'clients', element: <ClientsPage /> },
 				{ path: 'calendar', element: <CalendarPage /> },
 				{ path: 'records', element: <AppointmentsPage /> },

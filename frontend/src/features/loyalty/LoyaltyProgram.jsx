@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { LoyaltyProgramItem } from './LoyaltyProgramItem'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Star } from 'lucide-react'
