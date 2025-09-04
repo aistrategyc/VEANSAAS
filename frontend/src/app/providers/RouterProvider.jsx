@@ -15,6 +15,9 @@ import FinancesPage from '@/pages/finances/FinancesPage'
 import AnalyticsPage from '@/pages/analytics/AnalyticsPage'
 import { AuthPage } from '@/pages/auth/AuthPage'
 import MainPage from '@/pages/main/MainPage'
+import VerificationEmailPage from '@/pages/auth/VerificationEmailPage'
+import { RegisterSimple } from '@/pages/auth/RegisterSimple'
+import DashboardPage from '@/pages/dashboard/DashboardPage'
 
 export const RouterProvider = () => {
 	const { isAuthenticated, loading } = useAuth()
@@ -55,6 +58,22 @@ export const RouterProvider = () => {
 		{
 			path: '*',
 			element: <Navigate to='/' replace />,
+		},
+		{
+			path: '/verification',
+			element: <VerificationEmailPage />,
+		},
+		{
+			path: '/register-invite',
+			element: isAuthenticated ? (
+				<Navigate to='/' replace />
+			) : (
+				<RegisterSimple />
+			),
+		},
+		{
+			path: '/dashboard',
+			element: <DashboardPage />,
 		},
 	])
 

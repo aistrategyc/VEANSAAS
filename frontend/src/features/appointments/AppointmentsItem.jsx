@@ -18,8 +18,8 @@ export const AppointmentsItem = ({
 	status,
 }) => {
 	return (
-		<div className='flex items-center justify-between p-4 rounded-lg bg-muted/20 hover:bg-muted/30 transition-all duration-200 group'>
-			<div className='flex items-center gap-4'>
+		<div className='flex items-center flex-wrap justify-between p-4 rounded-lg bg-muted/20 hover:bg-muted/30 transition-all duration-200 group'>
+			<div className='flex items-center flex-wrap gap-4 max-md:text-sm'>
 				<div className='flex items-center gap-2'>
 					<Clock className='h-4 w-4 text-muted-foreground' />
 					<div>
@@ -48,7 +48,7 @@ export const AppointmentsItem = ({
 					)}
 				</div>
 			</div>
-			<div className='flex items-center gap-3'>
+			<div className='flex flex-wrap items-center gap-3 max-md:mt-3'>
 				<Badge
 					variant={
 						status === 'confirmed'

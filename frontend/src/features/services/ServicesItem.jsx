@@ -15,10 +15,10 @@ export const ServicesItem = ({
 	status = null,
 }) => {
 	return (
-		<div className='flex items-center justify-between p-4 rounded-lg bg-muted/20 hover:bg-muted/30 transition-colors'>
+		<div className='flex flex-wrap items-center justify-between p-4 rounded-lg bg-muted/20 hover:bg-muted/30 transition-colors max-md:text-sm'>
 			<div className='flex items-center gap-4'>
-				<div className='w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center'>
-					<Scissors className='h-5 w-5 text-primary' />
+				<div className='w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center max-md:h-9 max-md:w-9'>
+					<Scissors className='h-5 w-5  max-md:h-4 max-md:w-4 text-primary' />
 				</div>
 				<div>
 					<p className='font-medium text-foreground'>{name}</p>
@@ -26,7 +26,7 @@ export const ServicesItem = ({
 					<p className='text-xs text-muted-foreground mt-1'>{description}</p>
 				</div>
 			</div>
-			<div className='flex items-center gap-6'>
+			<div className='flex flex-wrap items-center gap-6 max-md:mt-3'>
 				<div className='text-center'>
 					<p className='font-medium text-foreground'>{duration}</p>
 					<p className='text-xs text-muted-foreground'>Длительность</p>

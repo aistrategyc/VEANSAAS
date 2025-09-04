@@ -15,7 +15,7 @@ export const SelectForm = ({
 	title,
 	name,
 	control,
-	rules = { require: 'Choose plan' },
+	rules = { required: 'Choose plan' },
 	error,
 }) => {
 	const {
@@ -35,7 +35,8 @@ export const SelectForm = ({
 				<p className='text-red-500 text-sm h-5 ml-2'>{error}</p>
 			</div>
 			<Select
-				{...field}
+				value={field.value}
+				onValueChange={field.onChange}
 				className='w-full px-3 text-gray-500 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
 			>
 				<SelectTrigger className='w-full'>
@@ -43,7 +44,6 @@ export const SelectForm = ({
 				</SelectTrigger>
 				<SelectContent>
 					<SelectGroup>
-						<SelectLabel>{title}</SelectLabel>
 						{plans.map(plan => (
 							<SelectItem key={plan.value} value={plan.value}>
 								{plan.label}

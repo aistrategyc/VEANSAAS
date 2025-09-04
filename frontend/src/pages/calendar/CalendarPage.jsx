@@ -89,14 +89,14 @@ export default function CalendarPage() {
 	return (
 		<div className='space-y-6'>
 			{/* Header */}
-			<div className='flex items-center justify-between'>
+			<div className='flex flex-wrap items-center justify-between'>
 				<div>
 					<h1 className='text-3xl font-bold text-foreground'>Календарь</h1>
 					<p className='text-muted-foreground'>
 						Управление записями и расписанием
 					</p>
 				</div>
-				<div className='flex gap-2'>
+				<div className='flex flex-wrap gap-2'>
 					<Button variant='outline'>
 						<Calendar className='h-4 w-4 mr-2' />
 						Сегодня

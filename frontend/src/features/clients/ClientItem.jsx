@@ -14,8 +14,8 @@ export const ClientItem = ({
 	notes,
 }) => {
 	return (
-		<div className='flex items-center justify-between p-4 rounded-lg bg-muted/20 hover:bg-muted/30 transition-colors'>
-			<div className='flex items-center gap-4'>
+		<div className='flex items-center justify-between flex-wrap p-4 rounded-lg bg-muted/20 hover:bg-muted/30 transition-colors'>
+			<div className='flex items-center flex-wrap gap-4'>
 				<Avatar>
 					<AvatarFallback>
 						{name
@@ -26,7 +26,7 @@ export const ClientItem = ({
 				</Avatar>
 				<div>
 					<p className='font-medium text-foreground'>{name}</p>
-					<div className='flex items-center gap-4 text-sm text-muted-foreground'>
+					<div className='flex items-center gap-4 text-sm text-muted-foreground flex-wrap'>
 						<div className='flex items-center gap-1'>
 							<Phone className='h-3 w-3' />
 							{phone}
@@ -46,7 +46,7 @@ export const ClientItem = ({
 					</div>
 				</div>
 			</div>
-			<div className='flex items-center gap-6'>
+			<div className='flex items-center gap-6 flex-wrap max-md:mt-3'>
 				<div className='text-center'>
 					<p className='font-medium text-foreground'>{totalVisits}</p>
 					<p className='text-xs text-muted-foreground'>Визитов</p>

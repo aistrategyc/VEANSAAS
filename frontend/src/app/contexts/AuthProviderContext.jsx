@@ -12,10 +12,10 @@ export const AuthProvider = ({ children }) => {
 
 	const { fetchUser } = useUser()
 
-	const login = useCallback((token, options = {}) => {
+	const login = useCallback((accessToken, refreshToken, options = {}) => {
 		const { expires = 7 } = options
-
-		setCookie('authToken', token, expires)
+		setCookie('authToken', accessToken, expires)
+		setCookie('refreshToken', refreshToken)
 		setIsAuthenticated(true)
 	}, [])
 
@@ -26,10 +26,9 @@ export const AuthProvider = ({ children }) => {
 
 	useEffect(() => {
 		const token = getCookie('authToken')
-
 		if (token) {
 			setIsAuthenticated(true)
-			fetchUser()
+			// fetchUser()
 		} else {
 			setIsAuthenticated(false)
 		}

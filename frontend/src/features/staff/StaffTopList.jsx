@@ -28,7 +28,7 @@ export const StaffTopList = ({ staffList }) => {
 						>
 							<div className='flex items-center gap-3'>
 								<div
-									className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+									className={`w-6 h-6 max-md:h-4 max-md:w-8 rounded-full flex items-center justify-center text-xs font-bold ${
 										master.position === 1
 											? 'bg-yellow-500 text-black'
 											: master.position === 2

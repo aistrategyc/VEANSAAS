@@ -6,19 +6,19 @@ export const CalendarNavigation = () => {
 	return (
 		<Card className='bg-card border-border'>
 			<CardContent className='pt-6'>
-				<div className='flex items-center justify-between'>
+				<div className='flex flex-wrap items-center justify-between'>
 					<div className='flex items-center gap-4'>
 						<Button variant='outline' size='sm'>
 							<ChevronLeft className='h-4 w-4' />
 						</Button>
-						<h2 className='text-xl font-semibold text-foreground'>
+						<h2 className='text-xl max-md:flex font-semibold text-foreground max-md:text-sm'>
 							15 января 2024
 						</h2>
 						<Button variant='outline' size='sm'>
 							<ChevronRight className='h-4 w-4' />
 						</Button>
 					</div>
-					<div className='flex gap-2'>
+					<div className='flex gap-2 max-md:mt-2'>
 						<Button variant='outline' size='sm'>
 							День
 						</Button>

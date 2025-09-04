@@ -22,7 +22,7 @@ export const CalendarScheduleItem = ({ time, appointments = [] }) => {
 				<div className='flex-1 pl-4'>
 					{appointment && (
 						<div
-							className={`p-3 rounded-lg border-l-4 transition-all duration-200 hover:scale-[1.02] cursor-pointer ${
+							className={`p-3 max-md:w-30 rounded-lg border-l-4 transition-all duration-200 hover:scale-[1.02] cursor-pointer ${
 								appointment.status === 'confirmed'
 									? 'bg-blue-500/10 border-l-blue-500'
 									: appointment.status === 'in-progress'
@@ -34,14 +34,14 @@ export const CalendarScheduleItem = ({ time, appointments = [] }) => {
 							}}
 						>
 							<div className='flex items-start justify-between'>
-								<div className='flex-1'>
+								<div className='flex-1 max-md:text-sm'>
 									<p className='font-medium text-foreground'>
 										{appointment.client}
 									</p>
 									<p className='text-sm text-muted-foreground'>
 										{appointment.service}
 									</p>
-									<div className='flex items-center gap-2 mt-1'>
+									<div className='flex flex-wrap items-center gap-2 mt-1'>
 										<Badge variant='outline' className='text-xs'>
 											<User className='h-3 w-3 mr-1' />
 											{appointment.master}

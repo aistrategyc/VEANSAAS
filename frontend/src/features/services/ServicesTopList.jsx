@@ -24,7 +24,7 @@ export const ServicesTopList = ({ topList }) => {
 					{topList.map((service, index) => (
 						<div
 							key={index}
-							className='flex items-center justify-between p-3 rounded-lg hover:bg-muted/20 transition-all duration-200 group'
+							className='flex flex-wrap items-center justify-between p-3 rounded-lg hover:bg-muted/20 transition-all duration-200 group'
 						>
 							<div className='flex items-center gap-3'>
 								<div className={`w-3 h-3 rounded-full ${service.color}`} />

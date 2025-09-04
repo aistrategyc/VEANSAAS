@@ -9,14 +9,14 @@ export const HeaderPages = ({
 	type = null,
 }) => {
 	return (
-		<div className='flex flex-wrap items-center justify-between'>
+		<div className='flex flex-wrap items-center justify-between max-md:'>
 			<div>
 				<h1 className='max-sm:text-xl text-3xl font-bold text-foreground'>
 					{title}
 				</h1>
 				<p className='max-sm:text-sm text-muted-foreground'>{description}</p>
 			</div>
-			<div className='flex gap-2'>
+			<div className='flex gap-2 max-md:mt-2'>
 				{(() => {
 					switch (type) {
 						case 'analytics':

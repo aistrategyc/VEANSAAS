@@ -29,8 +29,8 @@ export const StaffItem = ({
 	specializations = [],
 }) => {
 	return (
-		<div className='flex items-center justify-between p-4 rounded-lg bg-muted/20 hover:bg-muted/30 transition-all duration-200 hover:shadow-md'>
-			<div className='flex items-center gap-4'>
+		<div className='flex items-center flex-wrap justify-between p-4 rounded-lg bg-muted/20 hover:bg-muted/30 transition-all duration-200 hover:shadow-md'>
+			<div className='flex flex-wrap items-center gap-4'>
 				<Avatar className='hover:scale-105 transition-transform'>
 					<AvatarFallback>
 						{name
@@ -42,7 +42,7 @@ export const StaffItem = ({
 				<div>
 					<p className='font-medium text-foreground'>{name}</p>
 					<p className='text-sm text-muted-foreground'>{role}</p>
-					<div className='flex items-center gap-4 text-xs text-muted-foreground mt-1'>
+					<div className='flex flex-wrap items-center gap-4 text-xs text-muted-foreground mt-1'>
 						<div className='flex items-center gap-1'>
 							<Phone className='h-3 w-3' />
 							{phone}
@@ -67,7 +67,7 @@ export const StaffItem = ({
 					</div>
 				</div>
 			</div>
-			<div className='flex items-center gap-6'>
+			<div className='flex flex-wrap items-center gap-6 max-md:mt-3 '>
 				<div className='text-center'>
 					<div className='flex items-center gap-1'>
 						<Star className='h-3 w-3 text-yellow-500 fill-current' />

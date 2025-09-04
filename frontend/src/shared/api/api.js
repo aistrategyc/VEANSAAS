@@ -1,9 +1,8 @@
 import axios from 'axios'
-import { deleteCookie, getCookie, setCookie } from '../helper/authHelper'
+import { getCookie, setCookie } from '../helper/authHelper'
 
 // Конфигурация базового URL
-const BASE_URL =
-	process.env.REACT_APP_API_URL || 'http://localhost:8000/api/v1/'
+const BASE_URL = 'http://localhost:8000/api/v1/'
 
 // Создание экземпляра axios
 export const apiClient = axios.create({
@@ -17,17 +16,19 @@ export const apiClient = axios.create({
 // Утилиты для работы с токенами
 export const tokenManager = {
 	getAccessToken: () => getCookie('authToken'),
-	getRefreshToken: () => getCookie('authToken'),
-	setTokens: (accessToken, refreshToken) => {
+	getRefreshToken: () => getCookie('refreshToken'),
+	setTokens: accessToken => {
 		setCookie('authToken', accessToken)
-		setCookie('refreshToken', refreshToken)
 	},
 	clearTokens: () => {
-		deleteCookie('authToken')
-		deleteCookie('refreshToken')
+		localStorage.removeItem('authToken')
+		localStorage.removeItem('refreshToken')
 	},
 	hasTokens: () => {
-		return !!getCookie('authToken') && !!getCookie('refreshToken')
+		return (
+			!!localStorage.getItem('authToken') &&
+			!!localStorage.getItem('refreshToken')
+		)
 	},
 }
 
@@ -46,6 +47,14 @@ const processQueue = (error, token = null) => {
 	failedQueue = []
 }
 
+// Создаем отдельный экземпляр axios для запросов без interceptor'ов
+const authClient = axios.create({
+	baseURL: BASE_URL,
+	headers: {
+		'Content-Type': 'application/json',
+	},
+})
+
 // Функция обновления токена
 const refreshAuthToken = async () => {
 	try {
@@ -54,25 +63,25 @@ const refreshAuthToken = async () => {
 			throw new Error('No refresh token available')
 		}
 
-		const response = await axios.post(
-			`${BASE_URL}auth/refresh/`,
+		const response = await authClient.post(
+			'auth/refresh-access-token',
+			{},
 			{
-				refresh: refreshToken,
-			},
-			{
-				skipAuthRefresh: true, // Пропускаем interceptor для этого запроса
+				headers: {
+					Authorization: `Bearer ${refreshToken}`,
+				},
 			}
 		)
 
-		const { access, refresh } = response.data
-		tokenManager.setTokens(access, refresh)
-		return access
+		const { access_token } = response.data
+		tokenManager.setTokens(access_token)
+		return access_token
 	} catch (error) {
-		tokenManager.clearTokens()
-		// Здесь можно добавить редирект на логин
-		if (window.location.pathname !== '/login') {
-			window.location.href = '/login'
-		}
+		console.log('err')
+		// tokenManager.clearTokens()
+		// if (window.location.pathname !== '/login') {
+		// 	window.location.href = '/login'
+		// }
 		throw error
 	}
 }
@@ -103,118 +112,91 @@ apiClient.interceptors.response.use(
 	async error => {
 		const originalRequest = error.config
 
-		// Пропускаем обработку для определенных эндпоинтов или статусов
 		if (
-			originalRequest.skipAuthRefresh ||
 			error.response?.status !== 401 ||
-			originalRequest._retry
+			originalRequest._retry ||
+			originalRequest.url?.includes('/auth/')
 		) {
 			return Promise.reject(error)
 		}
 
-		// Если нет refresh token, сразу отклоняем
 		if (!tokenManager.getRefreshToken()) {
 			return Promise.reject(error)
 		}
 
-		if (isRefreshing) {
-			// Добавляем запрос в очередь
-			return new Promise((resolve, reject) => {
-				failedQueue.push({ resolve, reject })
-			})
-				.then(token => {
-					originalRequest.headers.Authorization = `Bearer ${token}`
-					return apiClient(originalRequest)
-				})
-				.catch(err => Promise.reject(err))
-		}
-
 		originalRequest._retry = true
-		isRefreshing = true
 
 		try {
 			const newAccessToken = await refreshAuthToken()
-
-			// Обновляем заголовок и повторяем запрос
 			originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
 
-			// Обрабатываем очередь успешных запросов
-			processQueue(null, newAccessToken)
-
+			// Повторяем оригинальный запрос
 			return apiClient(originalRequest)
 		} catch (refreshError) {
-			// Обрабатываем очередь с ошибкой
-			processQueue(refreshError, null)
+			console.log('21')
+			// tokenManager.clearTokens()
+			// if (window.location.pathname !== '/login') {
+			// 	window.location.href = '/login'
+			// }
 			return Promise.reject(refreshError)
-		} finally {
-			isRefreshing = false
 		}
 	}
 )
 
 // API методы
 export const api = {
-	// GET запрос
 	get: (endpoint, config = {}) => apiClient.get(endpoint, config),
-
-	// POST запрос
 	post: (endpoint, data, config = {}) => apiClient.post(endpoint, data, config),
-
-	// PUT запрос
 	put: (endpoint, data, config = {}) => apiClient.put(endpoint, data, config),
-
-	// PATCH запрос
 	patch: (endpoint, data, config = {}) =>
 		apiClient.patch(endpoint, data, config),
-
-	// DELETE запрос
 	delete: (endpoint, config = {}) => apiClient.delete(endpoint, config),
-
-	// Загрузка файлов
-	upload: (endpoint, formData, config = {}) =>
-		apiClient.post(endpoint, formData, {
-			...config,
-			headers: {
-				...config.headers,
-				'Content-Type': 'multipart/form-data',
-			},
-		}),
 }
 
 // Вспомогательные функции для аутентификации
 export const authAPI = {
-	// Логин
 	login: credentials =>
 		apiClient.post('auth/login/', credentials, { skipAuth: true }),
 
-	// Регистрация
 	register: userData =>
 		apiClient.post('auth/register/', userData, { skipAuth: true }),
 
-	// Выход
-	logout: () =>
-		apiClient.post('auth/logout/', {
-			refresh: tokenManager.getRefreshToken(),
-		}),
+	logout: () => {
+		const refreshToken = tokenManager.getRefreshToken()
+		return authClient.post(
+			'auth/logout/',
+			{},
+			{
+				headers: {
+					Authorization: `Bearer ${refreshToken}`,
+				},
+			}
+		)
+	},
 
-	// Проверка токена
-	verifyToken: () =>
-		apiClient.post('auth/verify/', {
-			token: tokenManager.getAccessToken(),
-		}),
+	verifyToken: token => {
+		const params = new URLSearchParams()
+		if (token) {
+			params.append('token', token)
+		}
 
-	// Обновление токена (явное)
-	refreshToken: () => refreshAuthToken(),
-}
+		return apiClient.get(`auth/verify-email/?${params.toString()}`, {
+			skipAuth: true,
+		})
+	},
 
-// Утилита для проверки сетевых ошибок
-export const isNetworkError = error => {
-	return !error.response && error.message === 'Network Error'
-}
-
-// Утилита для проверки timeout
-export const isTimeoutError = error => {
-	return error.code === 'ECONNABORTED'
+	refreshToken: () => {
+		const refreshToken = tokenManager.getRefreshToken()
+		return authClient.post(
+			'auth/refresh/',
+			{},
+			{
+				headers: {
+					Authorization: `Bearer ${refreshToken}`,
+				},
+			}
+		)
+	},
 }
 
 export default apiClient

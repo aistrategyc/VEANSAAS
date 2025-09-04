@@ -10,7 +10,7 @@ export const AnalyticsMastersItem = ({
 	growth,
 }) => {
 	return (
-		<div className='flex items-center justify-between p-3 rounded-lg bg-muted/20'>
+		<div className='flex flex-wrap items-center justify-between p-3 rounded-lg bg-muted/20'>
 			<div>
 				<p className='font-medium text-foreground'>{name}</p>
 				<div className='flex items-center gap-3 text-sm text-muted-foreground'>
@@ -21,7 +21,7 @@ export const AnalyticsMastersItem = ({
 					</div>
 				</div>
 			</div>
-			<div className='text-right'>
+			<div className='text-right  max-md:text-left'>
 				<p className='font-medium text-foreground'>{revenue}</p>
 				<div className='flex items-center gap-2'>
 					<span className='text-xs text-muted-foreground'>

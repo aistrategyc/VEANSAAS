@@ -1,5 +1,6 @@
 import { User } from 'lucide-react'
 import { useUser } from '../../shared/hooks/useUser'
+import { useEffect } from 'react'
 
 export const ProfileCard = ({ isCollapsed }) => {
 	const { user, loading } = useUser()

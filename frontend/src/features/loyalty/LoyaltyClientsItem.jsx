@@ -15,7 +15,7 @@ export const LoyaltyClientsItem = ({
 	tier,
 }) => {
 	return (
-		<div className='flex items-center justify-between p-4 rounded-lg bg-muted/20 hover:bg-muted/30 transition-all duration-200 hover:scale-[1.01] group'>
+		<div className='flex flex-wrap items-center justify-between p-4 rounded-lg bg-muted/20 hover:bg-muted/30 transition-all duration-200 hover:scale-[1.01] group'>
 			<div className='flex items-center gap-4'>
 				<div
 					className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
@@ -37,7 +37,7 @@ export const LoyaltyClientsItem = ({
 					<p className='text-sm text-muted-foreground'>{program}</p>
 				</div>
 			</div>
-			<div className='flex items-center gap-6'>
+			<div className='flex flex-wrap items-center gap-6 max-md:mt-3'>
 				<div className='text-center'>
 					<p className='font-medium text-foreground'>{totalSpent}</p>
 					<p className='text-xs text-muted-foreground'>Потрачено</p>

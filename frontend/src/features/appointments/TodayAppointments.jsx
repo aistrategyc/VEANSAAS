@@ -34,9 +34,9 @@ export const TodayAppointments = ({ todayAppointments }) => {
 					{todayAppointments.map((appointment, index) => (
 						<div
 							key={index}
-							className='flex items-center justify-between p-4 rounded-lg bg-muted/20 hover:bg-muted/30 transition-all duration-200 hover:scale-[1.02] group'
+							className='flex flex-wrap items-center justify-between p-4 rounded-lg bg-muted/20 hover:bg-muted/30 transition-all duration-200 hover:scale-[1.02] group'
 						>
-							<div className='flex items-center gap-3'>
+							<div className='flex flex-wrap items-center gap-3'>
 								<div className='flex items-center gap-2'>
 									<div
 										className={`w-2 h-8 rounded-full ${
@@ -70,7 +70,7 @@ export const TodayAppointments = ({ todayAppointments }) => {
 									</div>
 								</div>
 							</div>
-							<div className='flex items-center gap-2'>
+							<div className='flex items-center gap-2  max-md:mt-2'>
 								<Badge
 									variant={
 										appointment.status === 'confirmed'

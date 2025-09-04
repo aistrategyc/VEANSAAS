@@ -14,7 +14,7 @@ export const InventoryItem = ({
 	id,
 }) => {
 	return (
-		<div className='flex items-center justify-between p-4 rounded-lg bg-muted/20 hover:bg-muted/30 transition-all duration-200 hover:scale-[1.01] group'>
+		<div className='flex flex-wrap items-center justify-between p-4 rounded-lg bg-muted/20 hover:bg-muted/30 transition-all duration-200 hover:scale-[1.01] group'>
 			<div className='flex items-center gap-4'>
 				<div
 					className={`w-12 h-12 rounded-lg flex items-center justify-center ${
@@ -43,7 +43,7 @@ export const InventoryItem = ({
 					<p className='text-xs text-muted-foreground'>Поставщик: {supplier}</p>
 				</div>
 			</div>
-			<div className='flex items-center gap-6'>
+			<div className='flex flex-wrap items-center gap-6 max-md:mt-3'>
 				<div className='text-center'>
 					<p
 						className={`font-medium ${
