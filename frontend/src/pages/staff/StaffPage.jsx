@@ -19,6 +19,7 @@ import {
 import { HeaderPages } from '@/features/headerPages/HeaderPages'
 import { StatsList } from '@/features/stats/StatsList'
 import { FiltersPages } from '@/features/filtersPages/FiltersPages'
+import { StaffList } from '@/features/staff/StaffList'
 
 export default function StaffPage() {
 	const staff = [
@@ -26,53 +27,103 @@ export default function StaffPage() {
 			id: 1,
 			name: 'Елена Кузнецова',
 			role: 'Парикмахер-стилист',
-			phone: '+7 (999) 111-22-33',
-			email: 'elena.kuznetsova@salon.ru',
+			phone: '+33 1 42 86 83 26',
+			email: 'elena.kuznetsova@salon.eu',
 			rating: 4.9,
 			experience: '8 лет',
-			specializations: ['Стрижки', 'Окрашивание', 'Укладки'],
+			specializations: ['Стрижки', 'Окрашивание', 'Укладки', 'Кератин'],
 			todayAppointments: 8,
-			monthRevenue: '$125,000',
+			monthRevenue: '€5,200',
 			status: 'active',
+			workingHours: '09:00 - 18:00',
+			nextBreak: '13:00 - 14:00',
+			certificates: ['Международный стилист', "Колорист L'Oreal"],
+			clientSatisfaction: 98,
 		},
 		{
 			id: 2,
 			name: 'Ольга Морозова',
 			role: 'Мастер маникюра',
-			phone: '+7 (999) 222-33-44',
-			email: 'olga.morozova@salon.ru',
+			phone: '+49 30 12345678',
+			email: 'olga.morozova@salon.eu',
 			rating: 4.8,
 			experience: '5 лет',
-			specializations: ['Маникюр', 'Педикюр', 'Наращивание'],
+			specializations: ['Маникюр', 'Педикюр', 'Наращивание', 'Дизайн ногтей'],
 			todayAppointments: 6,
-			monthRevenue: '$89,000',
+			monthRevenue: '€3,680',
 			status: 'active',
+			workingHours: '10:00 - 19:00',
+			nextBreak: '14:00 - 15:00',
+			certificates: ['Nail Art Master', 'Гель-лак специалист'],
+			clientSatisfaction: 96,
 		},
 		{
 			id: 3,
 			name: 'Дмитрий Волков',
 			role: 'Тату-мастер',
-			phone: '+7 (999) 333-44-55',
-			email: 'dmitry.volkov@salon.ru',
+			phone: '+39 06 1234567',
+			email: 'dmitry.volkov@salon.eu',
 			rating: 4.9,
 			experience: '12 лет',
-			specializations: ['Татуировки', 'Эскизы', 'Реализм'],
+			specializations: ['Татуировки', 'Эскизы', 'Реализм', 'Блэкворк'],
 			todayAppointments: 3,
-			monthRevenue: '$180,000',
+			monthRevenue: '€7,450',
 			status: 'active',
+			workingHours: '12:00 - 21:00',
+			nextBreak: '16:00 - 17:00',
+			certificates: ['Международная лицензия', 'Мастер реализма'],
+			clientSatisfaction: 99,
 		},
 		{
 			id: 4,
 			name: 'Анна Лебедева',
 			role: 'Мастер пирсинга',
-			phone: '+7 (999) 444-55-66',
-			email: 'anna.lebedeva@salon.ru',
+			phone: '+34 91 123 45 67',
+			email: 'anna.lebedeva@salon.eu',
 			rating: 4.7,
 			experience: '6 лет',
-			specializations: ['Пирсинг', 'Украшения', 'Консультации'],
+			specializations: ['Пирсинг', 'Украшения', 'Консультации', 'Заживление'],
 			todayAppointments: 4,
-			monthRevenue: '$67,000',
+			monthRevenue: '€2,780',
 			status: 'vacation',
+			workingHours: '11:00 - 20:00',
+			nextBreak: 'В отпуске до 25.01',
+			certificates: ['Сертификат безопасности', 'Анатомия пирсинга'],
+			clientSatisfaction: 94,
+		},
+		{
+			id: 5,
+			name: 'Мария Соколова',
+			role: 'Лазерный косметолог',
+			phone: '+41 22 123 45 67',
+			email: 'maria.sokolova@salon.eu',
+			rating: 4.8,
+			experience: '7 лет',
+			specializations: ['Лазерная эпиляция', 'RF-лифтинг', 'Фотоомоложение'],
+			todayAppointments: 5,
+			monthRevenue: '€4,920',
+			status: 'active',
+			workingHours: '09:00 - 17:00',
+			nextBreak: '12:30 - 13:30',
+			certificates: ['Лазерная косметология', 'Аппаратная косметология'],
+			clientSatisfaction: 97,
+		},
+		{
+			id: 6,
+			name: 'Александр Петров',
+			role: 'Барбер',
+			phone: '+43 1 123 45 67',
+			email: 'alexander.petrov@salon.eu',
+			rating: 4.9,
+			experience: '4 года',
+			specializations: ['Мужские стрижки', 'Бритье', 'Уход за бородой'],
+			todayAppointments: 7,
+			monthRevenue: '€3,150',
+			status: 'active',
+			workingHours: '10:00 - 19:00',
+			nextBreak: '15:00 - 16:00',
+			certificates: ['Классическое бритье', 'Мужская стилистика'],
+			clientSatisfaction: 95,
 		},
 	]
 	const statsEmployeeList = [
@@ -91,109 +142,7 @@ export default function StaffPage() {
 			/>
 			<StatsList stats={statsEmployeeList} />
 			<FiltersPages />
-			<Card className='bg-card border-border'>
-				<CardHeader>
-					<CardTitle className='text-card-foreground'>
-						Список сотрудников
-					</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<div className='space-y-4'>
-						{staff.map(member => (
-							<div
-								key={member.id}
-								className='flex items-center justify-between p-4 rounded-lg bg-muted/20 hover:bg-muted/30 transition-colors'
-							>
-								<div className='flex items-center gap-4'>
-									<Avatar>
-										<AvatarFallback>
-											{member.name
-												.split(' ')
-												.map(n => n[0])
-												.join('')}
-										</AvatarFallback>
-									</Avatar>
-									<div>
-										<p className='font-medium text-foreground'>{member.name}</p>
-										<p className='text-sm text-muted-foreground'>
-											{member.role}
-										</p>
-										<div className='flex items-center gap-4 text-xs text-muted-foreground mt-1'>
-											<div className='flex items-center gap-1'>
-												<Phone className='h-3 w-3' />
-												{member.phone}
-											</div>
-											<div className='flex items-center gap-1'>
-												<Mail className='h-3 w-3' />
-												{member.email}
-											</div>
-										</div>
-									</div>
-								</div>
-								<div className='flex items-center gap-6'>
-									<div className='text-center'>
-										<div className='flex items-center gap-1'>
-											<Star className='h-3 w-3 text-yellow-500 fill-current' />
-											<span className='font-medium text-foreground'>
-												{member.rating}
-											</span>
-										</div>
-										<p className='text-xs text-muted-foreground'>Рейтинг</p>
-									</div>
-									<div className='text-center'>
-										<p className='font-medium text-foreground'>
-											{member.experience}
-										</p>
-										<p className='text-xs text-muted-foreground'>Опыт</p>
-									</div>
-									<div className='text-center'>
-										<p className='font-medium text-foreground'>
-											{member.todayAppointments}
-										</p>
-										<p className='text-xs text-muted-foreground'>
-											Записей сегодня
-										</p>
-									</div>
-									<div className='text-center'>
-										<p className='font-medium text-foreground'>
-											{member.monthRevenue}
-										</p>
-										<p className='text-xs text-muted-foreground'>
-											Выручка за месяц
-										</p>
-									</div>
-									<Badge
-										variant={
-											member.status === 'active'
-												? 'default'
-												: member.status === 'vacation'
-												? 'secondary'
-												: 'outline'
-										}
-									>
-										{member.status === 'active'
-											? 'Активен'
-											: member.status === 'vacation'
-											? 'В отпуске'
-											: 'Неактивен'}
-									</Badge>
-									<div className='flex items-center gap-1'>
-										<Button size='sm' variant='ghost'>
-											<Eye className='h-4 w-4' />
-										</Button>
-										<Button size='sm' variant='ghost'>
-											<Edit className='h-4 w-4' />
-										</Button>
-										<Button size='sm' variant='ghost'>
-											<Trash2 className='h-4 w-4' />
-										</Button>
-									</div>
-								</div>
-							</div>
-						))}
-					</div>
-				</CardContent>
-			</Card>
+			<StaffList staffs={staff} />
 		</div>
 	)
 }

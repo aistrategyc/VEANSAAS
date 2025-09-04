@@ -16,7 +16,6 @@ export const fetchUserData = createAsyncThunk(
 					Authorization: `Bearer ${token}`,
 				},
 			})
-			console.log(response.data)
 			return response.data
 		} catch (error) {
 			return rejectWithValue(error)
@@ -31,7 +30,7 @@ const userSLice = createSlice({
 		isLoading: false,
 		error: null,
 	},
-	reducer: {
+	reducers: {
 		logout: state => {
 			state.data = null
 			state.error = null

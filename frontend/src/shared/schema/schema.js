@@ -6,6 +6,10 @@ export const passwordSchema = yup
 	.min(8, 'Password must be at least 8 characters')
 	.matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
 	.matches(/[0-9]/, 'Password must contain at least one number')
+	.matches(
+		/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/,
+		'Password must contain at least one special character'
+	)
 
 export const schemaLogin = yup.object().shape({
 	username: yup
@@ -14,6 +18,40 @@ export const schemaLogin = yup.object().shape({
 		.required('Required field')
 		.min(3, 'Username must be at least 3 characters'),
 	password: passwordSchema,
+})
+
+export const schemaRegisterSimple = yup.object().shape({
+	username: yup
+		.string()
+		.required('Username is required')
+		.min(3, 'Username must be at least 3 characters')
+		.max(30, 'Username must not exceed 30 characters'),
+
+	first_name: yup
+		.string()
+		.required('First name is required')
+		.min(2, 'First name must be at least 2 characters')
+		.max(50, 'First name must not exceed 50 characters'),
+
+	last_name: yup
+		.string()
+		.required('Last name is required')
+		.min(2, 'Last name must be at least 2 characters')
+		.max(50, 'Last name must not exceed 50 characters'),
+
+	phone_number: yup
+		.string()
+		.required('Phone number is required')
+		.matches(
+			/^\+?[0-9]{10,15}$/,
+			'Please enter a valid phone number (10-15 digits, optional + prefix)'
+		),
+	password: passwordSchema,
+	confirmPassword: yup
+		.string()
+		.oneOf([yup.ref('password')], 'Passwords must match')
+		.required('Confirm password is required'),
+	invite_token: yup.string().required(),
 })
 
 export const schemaRegister = yup.object().shape({

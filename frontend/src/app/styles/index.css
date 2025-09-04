@@ -22,7 +22,7 @@
 	--destructive: #ef4444;
 	--destructive-foreground: #ffffff;
 	--border: #262626;
-	--input: #1a1a1a;
+	--input: #302f2f;
 	--ring: rgba(99, 102, 241, 0.3);
 	--chart-1: #6366f1;
 	--chart-2: #fbbf24;
@@ -137,6 +137,24 @@
 		font-family: 'Work Sans', system-ui, sans-serif;
 		font-weight: 700;
 		color: #ffffff;
+	}
+	input:-webkit-autofill,
+	input:-webkit-autofill:hover,
+	input:-webkit-autofill:focus,
+	textarea:-webkit-autofill,
+	textarea:-webkit-autofill:hover,
+	textarea:-webkit-autofill:focus,
+	select:-webkit-autofill,
+	select:-webkit-autofill:hover,
+	select:-webkit-autofill:focus {
+		-webkit-box-shadow: 0 0 0 1100px var(--popover) inset !important;
+		-webkit-text-fill-color: var(--foreground) !important;
+		caret-color: var(--popover) !important;
+		transition: background-color 9999s ease-in-out 0s;
+	}
+	input:-webkit-autofill {
+		background-clip: padding-box;
+		border-radius: var(--radius);
 	}
 }
 

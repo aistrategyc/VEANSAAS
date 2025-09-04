@@ -23,7 +23,7 @@ export const FormInput = ({
 	})
 
 	return (
-		<div className='space-y-2'>
+		<div className='space-y-2 mt-2 mb-1'>
 			<div className='flex items-center'>
 				<Label htmlFor='login-email'>{title}</Label>{' '}
 				<p className='text-red-500 text-sm h-5 ml-2'>{error}</p>

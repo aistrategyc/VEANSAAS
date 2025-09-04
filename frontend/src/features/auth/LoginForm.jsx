@@ -34,7 +34,9 @@ export const LoginForm = () => {
 	const onSubmit = data => {
 		post('auth/login', data)
 			.then(response => {
-				login(response.data.access_token, { expires: 7 })
+				login(response.data.access_token, response.data.refresh_token, {
+					expires: 7,
+				})
 				dispatch(fetchUserData()).unwrap()
 				reset()
 			})
