@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
 		const token = getCookie('authToken')
 		if (token) {
 			setIsAuthenticated(true)
-			// fetchUser()
+			fetchUser()
 		} else {
 			setIsAuthenticated(false)
 		}

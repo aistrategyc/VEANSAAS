@@ -64,7 +64,7 @@ export const RouterProvider = () => {
 			element: <Navigate to='/' replace />,
 		},
 		{
-			path: '/verification',
+			path: '/verify-email',
 			element: <VerificationEmailPage />,
 		},
 		{

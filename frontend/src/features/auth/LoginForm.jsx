@@ -11,6 +11,7 @@ import { useDispatch } from 'react-redux'
 import { fetchUserData } from '../../shared/slices/userSlice'
 import { Link } from 'react-router'
 import { Button } from '@/components/ui/button'
+import { useState } from 'react'
 
 export const LoginForm = () => {
 	const {
@@ -26,9 +27,9 @@ export const LoginForm = () => {
 		},
 		resolver: yupResolver(schemaLogin),
 	})
-
+	const [error, setError] = useState('')
 	const { login } = useAuth()
-	const { loading, error, post, reset: resetApi } = useApi()
+	const { loading, post, reset: resetApi } = useApi()
 	const dispatch = useDispatch()
 
 	const onSubmit = data => {
@@ -40,13 +41,17 @@ export const LoginForm = () => {
 				dispatch(fetchUserData()).unwrap()
 				reset()
 			})
-			.catch({})
+			.catch(err => {
+				setError(err.response.data.detail)
+			})
 	}
+
 	if (loading) {
 		return <Loader />
 	}
 	return (
 		<Form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
+			<p className='text-red-500 text-sm h-5 ml-2'>{error}</p>
 			<FormInput
 				title='Username'
 				type='text'

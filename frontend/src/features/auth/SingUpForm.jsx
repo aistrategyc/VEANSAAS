@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { cn } from '@/lib/utils'
 import { SelectForm } from '@/shared/ui/select/Select'
+import { useState } from 'react'
 
 const plans = [
 	{ value: 'solo', label: 'solo' },
@@ -61,15 +62,19 @@ export const SingUpForm = () => {
 		errors.organization?.studio?.name
 
 	const navigate = useNavigate()
-	const { loading, error, post, reset: resetApi } = useApi()
+	const { loading, post, reset: resetApi } = useApi()
+	const [error, setError] = useState('')
 
 	const onSubmit = data => {
 		post('auth/register', data)
 			.then(() => {
 				showAlert.successRegister().then(() => navigate('/login'))
 				reset()
+				setError('')
 			})
-			.catch()
+			.catch(err => {
+				setError(err.response.data.detail)
+			})
 	}
 
 	if (loading) {
@@ -93,6 +98,7 @@ export const SingUpForm = () => {
 			</TabsList>
 
 			<Form onSubmit={handleSubmit(onSubmit)}>
+				<p className='text-red-500 text-sm h-5 ml-2'>{error}</p>
 				<TabsContent value='person'>
 					<FormInput
 						title='First name'

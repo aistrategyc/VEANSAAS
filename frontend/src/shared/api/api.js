@@ -180,7 +180,7 @@ export const authAPI = {
 			params.append('token', token)
 		}
 
-		return apiClient.get(`auth/verify-email/?${params.toString()}`, {
+		return apiClient.get(`auth/verify-email?${params.toString()}`, {
 			skipAuth: true,
 		})
 	},
