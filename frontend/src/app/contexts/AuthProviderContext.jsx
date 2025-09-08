@@ -21,7 +21,9 @@ export const AuthProvider = ({ children }) => {
 
 	const logout = useCallback(() => {
 		deleteCookie('authToken')
+		deleteCookie('refreshToken')
 		setIsAuthenticated(false)
+		console.log(1)
 	}, [])
 
 	useEffect(() => {
@@ -36,11 +38,14 @@ export const AuthProvider = ({ children }) => {
 		setLoading(false)
 	}, [])
 
+	const currentRole = 'admin'
+
 	const value = {
 		isAuthenticated,
 		loading,
 		login,
 		logout,
+		currentRole,
 	}
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

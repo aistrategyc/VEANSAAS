@@ -8,22 +8,26 @@ export const Item = ({
 	to,
 	iconName: Icon = null,
 	isCollapsed,
+	role = null,
+	currentRole,
 }) => {
 	return (
-		<li>
-			<Link
-				to={to}
-				className={cn(
-					'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-					isActive
-						? 'bg-sidebar-primary text-sidebar-primary-foreground'
-						: 'text-sidebar-foreground hover:bg-sidebar-accent/10 hover:text-sidebar-accent'
-				)}
-				onClick={onClick}
-			>
-				<Icon className='h-5 w-5 flex-shrink-0' />
-				{!isCollapsed && <span>{text}</span>}
-			</Link>
-		</li>
+		(!role || role === currentRole || currentRole === 'admin') && (
+			<li>
+				<Link
+					to={to}
+					className={cn(
+						'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+						isActive
+							? 'bg-sidebar-primary text-sidebar-primary-foreground'
+							: 'text-sidebar-foreground hover:bg-sidebar-accent/10 hover:text-sidebar-accent'
+					)}
+					onClick={onClick}
+				>
+					<Icon className='h-5 w-5 flex-shrink-0' />
+					{!isCollapsed && <span>{text}</span>}
+				</Link>
+			</li>
+		)
 	)
 }

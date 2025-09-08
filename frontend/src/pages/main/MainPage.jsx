@@ -37,6 +37,9 @@ import { TodayAppointments } from '../../features/appointments/TodayAppointments
 import { MainActions } from '../../features/main/MainActions'
 import { ServicesTopList } from '@/features/services/ServicesTopList'
 import { StaffTopList } from '../../features/staff/StaffTopList'
+import { useAuth } from '@/shared/hooks/useAuth'
+import { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 
 const revenueData = [
 	{ name: 'Пн', revenue: 2400, bookings: 12 },

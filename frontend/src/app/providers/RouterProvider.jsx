@@ -18,6 +18,7 @@ import MainPage from '@/pages/main/MainPage'
 import VerificationEmailPage from '@/pages/auth/VerificationEmailPage'
 import { RegisterSimple } from '@/pages/auth/RegisterSimple'
 import DashboardPage from '@/pages/dashboard/DashboardPage'
+import UserManager from '@/role/UserManager'
 
 export const RouterProvider = () => {
 	const { isAuthenticated, loading } = useAuth()
@@ -38,6 +39,7 @@ export const RouterProvider = () => {
 			),
 			children: [
 				{ index: true, element: <MainPage /> },
+				{ path: 'dashboard', element: <DashboardPage /> },
 				{ path: 'clients', element: <ClientsPage /> },
 				{ path: 'calendar', element: <CalendarPage /> },
 				{ path: 'records', element: <AppointmentsPage /> },
@@ -48,6 +50,8 @@ export const RouterProvider = () => {
 				{ path: 'loyalty', element: <LoyaltyPage /> },
 				{ path: 'finance', element: <FinancesPage /> },
 				{ path: 'analytics', element: <AnalyticsPage /> },
+				{ path: 'role', element: <UserManager /> },
+
 				{ path: '*', element: <Navigate to='/' replace /> },
 			],
 		},

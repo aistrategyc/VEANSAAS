@@ -5,7 +5,6 @@ import { Bell, Plus, Settings, Menu, User, X } from 'lucide-react'
 import { useState } from 'react'
 
 export const TopHeader = () => {
-	const { fetchUser } = useUser()
 	const [isMenuOpen, setIsMenuOpen] = useState(false)
 
 	return (
@@ -35,7 +34,7 @@ export const TopHeader = () => {
 					>
 						View 1
 					</Button>
-					<Button onClick={() => fetchUser()} variant='ghost' size='sm'>
+					<Button variant='ghost' size='sm'>
 						<Settings className='h-4 w-4' />
 					</Button>
 				</div>
