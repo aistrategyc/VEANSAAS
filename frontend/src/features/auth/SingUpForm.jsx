@@ -37,7 +37,7 @@ export const SingUpForm = () => {
 			organization: {
 				name: '',
 				description: '',
-				plan_type: 'solo',
+				plan_type: '',
 				studio: {
 					name: '',
 				},
@@ -77,7 +77,7 @@ export const SingUpForm = () => {
 	}
 	return (
 		<Tabs defaultValue='person' className='w-full'>
-			<TabsList className='grid w-full grid-cols-2 p-0'>
+			<TabsList className='grid w-full grid-cols-2'>
 				<TabsTrigger
 					value='person'
 					className={cn(hasPersonErrors && 'border-destructive border-2')}

@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router'
+import { useLocation } from 'react-router'
 import { Item } from '../navigationItem/Item'
 import {
 	Home,
@@ -11,19 +11,24 @@ import {
 	Star,
 	DollarSign,
 	BarChart3,
-	Search,
-	User,
-	ChevronLeft,
-	ChevronRight,
+	LayoutDashboardIcon,
+	NotepadText,
 } from 'lucide-react'
+import { useAuth } from '@/shared/hooks/useAuth'
 
 const menuItems = [
-	{ id: 'dashboard', text: 'Главная', icon: Home, path: '/' },
+	{ id: 'home', text: 'Главная', icon: Home, path: '/' },
 	{ id: 'calendar', text: 'Календарь', icon: Calendar, path: '/calendar' },
+	{
+		id: 'dashboard',
+		text: 'Dashboard',
+		icon: LayoutDashboardIcon,
+		path: '/dashboard',
+	},
 	{
 		id: 'appointments',
 		text: 'Записи',
-		icon: Calendar,
+		icon: NotepadText,
 		path: '/records',
 		badge: '5',
 	},
@@ -35,10 +40,13 @@ const menuItems = [
 	{ id: 'loyalty', text: 'Лояльность', icon: Star, path: '/loyalty' },
 	{ id: 'finances', text: 'Финансы', icon: DollarSign, path: '/finance' },
 	{ id: 'analytics', text: 'Аналитика', icon: BarChart3, path: '/analytics' },
+	{ id: 'role', text: 'Роли', icon: UserCheck, path: '/role', role: 'admin' },
 ]
 
 export const NavMenu = ({ isCollapsed }) => {
 	const location = useLocation()
+
+	const { currentRole } = useAuth()
 
 	const isActive = path => {
 		if (path === '/') {
@@ -64,6 +72,8 @@ export const NavMenu = ({ isCollapsed }) => {
 						onClick={() => handleItemClick(item.id)}
 						to={item.path}
 						isCollapsed={isCollapsed}
+						role={item.role}
+						currentRole={currentRole}
 					/>
 				))}
 			</ul>

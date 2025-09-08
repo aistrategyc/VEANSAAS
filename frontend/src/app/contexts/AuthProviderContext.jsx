@@ -12,25 +12,25 @@ export const AuthProvider = ({ children }) => {
 
 	const { fetchUser } = useUser()
 
-	const login = useCallback((token, options = {}) => {
+	const login = useCallback((accessToken, refreshToken, options = {}) => {
 		const { expires = 7 } = options
-		console.log('token', token)
-
-		setCookie('authToken', token, expires)
+		setCookie('authToken', accessToken, expires)
+		setCookie('refreshToken', refreshToken)
 		setIsAuthenticated(true)
 	}, [])
 
 	const logout = useCallback(() => {
 		deleteCookie('authToken')
+		deleteCookie('refreshToken')
 		setIsAuthenticated(false)
+		console.log(1)
 	}, [])
 
 	useEffect(() => {
 		const token = getCookie('authToken')
-
 		if (token) {
 			setIsAuthenticated(true)
-			fetchUser()
+			// fetchUser()
 		} else {
 			setIsAuthenticated(false)
 		}
@@ -38,11 +38,14 @@ export const AuthProvider = ({ children }) => {
 		setLoading(false)
 	}, [])
 
+	const currentRole = 'admin'
+
 	const value = {
 		isAuthenticated,
 		loading,
 		login,
 		logout,
+		currentRole,
 	}
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
