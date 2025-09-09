@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/shared/hooks/useAuth'
-import { Eye, Plus, User } from 'lucide-react'
+import { Eye, MessageSquare, Plus, User } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 
@@ -56,6 +56,19 @@ export const HeaderPages = ({
 										<Button className='bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105'>
 											<Plus className='h-4 w-4 mr-2' />
 											Новая запись
+										</Button>
+									</div>
+								)
+							case 'clientCard':
+								return (
+									<div className='flex gap-3'>
+										<Button variant='outline' size='sm'>
+											<MessageSquare className='h-4 w-4 mr-2' />
+											Отправить SMS
+										</Button>
+										<Button size='sm'>
+											<Plus className='h-4 w-4 mr-2' />
+											Записать на прием
 										</Button>
 									</div>
 								)

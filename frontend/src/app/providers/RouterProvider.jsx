@@ -19,7 +19,7 @@ import VerificationEmailPage from '@/pages/auth/VerificationEmailPage'
 import { RegisterSimple } from '@/pages/auth/RegisterSimple'
 import DashboardPage from '@/pages/dashboard/DashboardPage'
 import UserManager from '@/role/UserManager'
-import ProfileLayout from '@/features/profile/ProfileLayout'
+import ProfileLayout from '@/features/clients/ClientCard'
 
 export const RouterProvider = () => {
 	const { isAuthenticated, loading } = useAuth()

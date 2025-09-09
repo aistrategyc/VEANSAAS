@@ -63,6 +63,8 @@ const initialRoles = [
 			'inventory:edit',
 			'inventory:delete',
 			'inventory:export',
+
+			'main:create',
 		],
 		isSystem: true,
 	},
