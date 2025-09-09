@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getCookie, setCookie } from '../helper/authHelper'
+import { deleteCookie, getCookie, setCookie } from '../helper/authHelper'
 
 // Конфигурация базового URL
 const BASE_URL = 'http://localhost:8000/api/v1/'
@@ -21,8 +21,8 @@ export const tokenManager = {
 		setCookie('authToken', accessToken)
 	},
 	clearTokens: () => {
-		localStorage.removeItem('authToken')
-		localStorage.removeItem('refreshToken')
+		deleteCookie('authToken')
+		deleteCookie('refreshToken')
 	},
 	hasTokens: () => {
 		return (
@@ -133,11 +133,10 @@ apiClient.interceptors.response.use(
 			// Повторяем оригинальный запрос
 			return apiClient(originalRequest)
 		} catch (refreshError) {
-			console.log('21')
-			// tokenManager.clearTokens()
-			// if (window.location.pathname !== '/login') {
-			// 	window.location.href = '/login'
-			// }
+			tokenManager.clearTokens()
+			if (window.location.pathname !== '/login') {
+				window.location.href = '/login'
+			}
 			return Promise.reject(refreshError)
 		}
 	}

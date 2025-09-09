@@ -1,6 +1,5 @@
 import { LogOut, User } from 'lucide-react'
 import { useUser } from '../../shared/hooks/useUser'
-import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/shared/hooks/useAuth'
 
@@ -17,11 +16,10 @@ export const ProfileCard = ({ isCollapsed }) => {
 				{!isCollapsed && (
 					<div className='flex-1 min-w-0'>
 						<p className='text-sm font-medium text-sidebar-foreground truncate'>
-							{loading ? user.first_name : 'user '}
-							{loading ? user.last : 'user'}
+							{!loading ? `${user?.first_name} ${user?.last_name}` : 'user'}
 						</p>
 						<p className='text-xs text-muted-foreground truncate'>
-							{loading ? user.email : 'email'}
+							{!loading ? user?.email : 'email'}
 						</p>
 					</div>
 				)}

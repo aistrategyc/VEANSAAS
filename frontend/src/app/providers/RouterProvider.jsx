@@ -19,6 +19,7 @@ import VerificationEmailPage from '@/pages/auth/VerificationEmailPage'
 import { RegisterSimple } from '@/pages/auth/RegisterSimple'
 import DashboardPage from '@/pages/dashboard/DashboardPage'
 import UserManager from '@/role/UserManager'
+import ProfileLayout from '@/features/profile/ProfileLayout'
 
 export const RouterProvider = () => {
 	const { isAuthenticated, loading } = useAuth()
@@ -49,6 +50,7 @@ export const RouterProvider = () => {
 				{ path: 'inventory', element: <InventoryPage /> },
 				{ path: 'loyalty', element: <LoyaltyPage /> },
 				{ path: 'finance', element: <FinancesPage /> },
+				{ path: 'customer', element: <ProfileLayout /> },
 				{ path: 'analytics', element: <AnalyticsPage /> },
 				{ path: 'role', element: <UserManager /> },
 

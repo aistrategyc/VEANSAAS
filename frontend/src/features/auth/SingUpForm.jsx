@@ -73,7 +73,7 @@ export const SingUpForm = () => {
 				setError('')
 			})
 			.catch(err => {
-				setError(err.response.data.detail)
+				setError(err.response.data?.detail.detail)
 			})
 	}
 
@@ -98,7 +98,7 @@ export const SingUpForm = () => {
 			</TabsList>
 
 			<Form onSubmit={handleSubmit(onSubmit)}>
-				<p className='text-red-500 text-sm h-5 ml-2'>{error}</p>
+				{error && <p className='text-red-500 text-sm h-5 ml-2'>{error}</p>}
 				<TabsContent value='person'>
 					<FormInput
 						title='First name'

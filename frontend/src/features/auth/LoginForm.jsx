@@ -51,7 +51,7 @@ export const LoginForm = () => {
 	}
 	return (
 		<Form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
-			<p className='text-red-500 text-sm h-5 ml-2'>{error}</p>
+			{error && <p className='text-red-500 text-sm h-5 ml-2'>{error}</p>}
 			<FormInput
 				title='Username'
 				type='text'

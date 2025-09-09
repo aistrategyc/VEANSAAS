@@ -23,7 +23,6 @@ export const AuthProvider = ({ children }) => {
 		deleteCookie('authToken')
 		deleteCookie('refreshToken')
 		setIsAuthenticated(false)
-		console.log(1)
 	}, [])
 
 	useEffect(() => {
