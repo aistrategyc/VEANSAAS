@@ -9,6 +9,11 @@ class RegisterUserRequest(BaseModel):
     organization: OrganizationCreateRequest
 
 
+class RegisterByInviterUserRequest(UserCreateRequest):
+    email: None = Field(default=None, exclude=True)
+    invite_token: str = Field(..., max_length=64)
+
+
 class LoginUserRequest(BaseModel):
     username: str
     password: str

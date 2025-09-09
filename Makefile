@@ -12,5 +12,10 @@ migrate:
 create-migration:
 	docker compose exec admin-panel alembic revision --autogenerate
 
+
+downgrade:
+	docker compose exec admin-panel alembic downgrade -1
+
+
 history:
 	docker compose exec admin-panel alembic history
