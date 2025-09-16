@@ -2,7 +2,7 @@ import admin as admin_view
 from fastapi import FastAPI
 from sqladmin import Admin
 
-from shared.config import settings
+from shared.config.config import settings
 from shared.database import engine
 
 app = FastAPI(

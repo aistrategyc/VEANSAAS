@@ -4,7 +4,7 @@ import redis.asyncio as redis
 from fastapi import HTTPException
 from redis.asyncio import Redis
 
-from shared.config import settings
+from shared.config.config import settings
 
 
 async def get_redis_client() -> Redis:

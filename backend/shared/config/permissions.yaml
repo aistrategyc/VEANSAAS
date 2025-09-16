@@ -1,0 +1,24 @@
+permissions:
+  - code: user.view
+    description: Просмотр пользователей
+    category: Users
+
+  - code: user.create
+    description: Создание пользователей
+    category: Users
+
+  - code: user.delete
+    description: Удаление пользователей
+    category: Users
+
+  - code: report.view
+    description: Просмотр отчетов
+    category: Reports
+
+  - code: report.download
+    description: Скачивание отчетов
+    category: Reports
+
+  - code: settings.edit
+    description: Редактирование настроек
+    category: System

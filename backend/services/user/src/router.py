@@ -46,7 +46,7 @@ async def create_user_route(
 async def delete_user_route(
     request: Request,
     user_uuid: UUID,
-    current_service: dict = Depends(get_service_token),
+    auth: AuthContext = Depends(get_service_token),
     db: AsyncSession = Depends(get_db),
 ):
     return await delete_user(request=request, user_uuid=user_uuid, db=db)
@@ -56,10 +56,10 @@ async def delete_user_route(
 @redis_cache(expire=180, key_builder=user_me_key_builder)
 async def get_my_user_router(
     request: Request,
-    current_user: dict = Depends(get_current_user),
+    auth: AuthContext = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    return await get_my_user(request=request, current_user=current_user, db=db)
+    return await get_my_user(request=request, auth=auth, db=db)
 
 
 @router.get(

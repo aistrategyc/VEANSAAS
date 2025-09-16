@@ -1,4 +1,10 @@
+from pathlib import Path
+
 from pydantic_settings import BaseSettings
+from ruamel.yaml import YAML
+
+ROLES_FILE = Path('shared/config/roles.yaml')
+yaml = YAML()
 
 
 class Config(BaseSettings):
@@ -60,6 +66,11 @@ class Config(BaseSettings):
     @property
     def COMPANY_UNITS_SERVICE_INVITE_URL(self) -> str:
         return f'{self.BASE_API_URL}{self.COMPANY_UNITS_SERVICE_INVITE_ROUTE}'
+
+    @property
+    def roles(self) -> dict:
+        with open(ROLES_FILE, 'r', encoding='utf-8') as f:
+            return yaml.load(f)
 
     class Config:
         env_file = '../.env'

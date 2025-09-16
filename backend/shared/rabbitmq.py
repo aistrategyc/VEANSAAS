@@ -13,7 +13,7 @@ from aio_pika.abc import (
 )
 from fastapi import FastAPI
 
-from .config import settings
+from shared.config.config import settings
 
 
 class RabbitMQ:

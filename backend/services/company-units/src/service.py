@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from shared.config import settings
+from shared.config.config import settings
 from shared.dependencies import AuthContext
 from shared.models.company_units.org import (
     Organization,

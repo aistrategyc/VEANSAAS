@@ -14,6 +14,7 @@ from utils import (
     verify_password,
 )
 
+from shared.config.config import settings
 from shared.rabbitmq import rabbitmq
 from shared.schemas.company_units.common import BaseInviteMemberCreateRequest
 from shared.schemas.user import UserCreateInternal, UserVerificationEmail
@@ -140,6 +141,7 @@ async def login(
         'username': user.username,
         'email': user.email,
         'roles': user.roles,
+        'permissions': settings.roles['roles'],
     }
 
     access_token = await create_access_token(data=user_date)

@@ -3,7 +3,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from router import router
 
-from shared.config import settings
+from shared.config.config import settings
 from shared.exceptions import validation_exception_handler
 from shared.middleware import error_handler
 from shared.rabbitmq import create_lifespan

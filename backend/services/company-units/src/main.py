@@ -5,7 +5,7 @@ from routers.invite import router as router_invite
 from routers.org import router as router_organization
 from routers.studio import router as router_studio
 
-from shared.config import settings
+from shared.config.config import settings
 from shared.exceptions import validation_exception_handler
 from shared.middleware import error_handler
 from shared.rabbitmq import create_lifespan

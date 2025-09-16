@@ -5,6 +5,7 @@ from sqlalchemy import exists, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from shared.dependencies import AuthContext
 from shared.models.user import User
 from shared.schemas.auth import AuthUserResponse
 from shared.schemas.error import FieldError, ValidationError
@@ -111,18 +112,12 @@ async def delete_user(request: Request, user_uuid: UUID, db: AsyncSession):
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-async def get_my_user(request: Request, current_user: dict, db: AsyncSession):
-    user_uuid = current_user.get('user_uuid')
-    if not user_uuid:
+async def get_my_user(request: Request, auth: AuthContext, db: AsyncSession):
+    if not auth.is_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail='User not found'
         )
-    user = await db.get(User, user_uuid)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail='User not found'
-        )
-    return user
+    return auth.user
 
 
 async def verification_email(
