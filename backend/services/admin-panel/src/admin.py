@@ -1,7 +1,11 @@
 from sqladmin import ModelView
 
-from shared.models.company_units.org import Organization, OrganizationMember
-from shared.models.company_units.studio import Studio, StudioMember
+from shared.models.company_units.org import (
+    Organization,
+    OrganizationInvite,
+    OrganizationMember,
+)
+from shared.models.company_units.studio import Studio, StudioInvite, StudioMember
 from shared.models.user import User
 
 
@@ -32,4 +36,16 @@ class StudioAdmin(ModelView, model=Studio):
 class StudioMemberAdmin(ModelView, model=StudioMember):
     name = 'Studio member'
     name_plural = 'Studio members'
+    can_export = False
+
+
+class StudioInviteAdmin(ModelView, model=StudioInvite):
+    name = 'Studio invite'
+    name_plural = 'Studio invites'
+    can_export = False
+
+
+class OrganizationInviteAdmin(ModelView, model=OrganizationInvite):
+    name = 'Organization invite'
+    name_plural = 'Organization invites'
     can_export = False

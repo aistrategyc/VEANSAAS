@@ -18,14 +18,6 @@ from shared.schemas.user import (
 
 async def get_user_for_auth(request: Request, username: str, db: AsyncSession):
     result = await db.execute(
-        select(User).filter(
-            User.username == username,
-            User.is_active.is_(True),
-            User.is_verified.is_(True),
-        )
-    )
-
-    result = await db.execute(
         select(User)
         .filter(
             User.username == username,
