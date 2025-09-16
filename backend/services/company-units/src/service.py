@@ -1,8 +1,8 @@
 import secrets
 from datetime import datetime, timedelta, timezone
 
-from shared.schemas.company_units.common import BaseInviteResponse
 from fastapi import HTTPException, Request, status
+from fastapi.responses import JSONResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -15,7 +15,11 @@ from shared.models.company_units.org import (
 )
 from shared.models.company_units.studio import Studio, StudioInvite, StudioMember
 from shared.rabbitmq import rabbitmq
-from shared.schemas.company_units.common import BaseInviteValidateResponse
+from shared.schemas.company_units.common import (
+    BaseInviteMemberCreateRequest,
+    BaseInviteResponse,
+    BaseInviteValidateResponse,
+)
 from shared.schemas.company_units.org import (
     OrganizationCreateRequest,
     OrganizationMemberCreateRequest,
@@ -166,3 +170,25 @@ async def invite_validate(request: Request, token: str, db: AsyncSession):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail='Invite not found'
         )
+
+
+async def invite_create_members(
+    request: Request,
+    uuid: str,
+    data: BaseInviteMemberCreateRequest,
+    db: AsyncSession,
+):
+    async with db.begin():
+        _model = OrganizationInvite if data.type == 'organization' else StudioInvite
+        invite_member = await db.get(_model, uuid)
+        if not invite_member:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail='Invite is not found'
+            )
+        await invite_member.crete_member(db=db, user_uuid=data.user_uuid)
+        invite_member.is_used = True
+        await db.commit()
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={'status': 'success', 'message': 'Member created successfully'},
+    )

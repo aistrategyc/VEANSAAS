@@ -37,7 +37,7 @@ class StudioResponse(StudioBase):
 
 
 class StudioMemberCreateRequest(StudioMemberBase):
-    created_by_uuid: UUID | str
+    created_by_uuid: UUID | str | None = Field(default=None)
 
 
 class StudioInviteCreateRequest(BaseInviteCreateRequest):

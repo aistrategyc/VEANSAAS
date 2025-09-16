@@ -15,6 +15,7 @@ from utils import (
 )
 
 from shared.rabbitmq import rabbitmq
+from shared.schemas.company_units.common import BaseInviteMemberCreateRequest
 from shared.schemas.user import UserCreateInternal, UserVerificationEmail
 from shared.service_clients.company_units import (
     CompanyUnitsInviteServiceClient,
@@ -74,36 +75,49 @@ async def register_by_invite(
     user_service: UserServiceClient,
     invite_service: CompanyUnitsInviteServiceClient,
 ):
-    invite_token = data.invite_token
-    invite_data = await invite_service.validate(invite_token=invite_token)
+    user_created = None
+    try:
+        invite_token = data.invite_token
+        invite_data = await invite_service.validate(invite_token=invite_token)
 
-    hashed_password = pwd_context.hash(data.password)
-    user_internal = UserCreateInternal(
-        **data.model_dump(exclude={'password'}),
-        hashed_password=hashed_password,
-        email=invite_data.email,
-    )
+        hashed_password = pwd_context.hash(data.password)
+        user_internal = UserCreateInternal(
+            **data.model_dump(exclude={'password'}),
+            hashed_password=hashed_password,
+            email=invite_data.email,
+        )
 
-    user_created = await user_service.create_user(request_data=user_internal)
+        user_created = await user_service.create_user(request_data=user_internal)
 
-    # verification_token = await create_verification_token(
-    #     data={
-    #         'sub': 'email',
-    #         'email': user_created.email,
-    #         'user_uuid': str(user_created.uuid),
-    #         'type': 'verification',
-    #     }
-    # )
+        await invite_service.create_members(
+            uuid=invite_data.uuid,
+            request_data=BaseInviteMemberCreateRequest(
+                user_uuid=str(user_created.uuid), type=invite_data.type
+            ),
+        )
 
-    # await rabbitmq.publish(
-    #     routing_key='user.verification_email',
-    #     message={'token': verification_token, 'email': user_created.email},
-    # )
+        verification_token = await create_verification_token(
+            data={
+                'sub': 'email',
+                'email': user_created.email,
+                'user_uuid': str(user_created.uuid),
+                'type': 'verification',
+            }
+        )
 
-    return {
-        'status': 'success',
-        'message': 'User registered. Check your email for confirmation.',
-    }
+        await rabbitmq.publish(
+            routing_key='user.verification_email',
+            message={'token': verification_token, 'email': user_created.email},
+        )
+
+        return {
+            'status': 'success',
+            'message': 'User registered. Check your email for confirmation.',
+        }
+    except Exception:
+        if user_created:
+            await user_service.delete_user(user_created.uuid)
+        raise
 
 
 async def login(

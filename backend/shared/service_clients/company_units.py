@@ -1,4 +1,9 @@
-from shared.schemas.company_units.common import BaseInviteValidateResponse
+from uuid import UUID
+
+from shared.schemas.company_units.common import (
+    BaseInviteMemberCreateRequest,
+    BaseInviteValidateResponse,
+)
 from shared.schemas.company_units.org import (
     OrganizationCreateRequest,
     OrganizationResponse,
@@ -27,3 +32,12 @@ class CompanyUnitsInviteServiceClient(BaseServiceClient):
         )
 
         return BaseInviteValidateResponse(**data)
+
+    async def create_members(
+        self, uuid: str | UUID, request_data: BaseInviteMemberCreateRequest
+    ):
+        await self._make_request(
+            method='POST',
+            endpoint=f'{uuid}/members',
+            payload=request_data.model_dump(),
+        )

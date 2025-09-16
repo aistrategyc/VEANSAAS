@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from sqlalchemy import JSON, Boolean, ForeignKey, String, Text, Uuid, true
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from shared.database import Base
@@ -65,3 +66,14 @@ class OrganizationInvite(BaseInvite):
     )
 
     roles: Mapped[list[OrganizationRole]] = mapped_column(JSON)
+
+    async def crete_member(self, db: AsyncSession, user_uuid: UUID | str):
+        db_member = OrganizationMember(
+            user_uuid=user_uuid,
+            organization_uuid=self.organization_uuid,
+            roles=self.roles,
+            created_by_uuid=self.created_by_uuid,
+        )
+        db.add(db_member)
+
+        return db_member

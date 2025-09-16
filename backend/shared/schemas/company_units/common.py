@@ -23,6 +23,11 @@ class BaseInviteValidateResponse(BaseModel):
     type: Literal['organization', 'studio']
 
 
+class BaseInviteMemberCreateRequest(BaseModel):
+    type: Literal['organization', 'studio']
+    user_uuid: UUID | str
+
+
 class BaseInviteCreateRequest(BaseModel):
     email: EmailStr
 

@@ -1,10 +1,13 @@
 from fastapi import APIRouter, Depends, Request, status
 from service import create_studio_invite
 from sqlalchemy.ext.asyncio import AsyncSession
-from shared.schemas.company_units.common import BaseInviteResponse
+
 from shared.database import get_db
 from shared.dependencies import AuthContext, get_auth_context
-from shared.schemas.company_units.studio import StudioInviteCreateRequest
+from shared.schemas.company_units.common import BaseInviteResponse
+from shared.schemas.company_units.studio import (
+    StudioInviteCreateRequest,
+)
 
 router = APIRouter(prefix='/studios', tags=['Studios'])
 
