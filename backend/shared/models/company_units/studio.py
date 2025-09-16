@@ -46,7 +46,6 @@ class StudioMember(Base):
     user: Mapped['User'] = relationship(
         back_populates='studio_memberships',
         foreign_keys=[user_uuid],
-        passive_deletes=True,
     )
     studio_uuid: Mapped[UUID] = mapped_column(
         Uuid(as_uuid=True),

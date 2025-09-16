@@ -24,13 +24,14 @@ class User(Base):
         back_populates='user',
         lazy='selectin',
         foreign_keys='StudioMember.user_uuid',
-        passive_deletes=True,
+        cascade='all, delete',
     )
     organization_memberships: Mapped[list['OrganizationMember']] = relationship(
         back_populates='user',
         lazy='selectin',
         foreign_keys='OrganizationMember.user_uuid',
         passive_deletes=True,
+        cascade='all, delete',
     )
     created_at: Mapped[created_at]
     updated_at: Mapped[updated_at]
