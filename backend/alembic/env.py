@@ -6,6 +6,12 @@ from alembic import context
 from shared.config.config import settings
 from shared.database import Base
 from shared.models.company_units.org import Organization, OrganizationMember  # noqa
+from shared.models.company_units.service import (
+    AttributeOption,  # noqa
+    CategoryAttribute,  # noqa
+    Service,  # noqa
+    ServiceCategory,  # noqa
+)
 from shared.models.company_units.studio import Studio, StudioMember  # noqa
 from shared.models.user import User  # noqa
 

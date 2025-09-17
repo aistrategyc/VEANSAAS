@@ -15,3 +15,11 @@ class OrganizationRole(str, enum.Enum):
 class OrganizationPlanType(str, enum.Enum):
     SOLO = 'solo'
     NETWORK = 'network'
+
+
+class AttributeType(str, enum.Enum):
+    TEXT = 'text'
+    NUMBER = 'number'
+    SELECT = 'select'
+    CHECKBOX = 'checkbox'
+    TEXTAREA = 'textarea'

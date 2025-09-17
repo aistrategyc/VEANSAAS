@@ -1,11 +1,8 @@
 import datetime
+from typing import Annotated
+from uuid import UUID
 
-from sqlalchemy import (
-    Boolean,
-    DateTime,
-    String,
-    false,
-)
+from sqlalchemy import Boolean, DateTime, ForeignKey, String, Uuid, false
 from sqlalchemy.orm import Mapped, mapped_column
 
 from shared.database import Base
@@ -15,6 +12,14 @@ from shared.models.base import (
     updated_at,
     uuid_primary_key,
 )
+
+organization_uuid = Annotated[
+    UUID,
+    mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey('organization_service.organizations.uuid', ondelete='CASCADE'),
+    ),
+]
 
 
 class BaseInvite(Base):

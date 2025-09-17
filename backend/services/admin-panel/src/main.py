@@ -25,3 +25,8 @@ admin.add_view(admin_view.StudioAdmin)
 admin.add_view(admin_view.StudioMemberAdmin)
 admin.add_view(admin_view.OrganizationInviteAdmin)
 admin.add_view(admin_view.StudioInviteAdmin)
+
+admin.add_view(admin_view.AttributeOptionAdmin)
+admin.add_view(admin_view.CategoryAttributeAdmin)
+admin.add_view(admin_view.ServiceAdmin)
+admin.add_view(admin_view.ServiceCategoryAdmin)
