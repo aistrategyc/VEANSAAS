@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Request, status
-from service import create_studio_invite
+from services.studio import create_studio_invite
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.database import get_db

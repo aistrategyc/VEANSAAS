@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, Request, status
-from service import create_organization
+from services.org import create_organization
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.database import get_db
-from shared.dependencies import get_auth_context, AuthContext
+from shared.dependencies import AuthContext, get_auth_context
 from shared.schemas.company_units.org import (
     OrganizationCreateRequest,
     OrganizationResponse,

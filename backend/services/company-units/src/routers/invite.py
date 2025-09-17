@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Request, status
-from service import invite_create_members, invite_validate
+from services.invite import invite_create_members, invite_validate
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.dependencies import AuthContext, get_db, get_service_token
