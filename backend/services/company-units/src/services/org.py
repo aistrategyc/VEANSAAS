@@ -1,5 +1,9 @@
-from fastapi import Request
+from uuid import UUID
+
+from fastapi import HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from shared.dependencies import AuthContext
 
 from shared.models.company_units.org import (
     Organization,
@@ -12,6 +16,7 @@ from shared.schemas.company_units.org import (
     OrganizationPlanType,
     OrganizationResponse,
     OrganizationRole,
+    OrganizationUpdateRequest,
 )
 from shared.schemas.company_units.studio import (
     StudioMemberCreateRequest,
@@ -69,3 +74,44 @@ async def create_organization(
         studio_response = StudioResponse.model_validate(db_studio)
         organization_response.studio = studio_response
         return organization_response
+
+
+async def get_organization(
+    request: Request, uuid: UUID, db: AsyncSession, auth: AuthContext
+):
+    organization_db = await db.get(Organization, uuid)
+
+    if not organization_db:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail='Organization not found'
+        )
+
+    return organization_db
+
+
+async def update_organization(
+    request: Request,
+    uuid: UUID,
+    data: OrganizationUpdateRequest,
+    db: AsyncSession,
+    auth: AuthContext,
+):
+    organization_db = await db.get(Organization, uuid)
+
+    if not organization_db:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail='Organization not found'
+        )
+
+    update_data = data.model_dump(
+        exclude_unset=True,
+        exclude_none=True,
+    )
+    if not update_data:
+        return organization_db
+
+    for field, value in update_data.items():
+        setattr(organization_db, field, value)
+    await db.commit()
+
+    return organization_db

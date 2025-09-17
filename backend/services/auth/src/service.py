@@ -138,6 +138,7 @@ async def login(
     user_date = {
         'sub': user.uuid,
         'user_uuid': user.uuid,
+        'organization_uuid': list(user.roles['orgs'].keys())[0],
         'username': user.username,
         'email': user.email,
         'roles': user.roles,

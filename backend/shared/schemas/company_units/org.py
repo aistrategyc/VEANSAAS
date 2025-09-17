@@ -44,3 +44,17 @@ class OrganizationResponse(OrganizationBase):
 class OrganizationInviteCreate(BaseInviteCreateRequest):
     organization_uuid: UUID | str
     roles: List[OrganizationRole]
+
+
+class OrganizationResponseSimple(OrganizationBase):
+    uuid: UUID
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class OrganizationUpdateRequest(BaseModel):
+    name: str | None = Field(default=None, max_length=244)
+    description: str | None = Field(default=None)

@@ -47,3 +47,7 @@ class StudioInviteCreateRequest(BaseInviteCreateRequest):
 class StudioInviteCreateDB(BaseInviteCreateDB):
     roles: List[StudioRole]
     studio_uuid: UUID | str
+
+
+class StudioUpdateRequest(BaseModel):
+    name: str | None = Field(default=None, max_length=244)

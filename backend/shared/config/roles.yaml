@@ -25,6 +25,8 @@ roles:
   studio_owner:
     permissions:
       - report.view
+      - org:update
+      - studio:update
 
   owner:
     permissions:
@@ -34,3 +36,4 @@ roles:
       - report.view
       - report.download
       - settings.edit
+      - org:update

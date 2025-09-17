@@ -1,12 +1,13 @@
 import secrets
 from datetime import datetime, timedelta, timezone
+from uuid import UUID
 
-from fastapi import Request
+from fastapi import HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.config.config import settings
 from shared.dependencies import AuthContext
-from shared.models.company_units.studio import StudioInvite
+from shared.models.company_units.studio import Studio, StudioInvite
 from shared.rabbitmq import rabbitmq
 from shared.schemas.company_units.common import (
     BaseInviteResponse,
@@ -14,6 +15,7 @@ from shared.schemas.company_units.common import (
 from shared.schemas.company_units.studio import (
     StudioInviteCreateDB,
     StudioInviteCreateRequest,
+    StudioUpdateRequest,
 )
 
 
@@ -49,3 +51,42 @@ async def create_studio_invite(
         token=db_invite.token,
         url=f'{settings.CLIENT_URL}/signup?token={db_invite.token}',
     )
+
+
+async def get_studio(request: Request, uuid: UUID, db: AsyncSession, auth: AuthContext):
+    studio_db = await db.get(Studio, uuid)
+
+    if not studio_db:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail='Studio not found'
+        )
+
+    return studio_db
+
+
+async def update_studio(
+    request: Request,
+    uuid: UUID,
+    data: StudioUpdateRequest,
+    db: AsyncSession,
+    auth: AuthContext,
+):
+    studio_db = await db.get(Studio, uuid)
+
+    if not studio_db:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail='Studio not found'
+        )
+
+    update_data = data.model_dump(
+        exclude_unset=True,
+        exclude_none=True,
+    )
+    if not update_data:
+        return studio_db
+
+    for field, value in update_data.items():
+        setattr(studio_db, field, value)
+    await db.commit()
+
+    return studio_db

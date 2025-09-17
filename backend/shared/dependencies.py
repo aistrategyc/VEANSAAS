@@ -1,4 +1,6 @@
-from fastapi import Depends, HTTPException, status
+from uuid import UUID
+
+from fastapi import Depends, Header, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -37,6 +39,14 @@ class AuthContext:
         return self._payload
 
     @property
+    def organization_uuid(self) -> str | UUID | None:
+        return self._payload.get('organization_uuid', None)
+
+    @property
+    def studio_uuid(self) -> str | UUID | None:
+        return self._payload.get('studio_uuid', None)
+
+    @property
     def roles(self) -> set:
         roles_data = self._payload.get('roles', {})
         unique_roles = set()
@@ -45,11 +55,13 @@ class AuthContext:
                 for roles_list in category.values():
                     unique_roles.update(roles_list)
 
-        return unique_roles
+        return self._payload.get('roles', {})
 
 
 async def get_current_user(
-    token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
+    token: str = Depends(oauth2_scheme),
+    db: AsyncSession = Depends(get_db),
+    studio_uuid: str | None = Header(None, alias='X-Studio-UUID'),
 ) -> AuthContext:
     try:
         payload = jwt.decode(
@@ -86,7 +98,9 @@ async def get_current_user(
                 detail='User account is not verified',
             )
 
-        return AuthContext(payload={**payload, 'user': user})
+        return AuthContext(
+            payload={**payload, 'user': user, 'studio_uuid': studio_uuid}
+        )
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -125,7 +139,9 @@ async def get_service_token(token: str = Depends(oauth2_scheme)) -> AuthContext:
 
 
 async def get_auth_context(
-    token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
+    token: str = Depends(oauth2_scheme),
+    db: AsyncSession = Depends(get_db),
+    studio_uuid: str | None = Header(None, alias='X-Studio-UUID'),
 ) -> AuthContext:
     try:
         return await get_service_token(token=token)
@@ -133,7 +149,7 @@ async def get_auth_context(
         pass
 
     try:
-        return await get_current_user(token=token, db=db)
+        return await get_current_user(token=token, db=db, studio_uuid=studio_uuid)
     except HTTPException:
         pass
 
