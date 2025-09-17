@@ -1,36 +1,35 @@
-import { mockUsers } from './mocks/rolesMock'
+import { useSelector } from 'react-redux'
 
-const currentRole = 'user'
-
-const permissions = mockUsers.find(
-	user => user.role === currentRole
-).permissions
-
-const hasPermission = requiredPermission => {
-	console.log(permissions.includes(requiredPermission))
-	if (!requiredPermission) return true
-	return permissions.includes(requiredPermission[0])
-}
-
-const hasAnyPermission = requiredPermissions => {
-	if (!requiredPermissions || requiredPermissions.length === 0) return true
-	return requiredPermissions.some(permission =>
-		permissions.includes(permission)
-	)
-}
-
-const hasAllPermissions = requiredPermissions => {
-	if (!requiredPermissions || requiredPermissions.length === 0) return true
-	return requiredPermissions.every(permission =>
-		permissions.includes(permission)
-	)
-}
 export const PermissionGuard = ({
 	children,
 	requiredPermission,
 	requiredAny = [],
 	requiredAll = [],
 }) => {
+	const roleId = useSelector(state => state.rootReducer.rolesCurrent.roleId)
+	const roles = useSelector(state => state.rootReducer.roles?.roles)
+	const role = roles.find(r => r.name === roleId)
+
+	const permissions = role.permissions
+
+	const hasPermission = requiredPermission => {
+		if (!requiredPermission) return true
+		return permissions.includes(requiredPermission)
+	}
+
+	const hasAnyPermission = requiredPermissions => {
+		if (!requiredPermissions || requiredPermissions.length === 0) return true
+		return requiredPermissions.some(permission =>
+			permissions.includes(permission)
+		)
+	}
+
+	const hasAllPermissions = requiredPermissions => {
+		if (!requiredPermissions || requiredPermissions.length === 0) return true
+		return requiredPermissions.every(permission =>
+			permissions.includes(permission)
+		)
+	}
 	let hasAccess = true
 
 	if (requiredPermission) {
@@ -41,5 +40,5 @@ export const PermissionGuard = ({
 		hasAccess = hasAllPermissions(requiredAll)
 	}
 
-	return hasAccess ? children : <div>нету прав</div>
+	return hasAccess ? children : null
 }

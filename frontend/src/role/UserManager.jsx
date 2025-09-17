@@ -74,6 +74,21 @@ const permissionDescriptions = {
 	'settings:read': 'Просмотр ролей и разрешений',
 	'settings:write': 'Создание ролей и разрешений',
 	'settings:system': 'Настройка системных прав',
+
+	'view:page': 'Просмотр страниц',
+	'view:calendar': 'Просмотр страниц',
+	'view:inventory': 'Просмотр страниц',
+	'view:services': 'Просмотр страниц',
+	'view:records': 'Просмотр страниц',
+	'view:staff': 'Просмотр страниц',
+	'view:client': 'Просмотр страниц',
+	'view:loyalty': 'Просмотр страниц',
+	'view:finance': 'Просмотр страниц',
+	'view:report': 'Просмотр страниц',
+	'view:studios': 'Просмотр страниц',
+	'view:analytics': 'Просмотр страниц',
+	'view:locations': 'Просмотр страниц',
+	'view:role': 'Просмотр страниц',
 }
 
 // Группировка разрешений по категориям
@@ -86,6 +101,25 @@ const permissionCategories = [
 			'client:edit',
 			'client:delete',
 			'client:export',
+		],
+	},
+	{
+		name: 'Доступ страниц',
+		permissions: [
+			'view:page',
+			'view:calendar',
+			'view:inventory',
+			'view:services',
+			'view:records',
+			'view:staff',
+			'view:client',
+			'view:loyalty',
+			'view:finance',
+			'view:report',
+			'view:studios',
+			'view:analytics',
+			'view:locations',
+			'view:role',
 		],
 	},
 	{

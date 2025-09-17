@@ -4,25 +4,25 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-	/* Updated color tokens to match dark crypto dashboard reference */
-	--background: #0a0a0a;
-	--foreground: #ffffff;
-	--card: #1a1a1a;
-	--card-foreground: #ffffff;
-	--popover: #1a1a1a;
-	--popover-foreground: #ffffff;
+	/* Light theme */
+	--background: #ffffff;
+	--foreground: #0a0a0a;
+	--card: #f8fafc;
+	--card-foreground: #0a0a0a;
+	--popover: #f8fafc;
+	--popover-foreground: #0a0a0a;
 	--primary: #6366f1;
 	--primary-foreground: #ffffff;
 	--secondary: #fbbf24;
 	--secondary-foreground: #000000;
-	--muted: #262626;
-	--muted-foreground: #a3a3a3;
+	--muted: #f1f5f9;
+	--muted-foreground: #64748b;
 	--accent: #6366f1;
 	--accent-foreground: #ffffff;
 	--destructive: #ef4444;
 	--destructive-foreground: #ffffff;
-	--border: #262626;
-	--input: #302f2f;
+	--border: #e2e8f0;
+	--input: #ffffff;
 	--ring: rgba(99, 102, 241, 0.3);
 	--chart-1: #6366f1;
 	--chart-2: #fbbf24;
@@ -30,13 +30,13 @@
 	--chart-4: #f59e0b;
 	--chart-5: #8b5cf6;
 	--radius: 0.75rem;
-	--sidebar: #0a0a0a;
-	--sidebar-foreground: #ffffff;
+	--sidebar: #f8fafc;
+	--sidebar-foreground: #0a0a0a;
 	--sidebar-primary: #6366f1;
 	--sidebar-primary-foreground: #ffffff;
 	--sidebar-accent: #fbbf24;
 	--sidebar-accent-foreground: #000000;
-	--sidebar-border: #262626;
+	--sidebar-border: #e2e8f0;
 	--sidebar-ring: rgba(99, 102, 241, 0.3);
 }
 
@@ -125,7 +125,11 @@
 	body {
 		@apply bg-background text-foreground;
 		/* Added gradient background for modern look */
-		background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+		background: linear-gradient(
+			135deg,
+			var(--background) 0%,
+			color-mix(in srgb, var(--background) 90%, var(--card) 10%) 100%
+		);
 	}
 	/* Updated heading styles for better contrast */
 	h1,

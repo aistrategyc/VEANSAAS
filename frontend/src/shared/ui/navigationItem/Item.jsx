@@ -1,5 +1,6 @@
 import { Link } from 'react-router'
 import { cn } from '@/lib/utils'
+import { PermissionGuard } from '@/role/PermissionGuard'
 export const Item = ({
 	isActive = false,
 	onClick,
@@ -8,11 +9,10 @@ export const Item = ({
 	to,
 	iconName: Icon = null,
 	isCollapsed,
-	role = null,
-	currentRole,
+	permission,
 }) => {
 	return (
-		(!role || role === currentRole || currentRole === 'admin') && (
+		<PermissionGuard requiredAll={permission}>
 			<li>
 				<Link
 					to={to}
@@ -28,6 +28,6 @@ export const Item = ({
 					{!isCollapsed && <span>{text}</span>}
 				</Link>
 			</li>
-		)
+		</PermissionGuard>
 	)
 }

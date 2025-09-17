@@ -1,10 +1,29 @@
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { useUser } from '@/shared/hooks/useUser'
+import { ThemeToggle } from '@/shared/ui/theme/ToggleTheme'
 import { Bell, Plus, Settings, Menu, User, X } from 'lucide-react'
 import { useState } from 'react'
+import NotificationDropdown from '../notification/NotificationDropdown'
 
 export const TopHeader = () => {
+	const user = {
+		id: '1',
+		email: 'admin@salon.com',
+		name: 'Анна Администратор',
+		role: 'master',
+		organizationId: 'org1',
+		isActive: true,
+		createdAt: '2024-01-01T00:00:00Z',
+		updatedAt: '2024-01-01T00:00:00Z',
+	}
 	const [isMenuOpen, setIsMenuOpen] = useState(false)
 
 	return (
@@ -49,28 +68,58 @@ export const TopHeader = () => {
 						<div className='w-8 h-8 bg-accent rounded-full border-2 border-background'></div>
 					</div>
 				</div>
-
-				<Button variant='ghost' size='sm' className='relative'>
-					<Bell className='h-5 w-5' />
-					<Badge className='absolute -top-1 -right-1 h-5 w-5 pl-1 text-xs bg-destructive'>
-						3
-					</Badge>
-				</Button>
-
-				<Button variant='ghost' size='sm'>
-					<Settings className='h-5 w-5' />
-				</Button>
-
-				<Button size='sm' className='bg-primary hover:bg-primary/90'>
-					<Plus className='h-4 w-4 mr-2' />
-					Add Widget
-				</Button>
-
-				<div className='w-8 h-8 bg-primary rounded-full'></div>
+				<ThemeToggle />
+				<NotificationDropdown />
+				<div className='w-8 h-8 bg-primary rounded-full'>
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button variant='ghost' className='relative h-8 w-8 rounded-full'>
+								<div className='w-8 h-8 bg-primary rounded-full flex items-center justify-center'>
+									<span className='text-xs font-medium text-primary-foreground'>
+										{user?.name
+											.split(' ')
+											.map(n => n[0])
+											.join('')}
+									</span>
+								</div>
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent className='w-56' align='end' forceMount>
+							<DropdownMenuLabel className='font-normal'>
+								<div className='flex flex-col space-y-1'>
+									<p className='text-sm font-medium leading-none'>
+										{user?.name}
+									</p>
+									<p className='text-xs leading-none text-muted-foreground'>
+										{user?.email}
+									</p>
+								</div>
+							</DropdownMenuLabel>
+							<DropdownMenuSeparator />
+							<DropdownMenuItem
+								onClick={() => router.push('/dashboard/profile')}
+							>
+								<User className='mr-2 h-4 w-4' />
+								<span>Профиль</span>
+							</DropdownMenuItem>
+							<DropdownMenuItem
+								onClick={() => router.push('/dashboard/settings')}
+							>
+								<Settings className='mr-2 h-4 w-4' />
+								<span>Настройки</span>
+							</DropdownMenuItem>
+							<DropdownMenuSeparator />
+							<DropdownMenuItem onClick={console.log('exit')}>
+								<span>Выйти</span>
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
+				</div>
 			</div>
 
 			{/* Мобильное меню - иконка пользователя */}
 			<div className='md:hidden flex items-center'>
+				<ThemeToggle />
 				<Button variant='ghost' size='sm' className='relative mr-2'>
 					<Bell className='h-5 w-5' />
 					<Badge className='absolute -top-1 -right-1 h-5 w-5 pl-1 text-xs bg-destructive'>
@@ -78,7 +127,51 @@ export const TopHeader = () => {
 					</Badge>
 				</Button>
 
-				<div className='w-8 h-8 bg-primary rounded-full'></div>
+				<div className='w-8 h-8 bg-primary rounded-full'>
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button variant='ghost' className='relative h-8 w-8 rounded-full'>
+								<div className='w-8 h-8 bg-primary rounded-full flex items-center justify-center'>
+									<span className='text-xs font-medium text-primary-foreground'>
+										{user?.name
+											.split(' ')
+											.map(n => n[0])
+											.join('')}
+									</span>
+								</div>
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent className='w-56' align='end' forceMount>
+							<DropdownMenuLabel className='font-normal'>
+								<div className='flex flex-col space-y-1'>
+									<p className='text-sm font-medium leading-none'>
+										{user?.name}
+									</p>
+									<p className='text-xs leading-none text-muted-foreground'>
+										{user?.email}
+									</p>
+								</div>
+							</DropdownMenuLabel>
+							<DropdownMenuSeparator />
+							<DropdownMenuItem
+								onClick={() => router.push('/dashboard/profile')}
+							>
+								<User className='mr-2 h-4 w-4' />
+								<span>Профиль</span>
+							</DropdownMenuItem>
+							<DropdownMenuItem
+								onClick={() => router.push('/dashboard/settings')}
+							>
+								<Settings className='mr-2 h-4 w-4' />
+								<span>Настройки</span>
+							</DropdownMenuItem>
+							<DropdownMenuSeparator />
+							<DropdownMenuItem onClick={console.log('exit')}>
+								<span>Выйти</span>
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
+				</div>
 			</div>
 
 			{/* Мобильное выпадающее меню */}
@@ -106,14 +199,6 @@ export const TopHeader = () => {
 						<Button variant='ghost' size='sm' className='justify-start'>
 							<Settings className='h-4 w-4 mr-2' />
 							Settings
-						</Button>
-
-						<Button
-							size='sm'
-							className='justify-start bg-primary hover:bg-primary/90'
-						>
-							<Plus className='h-4 w-4 mr-2' />
-							Add Widget
 						</Button>
 					</div>
 				</div>
