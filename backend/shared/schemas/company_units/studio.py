@@ -4,6 +4,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
+from shared.schemas.common import PaginationResponse
 from shared.schemas.company_units.common import (
     BaseInviteCreateDB,
     BaseInviteCreateRequest,
@@ -51,3 +52,12 @@ class StudioInviteCreateDB(BaseInviteCreateDB):
 
 class StudioUpdateRequest(BaseModel):
     name: str | None = Field(default=None, max_length=244)
+
+
+class StudioFilter(BaseModel):
+    name: str | None = Field(default=None)
+
+
+class StudioListResponse(BaseModel):
+    items: List[StudioResponse]
+    pagination: PaginationResponse

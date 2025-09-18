@@ -3,18 +3,23 @@ from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
 from fastapi import HTTPException, Request, status
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.config.config import settings
 from shared.dependencies import AuthContext
 from shared.models.company_units.studio import Studio, StudioInvite
 from shared.rabbitmq import rabbitmq
+from shared.schemas.common import PaginationResponse
 from shared.schemas.company_units.common import (
     BaseInviteResponse,
 )
 from shared.schemas.company_units.studio import (
+    StudioFilter,
     StudioInviteCreateDB,
     StudioInviteCreateRequest,
+    StudioListResponse,
+    StudioResponse,
     StudioUpdateRequest,
 )
 
@@ -90,3 +95,37 @@ async def update_studio(
     await db.commit()
 
     return studio_db
+
+
+async def get_list_studios(
+    request: Request,
+    offset: int,
+    limit: int,
+    filters: StudioFilter,
+    db: AsyncSession,
+    auth: AuthContext,
+) -> StudioListResponse:
+    query = select(Studio).where(Studio.uuid.in_(auth.studios_uuid))
+    count_query = (
+        select(func.count())
+        .where(Studio.uuid.in_(auth.studios_uuid))
+        .select_from(Studio)
+    )
+
+    if filters.name:
+        query = query.where(Studio.name.ilike(f'%{filters.name}%'))
+        count_query = count_query.where(Studio.name.ilike(f'%{filters.name}%'))
+
+    query_result = await db.execute(query.offset(offset).limit(limit))
+    studios = query_result.scalars().all()
+    total_count = await db.scalar(count_query) or 0
+
+    return StudioListResponse(
+        items=[StudioResponse.model_validate(studio) for studio in studios],
+        pagination=PaginationResponse(
+            count=total_count,
+            offset=offset,
+            limit=limit,
+            has_more=(offset + limit) < total_count,
+        ),
+    )

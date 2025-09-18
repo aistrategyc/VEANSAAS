@@ -1,3 +1,4 @@
+from typing import List
 from uuid import UUID
 
 from fastapi import Depends, Header, HTTPException, status
@@ -45,6 +46,11 @@ class AuthContext:
     @property
     def studio_uuid(self) -> str | UUID | None:
         return self._payload.get('studio_uuid', None)
+
+    @property
+    def studios_uuid(self) -> List[str | UUID]:
+        roles_data = self._payload.get('roles', {}).get('studios', {})
+        return list(roles_data.keys())
 
     @property
     def roles(self) -> set:
