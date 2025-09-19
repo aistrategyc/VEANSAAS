@@ -58,21 +58,31 @@ async def check_uniqueness_user(
         select(
             exists().where(User.username == data.username).label('username_exists'),
             exists().where(User.email == data.email).label('email_exists'),
+            exists()
+            .where(User.phone_number == data.phone_number)
+            .label('phone_number_exists'),
         )
     )
     exists_info = result.first()
 
     return UserUniquenessCheckResponse(
-        is_valid=not (exists_info.username_exists or exists_info.email_exists),
+        is_valid=not (
+            exists_info.username_exists
+            or exists_info.email_exists
+            or exists_info.phone_number_exists
+        ),
         username_exists=exists_info.username_exists,
         email_exists=exists_info.email_exists,
+        phone_number_exists=exists_info.phone_number_exists,
     )
 
 
 async def create_user(request: Request, user: UserCreateInternal, db: AsyncSession):
     uniqueness_result = await check_uniqueness_user(
         request=request,
-        data=UserUniquenessCheckRequest(username=user.username, email=user.email),
+        data=UserUniquenessCheckRequest(
+            username=user.username, email=user.email, phone_number=user.phone_number
+        ),
         db=db,
     )
     if not uniqueness_result.is_valid:
@@ -87,6 +97,12 @@ async def create_user(request: Request, user: UserCreateInternal, db: AsyncSessi
             errors['email'] = FieldError(
                 code='email_exists',
                 message='Email already registered',
+            )
+
+        if uniqueness_result.phone_number_exists:
+            errors['email'] = FieldError(
+                code='phone_number_exists',
+                message='Phone number already registered',
             )
 
         raise HTTPException(

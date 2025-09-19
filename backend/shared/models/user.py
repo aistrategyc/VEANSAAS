@@ -1,11 +1,12 @@
+from shared.models.mixins import created_at, updated_at, uuid_primary_key
 from sqlalchemy import Boolean, String, true
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from shared.database import Base
-from shared.models.base import created_at, updated_at, uuid_primary_key
+from shared.models.mixins import PhoneNumberMixin
 
 
-class User(Base):
+class User(Base, PhoneNumberMixin):
     __tablename__ = 'users'
     __table_args__ = {'schema': 'user_service'}
 
@@ -14,7 +15,9 @@ class User(Base):
     email: Mapped[str | None] = mapped_column(
         String(255), nullable=True, unique=True, index=True
     )
-    phone_number: Mapped[str | None] = mapped_column(String(24), nullable=True)
+    phone_number: Mapped[str | None] = mapped_column(
+        String(24), nullable=True, unique=True, index=True
+    )
     first_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
     last_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, server_default=true())

@@ -5,7 +5,7 @@ from sqlalchemy import Boolean, ForeignKey, Integer, Numeric, String, Text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column
 
 from shared.database import Base
-from shared.models.base import created_at, updated_at, uuid_primary_key
+from shared.models.mixins import created_at, updated_at, uuid_primary_key
 from shared.models.company_units.common import organization_uuid
 from shared.schemas.company_units.enum import AttributeType
 

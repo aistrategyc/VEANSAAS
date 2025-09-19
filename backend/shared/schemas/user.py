@@ -86,12 +86,14 @@ class UserUpdate(BaseModel):
 class UserUniquenessCheckRequest(BaseModel):
     username: str
     email: str
+    phone_number: str | None = Field(default=None)
 
 
 class UserUniquenessCheckResponse(BaseModel):
     is_valid: bool = Field(default=False)
     username_exists: bool = Field(default=False)
     email_exists: bool = Field(default=False)
+    phone_number_exists: bool = Field(default=False)
 
 
 class UserVerificationEmail(BaseModel):

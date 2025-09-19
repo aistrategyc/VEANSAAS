@@ -6,7 +6,7 @@ from sqlalchemy import Boolean, DateTime, ForeignKey, String, Uuid, false
 from sqlalchemy.orm import Mapped, mapped_column
 
 from shared.database import Base
-from shared.models.base import (
+from shared.models.mixins import (
     created_at,
     created_by_uuid,
     updated_at,
