@@ -1,3 +1,4 @@
+from typing import List
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, Request, status
@@ -5,6 +6,7 @@ from services.studio import (
     create_studio_invite,
     get_list_studios,
     get_studio,
+    get_studio_select_options,
     update_studio,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,6 +19,7 @@ from shared.schemas.company_units.studio import (
     StudioInviteCreateRequest,
     StudioListResponse,
     StudioResponse,
+    StudioSelectOptionsResponse,
     StudioUpdateRequest,
 )
 from shared.security import requires_permission, requires_resource_access
@@ -39,6 +42,19 @@ async def create_studio_invite_route(
     return await create_studio_invite(
         request=request, studio_uuid=uuid, data=data, db=db, auth=auth
     )
+
+
+@router.get(
+    '/selection',
+    response_model=List[StudioSelectOptionsResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def get_studio_select_options_route(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    auth: AuthContext = Depends(get_auth_context),
+):
+    return await get_studio_select_options(request=request, db=db, auth=auth)
 
 
 @router.get('/{uuid}', response_model=StudioResponse, status_code=status.HTTP_200_OK)
@@ -65,7 +81,7 @@ async def update_organization_route(
     return await update_studio(request=request, uuid=uuid, data=data, db=db, auth=auth)
 
 
-@router.get('/', response_model=StudioListResponse, status_code=status.HTTP_200_OK)
+@router.get('', response_model=StudioListResponse, status_code=status.HTTP_200_OK)
 async def get_list_studios_route(
     request: Request,
     offset: int = Query(0, ge=0),

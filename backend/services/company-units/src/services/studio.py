@@ -114,7 +114,7 @@ async def get_list_studios(
             .filter(User.is_active.is_(True))
             .label('members_count'),
         )
-        .where(Studio.uuid.in_(auth.studios_uuid))
+        .filter(Studio.uuid.in_(auth.studios_uuid), Studio.is_active.is_(True))
         .outerjoin(Studio.studio_memberships)
         .outerjoin(StudioMember.user)
         .group_by(Studio.uuid)
@@ -151,3 +151,16 @@ async def get_list_studios(
             has_more=(offset + limit) < total_count,
         ),
     )
+
+
+async def get_studio_select_options(
+    request: Request, db: AsyncSession, auth: AuthContext
+):
+    query_result = await db.execute(
+        select(Studio).filter(
+            Studio.uuid.in_(auth.studios_uuid), Studio.is_active.is_(True)
+        )
+    )
+    studios = query_result.scalars().all()
+
+    return studios

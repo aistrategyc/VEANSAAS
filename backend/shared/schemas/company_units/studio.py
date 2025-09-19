@@ -67,6 +67,11 @@ class StudioWithMembersResponse(StudioResponse, WithMembersMixin):
         from_attributes = False
 
 
+class StudioSelectOptionsResponse(BaseModel):
+    uuid: UUID
+    name: str
+
+
 class StudioListResponse(BaseModel):
     items: List[StudioWithMembersResponse]
     pagination: PaginationResponse
