@@ -5,13 +5,16 @@ import { RouterProvider } from './providers/RouterProvider'
 import { store } from './store/store'
 import { BrowserRouter } from 'react-router'
 import { AuthProvider } from './contexts/AuthProviderContext'
+import { ThemeProvider } from './contexts/ThemeContext'
 
 createRoot(document.getElementById('root')).render(
 	<BrowserRouter>
 		<Provider store={store}>
-			<AuthProvider>
-				<RouterProvider />
-			</AuthProvider>
+			<ThemeProvider defaultTheme='dark' storageKey='crypto-dashboard-theme'>
+				<AuthProvider>
+					<RouterProvider />
+				</AuthProvider>
+			</ThemeProvider>
 		</Provider>
 	</BrowserRouter>
 )

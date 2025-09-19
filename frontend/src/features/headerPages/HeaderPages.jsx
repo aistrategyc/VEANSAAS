@@ -9,17 +9,18 @@ export const HeaderPages = ({
 	description,
 	nameButton,
 	type = null,
+	onClick,
 }) => {
 	const { currentRole } = useAuth()
 	const [permissions, setPermissions] = useState([])
 	const roles = useSelector(state => state.rootReducer.roles.roles)
 	useEffect(() => {
-		setPermissions(roles.find(user => user.name === currentRole).permissions)
+		setPermissions(roles.find(user => user.name === currentRole)?.permissions)
 	}, [roles])
 
 	const hasPermission = requiredPermission => {
 		if (!requiredPermission) return true
-		return permissions.includes(requiredPermission)
+		return permissions?.includes(requiredPermission)
 	}
 
 	return (
@@ -53,7 +54,10 @@ export const HeaderPages = ({
 											<Eye className='h-4 w-4 mr-2' />
 											Обзор
 										</Button>
-										<Button className='bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105'>
+										<Button
+											className='bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105'
+											onClick={onClick}
+										>
 											<Plus className='h-4 w-4 mr-2' />
 											Новая запись
 										</Button>

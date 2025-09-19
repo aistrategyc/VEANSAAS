@@ -4,6 +4,7 @@ import { ProfileCard } from '../profile/ProfileCard'
 import { LogoOrganization } from '../logoOrganization/LogoOrganization'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
+import { DropDownRole } from '@/shared/helper/DropDownRole'
 
 export const Sidebar = () => {
 	const [isCollapsed, setIsCollapsed] = useState(false)
@@ -32,7 +33,7 @@ export const Sidebar = () => {
 					)}
 				</div>
 			</div>
-
+			<DropDownRole />
 			<NavMenu isCollapsed={isCollapsed} />
 			<ProfileCard isCollapsed={isCollapsed} />
 		</aside>

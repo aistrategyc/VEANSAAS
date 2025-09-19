@@ -13,17 +13,33 @@ import {
 	BarChart3,
 	LayoutDashboardIcon,
 	NotepadText,
+	CompassIcon,
+	Paperclip,
+	ScanHeart,
+	TimerReset,
+	LocationEditIcon,
 } from 'lucide-react'
-import { useAuth } from '@/shared/hooks/useAuth'
 
 const menuItems = [
-	{ id: 'home', text: 'Главная', icon: Home, path: '/' },
-	{ id: 'calendar', text: 'Календарь', icon: Calendar, path: '/calendar' },
+	{
+		id: 'home',
+		text: 'Главная',
+		icon: Home,
+		path: '/',
+	},
+	{
+		id: 'calendar',
+		text: 'Календарь',
+		icon: Calendar,
+		path: '/calendar',
+		permission: ['view:page', 'view:calendar'],
+	},
 	{
 		id: 'dashboard',
 		text: 'Dashboard',
 		icon: LayoutDashboardIcon,
-		path: '/dashboard',
+		path: '/dashboard-test',
+		permission: ['view:page', 'view:dashboard'],
 	},
 	{
 		id: 'appointments',
@@ -31,22 +47,104 @@ const menuItems = [
 		icon: NotepadText,
 		path: '/records',
 		badge: '5',
+		permission: ['view:page', 'view:appointments'],
 	},
-	{ id: 'clients', text: 'Клиенты', icon: Users, path: '/clients' },
-	{ id: 'staff', text: 'Сотрудники', icon: UserCheck, path: '/staff' },
-	{ id: 'services', text: 'Услуги', icon: Scissors, path: '/services' },
-	{ id: 'studios', text: 'Студии', icon: Building2, path: '/studios' },
-	{ id: 'inventory', text: 'Склад', icon: Package, path: '/inventory' },
-	{ id: 'loyalty', text: 'Лояльность', icon: Star, path: '/loyalty' },
-	{ id: 'finances', text: 'Финансы', icon: DollarSign, path: '/finance' },
-	{ id: 'analytics', text: 'Аналитика', icon: BarChart3, path: '/analytics' },
-	{ id: 'role', text: 'Роли', icon: UserCheck, path: '/role', role: 'admin' },
+	{
+		id: 'clients',
+		text: 'Клиенты',
+		icon: Users,
+		path: '/clients',
+		permission: ['view:page', 'view:clients'],
+	},
+	{
+		id: 'staff',
+		text: 'Сотрудники',
+		icon: UserCheck,
+		path: '/staff',
+		permission: ['view:page', 'view:staff'],
+	},
+	{
+		id: 'services',
+		text: 'Услуги',
+		icon: Scissors,
+		path: '/services',
+		permission: ['view:page', 'view:services'],
+	},
+	{
+		id: 'studios',
+		text: 'Студии',
+		icon: Building2,
+		path: '/studios',
+		permission: ['view:page', 'view:studios'],
+	},
+	{
+		id: 'inventory',
+		text: 'Склад',
+		icon: Package,
+		path: '/inventory',
+		permission: ['view:page', 'view:inventory'],
+	},
+	{
+		id: 'schedule',
+		text: 'Расписание',
+		icon: TimerReset,
+		path: '/schedule',
+		permission: ['view:page', 'view:schedule'],
+	},
+	{
+		id: 'loyalty',
+		text: 'Лояльность',
+		icon: Star,
+		path: '/loyalty',
+		permission: ['view:page', 'view:loyalty'],
+	},
+	{
+		id: 'finances',
+		text: 'Финансы',
+		icon: DollarSign,
+		path: '/finance',
+		permission: ['view:page', 'view:finances'],
+	},
+	{
+		id: 'compatibility',
+		text: 'Матрица совместимости',
+		icon: CompassIcon,
+		path: '/compatibility',
+		permission: ['view:page', 'view:compatibility'],
+	},
+	{
+		id: 'locations',
+		text: 'Локации',
+		icon: LocationEditIcon,
+		path: '/locations',
+		permission: ['view:page', 'view:locations'],
+	},
+	{
+		id: 'report',
+		text: 'Отчеты',
+		icon: Paperclip,
+		path: '/report',
+		permission: ['view:page', 'view:report'],
+	},
+	{
+		id: 'analytics',
+		text: 'Аналитика',
+		icon: BarChart3,
+		path: '/analytics',
+		permission: ['view:page', 'view:analytics'],
+	},
+	{
+		id: 'role',
+		text: 'Роли',
+		icon: UserCheck,
+		path: '/role',
+		role: 'admin',
+		permission: ['view:page', 'view:role'],
+	},
 ]
 
 export const NavMenu = ({ isCollapsed }) => {
 	const location = useLocation()
-
-	const { currentRole } = useAuth()
 
 	const isActive = path => {
 		if (path === '/') {
@@ -72,8 +170,7 @@ export const NavMenu = ({ isCollapsed }) => {
 						onClick={() => handleItemClick(item.id)}
 						to={item.path}
 						isCollapsed={isCollapsed}
-						role={item.role}
-						currentRole={currentRole}
+						permission={item.permission}
 					/>
 				))}
 			</ul>

@@ -37,14 +37,11 @@ export const AuthProvider = ({ children }) => {
 		setLoading(false)
 	}, [])
 
-	const currentRole = 'admin'
-
 	const value = {
 		isAuthenticated,
 		loading,
 		login,
 		logout,
-		currentRole,
 	}
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
