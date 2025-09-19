@@ -58,6 +58,15 @@ class StudioFilter(BaseModel):
     name: str | None = Field(default=None)
 
 
+class WithMembersMixin(BaseModel):
+    members_count: int
+
+
+class StudioWithMembersResponse(StudioResponse, WithMembersMixin):
+    class Config:
+        from_attributes = False
+
+
 class StudioListResponse(BaseModel):
-    items: List[StudioResponse]
+    items: List[StudioWithMembersResponse]
     pagination: PaginationResponse

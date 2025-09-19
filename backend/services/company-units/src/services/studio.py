@@ -8,7 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.config.config import settings
 from shared.dependencies import AuthContext
-from shared.models.company_units.studio import Studio, StudioInvite
+from shared.models.company_units.studio import Studio, StudioInvite, StudioMember
+from shared.models.user import User
 from shared.rabbitmq import rabbitmq
 from shared.schemas.common import PaginationResponse
 from shared.schemas.company_units.common import (
@@ -21,6 +22,7 @@ from shared.schemas.company_units.studio import (
     StudioListResponse,
     StudioResponse,
     StudioUpdateRequest,
+    StudioWithMembersResponse,
 )
 
 
@@ -105,7 +107,18 @@ async def get_list_studios(
     db: AsyncSession,
     auth: AuthContext,
 ) -> StudioListResponse:
-    query = select(Studio).where(Studio.uuid.in_(auth.studios_uuid))
+    query = (
+        select(
+            Studio,
+            func.count(StudioMember.uuid)
+            .filter(User.is_active.is_(True))
+            .label('members_count'),
+        )
+        .where(Studio.uuid.in_(auth.studios_uuid))
+        .outerjoin(Studio.studio_memberships)
+        .outerjoin(StudioMember.user)
+        .group_by(Studio.uuid)
+    )
     count_query = (
         select(func.count())
         .where(Studio.uuid.in_(auth.studios_uuid))
@@ -117,11 +130,20 @@ async def get_list_studios(
         count_query = count_query.where(Studio.name.ilike(f'%{filters.name}%'))
 
     query_result = await db.execute(query.offset(offset).limit(limit))
-    studios = query_result.scalars().all()
+
+    studios_rows = query_result.all()
     total_count = await db.scalar(count_query) or 0
 
     return StudioListResponse(
-        items=[StudioResponse.model_validate(studio) for studio in studios],
+        items=[
+            StudioWithMembersResponse.model_validate(
+                {
+                    **StudioResponse.model_validate(studio).model_dump(),
+                    'members_count': members_count,
+                }
+            )
+            for studio, members_count in studios_rows
+        ],
         pagination=PaginationResponse(
             count=total_count,
             offset=offset,

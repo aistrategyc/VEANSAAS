@@ -1,5 +1,6 @@
 import asyncio
 import json
+import logging
 from contextlib import asynccontextmanager
 from typing import Any, Awaitable, Callable, Dict, List, Union
 
@@ -84,6 +85,9 @@ def create_lifespan(
 ):
     @asynccontextmanager
     async def lifespan(app: FastAPI):
+        logging.getLogger('aio_pika').setLevel(logging.WARNING)
+        logging.getLogger('aiormq').setLevel(logging.WARNING)
+        logging.getLogger('pika').setLevel(logging.WARNING)
         await rabbitmq.connect()
 
         queue = await rabbitmq.setup_queue(

@@ -27,6 +27,12 @@ class Studio(Base):
         ForeignKey('organization_service.organizations.uuid', ondelete='SET NULL'),
         nullable=True,
     )
+    studio_memberships: Mapped[list['StudioMember']] = relationship(
+        back_populates='studio',
+        lazy='noload',
+        foreign_keys='StudioMember.studio_uuid',
+        cascade='all, delete',
+    )
     created_by_uuid: Mapped[created_by_uuid]
     created_at: Mapped[created_at]
     updated_at: Mapped[updated_at]
@@ -50,6 +56,9 @@ class StudioMember(Base):
     studio_uuid: Mapped[UUID] = mapped_column(
         Uuid(as_uuid=True),
         ForeignKey('organization_service.studios.uuid', ondelete='CASCADE'),
+    )
+    studio: Mapped['Studio'] = relationship(
+        back_populates='studio_memberships', foreign_keys=[studio_uuid]
     )
 
     roles: Mapped[list[StudioRole]] = mapped_column(JSON)
