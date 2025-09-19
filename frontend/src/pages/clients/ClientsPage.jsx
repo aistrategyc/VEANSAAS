@@ -1,118 +1,70 @@
-import { StatsList } from '@/features/stats/StatsList'
-import { FiltersPages } from '@/features/filtersPages/FiltersPages'
-import { ClientList } from '@/features/clients/ClientList'
-import { HeaderPages } from '@/features/headerPages/HeaderPages'
-import { Calendar, Download, Plus, Star, Upload, Users } from 'lucide-react'
+'use client'
+
 import { useState } from 'react'
+
+// import { ClientModal } from '@/components/clients/client-modal'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select'
+import { Badge } from '@/components/ui/badge'
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from '@/components/ui/card'
+import { Plus, Search, Upload, Download, Users } from 'lucide-react'
 import { mockClients } from '@/lib/mock-data'
-import { RoleGuard } from '@/components/ui/role-guard'
+import { ClientsTable } from '@/features/clients/ClientsTable'
 import { ClientModal } from '@/features/clients/ClientModal'
 import { ImportModal } from '@/features/clients/ClientImportModal'
+import { PermissionGuard } from '@/role/PermissionGuard'
 
-export default function ClientsPage() {
-	const clientsList = [
-		{
-			id: 1,
-			name: 'Анна Петрова',
-			phone: '+33 1 42 86 83 26',
-			email: 'anna.petrova@email.com',
-			lastVisit: '2024-01-10',
-			totalVisits: 15,
-			totalSpent: '€2,750',
-			status: 'vip',
-			nextAppointment: '2024-01-15 09:00',
-			services: ['Маникюр', 'Педикюр', 'Наращивание ресниц'],
-			notes: 'Предпочитает утренние записи',
-		},
-		{
-			id: 2,
-			name: 'Мария Сидорова',
-			phone: '+49 30 12345678',
-			email: 'maria.sidorova@email.com',
-			lastVisit: '2024-01-08',
-			totalVisits: 8,
-			totalSpent: '€1,200',
-			status: 'regular',
-			nextAppointment: '2024-01-15 10:30',
-			services: ['Стрижка', 'Окрашивание'],
-			notes: 'Аллергия на аммиак',
-		},
-		{
-			id: 3,
-			name: 'Екатерина Иванова',
-			phone: '+39 06 1234567',
-			email: 'ekaterina.ivanova@email.com',
-			lastVisit: '2024-01-05',
-			totalVisits: 3,
-			totalSpent: '€1,850',
-			status: 'new',
-			nextAppointment: '2024-01-15 12:00',
-			services: ['Татуировка', 'Пирсинг'],
-			notes: 'Первая большая работа',
-		},
-		{
-			id: 4,
-			name: 'Светлана Козлова',
-			phone: '+34 91 123 45 67',
-			email: 'svetlana.kozlova@email.com',
-			lastVisit: '2023-12-20',
-			totalVisits: 12,
-			totalSpent: '€1,480',
-			status: 'inactive',
-			nextAppointment: null,
-			services: ['Массаж', 'Косметология'],
-			notes: 'Не отвечает на звонки',
-		},
-		{
-			id: 5,
-			name: 'Ольга Морозова',
-			phone: '+41 22 123 45 67',
-			email: 'olga.morozova@email.com',
-			lastVisit: '2024-01-12',
-			totalVisits: 22,
-			totalSpent: '€3,200',
-			status: 'vip',
-			nextAppointment: '2024-01-16 14:00',
-			services: ['Лазерная эпиляция', 'RF-лифтинг'],
-			notes: 'Постоянный клиент, скидка 15%',
-		},
-		{
-			id: 6,
-			name: 'Дарья Волкова',
-			phone: '+43 1 123 45 67',
-			email: 'darya.volkova@email.com',
-			lastVisit: '2024-01-09',
-			totalVisits: 5,
-			totalSpent: '€680',
-			status: 'regular',
-			nextAppointment: '2024-01-17 11:00',
-			services: ['Брови', 'Ламинирование ресниц'],
-			notes: 'Студентка, скидка 10%',
-		},
-	]
-	const statsClientList = [
-		{ id: 1, icon: Users, count: '1,247', name: 'Всего клиентов' },
-		{ id: 2, icon: Star, count: 156, name: 'VIP клиентов' },
-		{ id: 3, icon: Calendar, count: 89, name: 'Новые за месяц' },
-		{ id: 4, count: 23, name: 'Неактивные' },
-	]
-	const [isClientModalOpen, setIsClientModalOpen] = useState(false)
-	const [selectedClient, setSelectedClient] = useState()
-	const [isImportModalOpen, setIsImportModalOpen] = useState(false)
+export default function ClientsPag() {
 	const [clients, setClients] = useState(mockClients)
+	const [searchQuery, setSearchQuery] = useState('')
+	const [statusFilter, setStatusFilter] = useState('all')
+	const [selectedClient, setSelectedClient] = useState(null)
+	const [isClientModalOpen, setIsClientModalOpen] = useState(false)
+	const [isImportModalOpen, setIsImportModalOpen] = useState(false)
+
+	// Filter clients based on search and status
+	const filteredClients = clients.filter(client => {
+		const matchesSearch =
+			searchQuery === '' ||
+			`${client.firstName} ${client.lastName}`
+				.toLowerCase()
+				.includes(searchQuery.toLowerCase()) ||
+			client.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+			client.phone?.includes(searchQuery)
+
+		const matchesStatus =
+			statusFilter === 'all' ||
+			(statusFilter === 'active' ? client.isActive : !client.isActive)
+
+		return matchesSearch && matchesStatus
+	})
 
 	const handleCreateClient = () => {
 		setSelectedClient(null)
 		setIsClientModalOpen(true)
 	}
-	const handleImportComplete = importedClients => {
-		setClients(prev => [...importedClients, ...prev])
-		setIsImportModalOpen(false)
+
+	const handleEditClient = client => {
+		setSelectedClient(client)
+		setIsClientModalOpen(true)
 	}
 
 	const handleSaveClient = clientData => {
 		if (selectedClient) {
+			// Edit existing client
 			setClients(prev =>
 				prev.map(client =>
 					client.id === selectedClient.id
@@ -121,6 +73,7 @@ export default function ClientsPage() {
 				)
 			)
 		} else {
+			// Create new client
 			const newClient = {
 				id: `client${Date.now()}`,
 				organizationId: 'org1',
@@ -133,6 +86,15 @@ export default function ClientsPage() {
 		}
 		setIsClientModalOpen(false)
 		setSelectedClient(null)
+	}
+
+	const handleDeleteClient = clientId => {
+		setClients(prev => prev.filter(client => client.id !== clientId))
+	}
+
+	const handleImportComplete = importedClients => {
+		setClients(prev => [...importedClients, ...prev])
+		setIsImportModalOpen(false)
 	}
 
 	const handleExport = () => {
@@ -174,8 +136,24 @@ export default function ClientsPage() {
 		link.click()
 		document.body.removeChild(link)
 	}
+
+	const stats = {
+		total: clients.length,
+		active: clients.filter(c => c.isActive).length,
+		inactive: clients.filter(c => !c.isActive).length,
+		thisMonth: clients.filter(c => {
+			const created = new Date(c.createdAt)
+			const now = new Date()
+			return (
+				created.getMonth() === now.getMonth() &&
+				created.getFullYear() === now.getFullYear()
+			)
+		}).length,
+	}
+
 	return (
 		<div className='space-y-6'>
+			{/* Header */}
 			<div className='flex items-center justify-between'>
 				<div>
 					<h1 className='text-3xl font-bold tracking-tight'>Клиенты</h1>
@@ -183,12 +161,12 @@ export default function ClientsPage() {
 						Управление базой клиентов салона
 					</p>
 				</div>
-				<div className='flex items-center space-x-2'>
-					<Button variant='outline' onClick={handleExport}>
-						<Download className='h-4 w-4 mr-2' />
-						Экспорт
-					</Button>
-					<RoleGuard allowedRoles={['admin', 'MasterOwner']}>
+				<PermissionGuard requiredPermission='client:edit'>
+					<div className='flex items-center space-x-2'>
+						<Button variant='outline' onClick={handleExport}>
+							<Download className='h-4 w-4 mr-2' />
+							Экспорт
+						</Button>
 						<Button
 							variant='outline'
 							onClick={() => setIsImportModalOpen(true)}
@@ -196,16 +174,107 @@ export default function ClientsPage() {
 							<Upload className='h-4 w-4 mr-2' />
 							Импорт
 						</Button>
-					</RoleGuard>
-					<Button onClick={handleCreateClient}>
-						<Plus className='h-4 w-4 mr-2' />
-						Добавить клиента
-					</Button>
-				</div>
+						<Button onClick={handleCreateClient}>
+							<Plus className='h-4 w-4 mr-2' />
+							Добавить клиента
+						</Button>
+					</div>
+				</PermissionGuard>
 			</div>
-			<StatsList stats={statsClientList} />
-			<FiltersPages />
-			<ClientList clients={clientsList} />
+
+			{/* Stats Cards */}
+			<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+				<Card>
+					<CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+						<CardTitle className='text-sm font-medium'>
+							Всего клиентов
+						</CardTitle>
+						<Users className='h-4 w-4 text-muted-foreground' />
+					</CardHeader>
+					<CardContent>
+						<div className='text-2xl font-bold'>{stats.total}</div>
+					</CardContent>
+				</Card>
+				<Card>
+					<CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+						<CardTitle className='text-sm font-medium'>Активные</CardTitle>
+						<Badge variant='default' className='h-4 px-1 text-xs'>
+							A
+						</Badge>
+					</CardHeader>
+					<CardContent>
+						<div className='text-2xl font-bold'>{stats.active}</div>
+					</CardContent>
+				</Card>
+				<Card>
+					<CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+						<CardTitle className='text-sm font-medium'>Неактивные</CardTitle>
+						<Badge variant='secondary' className='h-4 px-1 text-xs'>
+							N
+						</Badge>
+					</CardHeader>
+					<CardContent>
+						<div className='text-2xl font-bold'>{stats.inactive}</div>
+					</CardContent>
+				</Card>
+				<Card>
+					<CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+						<CardTitle className='text-sm font-medium'>
+							Новые за месяц
+						</CardTitle>
+						<Plus className='h-4 w-4 text-muted-foreground' />
+					</CardHeader>
+					<CardContent>
+						<div className='text-2xl font-bold'>{stats.thisMonth}</div>
+					</CardContent>
+				</Card>
+			</div>
+
+			{/* Filters */}
+			<Card>
+				<CardHeader>
+					<CardTitle>Поиск и фильтры</CardTitle>
+					<CardDescription>
+						Найдите нужных клиентов по различным критериям
+					</CardDescription>
+				</CardHeader>
+				<CardContent>
+					<div className='flex flex-col sm:flex-row gap-4'>
+						<div className='flex-1'>
+							<div className='relative'>
+								<Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+								<Input
+									placeholder='Поиск по имени, email или телефону...'
+									value={searchQuery}
+									onChange={e => setSearchQuery(e.target.value)}
+									className='pl-10'
+								/>
+							</div>
+						</div>
+						<Select
+							value={statusFilter}
+							onValueChange={value => setStatusFilter(value)}
+						>
+							<SelectTrigger className='w-[180px]'>
+								<SelectValue placeholder='Статус' />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value='all'>Все клиенты</SelectItem>
+								<SelectItem value='active'>Активные</SelectItem>
+								<SelectItem value='inactive'>Неактивные</SelectItem>
+							</SelectContent>
+						</Select>
+					</div>
+				</CardContent>
+			</Card>
+
+			<ClientsTable
+				clients={filteredClients}
+				onEdit={handleEditClient}
+				onDelete={handleDeleteClient}
+				currentUser={'Admin'}
+			/>
+
 			<ClientModal
 				isOpen={isClientModalOpen}
 				onClose={() => {

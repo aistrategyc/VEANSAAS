@@ -585,9 +585,9 @@ const generateAppointments = () => {
 		{
 			id: '101',
 			clientId: '1',
-			serviceId: '1',
+			serviceId: 'serv1',
 			masterId: '1',
-			spaceId: '1',
+			spaceId: 'space1',
 			startTime: new Date(
 				today.getFullYear(),
 				today.getMonth(),
@@ -618,9 +618,9 @@ const generateAppointments = () => {
 		{
 			id: '102',
 			clientId: '2',
-			serviceId: '2',
+			serviceId: 'serv2',
 			masterId: '2',
-			spaceId: '2',
+			spaceId: 'space2',
 			startTime: new Date(
 				today.getFullYear(),
 				today.getMonth(),
@@ -651,9 +651,9 @@ const generateAppointments = () => {
 		{
 			id: '103',
 			clientId: '3',
-			serviceId: '6',
+			serviceId: 'serv3',
 			masterId: '3',
-			spaceId: '3',
+			spaceId: 'space3',
 			startTime: new Date(
 				today.getFullYear(),
 				today.getMonth(),
@@ -684,9 +684,9 @@ const generateAppointments = () => {
 		{
 			id: '104',
 			clientId: '4',
-			serviceId: '4',
+			serviceId: 'serv2',
 			masterId: '1',
-			spaceId: '1',
+			spaceId: 'space2',
 			startTime: new Date(
 				today.getFullYear(),
 				today.getMonth(),
@@ -717,9 +717,9 @@ const generateAppointments = () => {
 		{
 			id: '105',
 			clientId: '5',
-			serviceId: '5',
+			serviceId: 'serv1',
 			masterId: '2',
-			spaceId: '2',
+			spaceId: 'space3',
 			startTime: new Date(
 				today.getFullYear(),
 				today.getMonth(),
@@ -757,9 +757,9 @@ const generateAppointments = () => {
 		{
 			id: '201',
 			clientId: '3',
-			serviceId: '1',
+			serviceId: 'serv1',
 			masterId: '3',
-			spaceId: '3',
+			spaceId: 'space3',
 			startTime: new Date(
 				tomorrow.getFullYear(),
 				tomorrow.getMonth(),
@@ -790,9 +790,9 @@ const generateAppointments = () => {
 		{
 			id: '202',
 			clientId: '1',
-			serviceId: '3',
+			serviceId: 'serv3',
 			masterId: '1',
-			spaceId: '1',
+			spaceId: 'space1',
 			startTime: new Date(
 				tomorrow.getFullYear(),
 				tomorrow.getMonth(),
@@ -830,9 +830,9 @@ const generateAppointments = () => {
 		{
 			id: '301',
 			clientId: '2',
-			serviceId: '2',
+			serviceId: 'serv2',
 			masterId: '2',
-			spaceId: '2',
+			spaceId: 'space2',
 			startTime: new Date(
 				dayAfterTomorrow.getFullYear(),
 				dayAfterTomorrow.getMonth(),
@@ -863,9 +863,9 @@ const generateAppointments = () => {
 		{
 			id: '302',
 			clientId: '4',
-			serviceId: '4',
+			serviceId: 'serv1',
 			masterId: '1',
-			spaceId: '1',
+			spaceId: 'space1',
 			startTime: new Date(
 				dayAfterTomorrow.getFullYear(),
 				dayAfterTomorrow.getMonth(),

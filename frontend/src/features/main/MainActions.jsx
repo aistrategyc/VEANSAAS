@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Calendar, Scissors, UserCheck, Users } from 'lucide-react'
 
-export const MainActions = () => {
+export const MainActions = ({ addAppointment }) => {
 	return (
 		<Card className='bg-card border-border hover:border-primary/20 transition-all duration-300'>
 			<CardHeader>
@@ -12,6 +12,7 @@ export const MainActions = () => {
 				<Button
 					className='w-full justify-start bg-transparent hover:bg-primary/10 transition-all duration-200 hover:scale-105'
 					variant='outline'
+					onClick={addAppointment}
 				>
 					<Calendar className='h-4 w-4 mr-2 text-blue-500' />
 					Новая запись

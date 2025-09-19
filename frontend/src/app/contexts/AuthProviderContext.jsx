@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
 	const [isAuthenticated, setIsAuthenticated] = useState(false)
 	const [loading, setLoading] = useState(true)
 
-	// const { fetchUser } = useUser()
+	const { fetchUser } = useUser()
 
 	const login = useCallback((accessToken, refreshToken, options = {}) => {
 		const { expires = 7 } = options
@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
 		const token = getCookie('authToken')
 		if (token) {
 			setIsAuthenticated(true)
-			// fetchUser()
+			fetchUser()
 		} else {
 			setIsAuthenticated(false)
 		}
@@ -37,14 +37,11 @@ export const AuthProvider = ({ children }) => {
 		setLoading(false)
 	}, [])
 
-	const currentRole = 'admin'
-
 	const value = {
 		isAuthenticated,
 		loading,
 		login,
 		logout,
-		currentRole,
 	}
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

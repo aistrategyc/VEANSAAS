@@ -31,7 +31,7 @@ const menuItems = [
 		id: 'calendar',
 		text: 'Календарь',
 		icon: Calendar,
-		path: '/calendar-test',
+		path: '/calendar',
 		permission: ['view:page', 'view:calendar'],
 	},
 	{
@@ -53,7 +53,7 @@ const menuItems = [
 		id: 'clients',
 		text: 'Клиенты',
 		icon: Users,
-		path: '/clients-test',
+		path: '/clients',
 		permission: ['view:page', 'view:clients'],
 	},
 	{

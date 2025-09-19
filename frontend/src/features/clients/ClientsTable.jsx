@@ -30,7 +30,7 @@ import { ru } from 'date-fns/locale'
 import { EmptyState } from '@/components/ui/empty-state'
 import { PermissionGuard } from '@/role/PermissionGuard'
 
-export function ClientsTable({ clients, onEdit, onDelete, currentUser }) {
+export function ClientsTable({ clients, onEdit, onDelete }) {
 	const [sortField, setSortField] = useState('createdAt')
 	const [sortDirection, setSortDirection] = useState()
 
@@ -61,10 +61,6 @@ export function ClientsTable({ clients, onEdit, onDelete, currentUser }) {
 
 		return sortDirection === 'asc' ? comparison : -comparison
 	})
-
-	const canEdit =
-		currentUser?.role === 'Admin' || currentUser?.role === 'MasterOwner'
-	const canDelete = currentUser?.role === 'Admin'
 
 	if (clients.length === 0) {
 		return (

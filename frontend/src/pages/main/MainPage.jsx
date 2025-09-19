@@ -1,34 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import {
-	Calendar,
-	Users,
-	DollarSign,
-	TrendingUp,
-	Clock,
-	Star,
-	Scissors,
-	UserCheck,
-	ArrowUpRight,
-	ArrowDownRight,
-	Edit,
-	Eye,
-	Plus,
-	MoreHorizontal,
-} from 'lucide-react'
-import {
-	AreaChart,
-	Area,
-	XAxis,
-	YAxis,
-	CartesianGrid,
-	Tooltip,
-	ResponsiveContainer,
-	PieChart,
-	Pie,
-	Cell,
-} from 'recharts'
 import { HeaderPages } from '@/features/headerPages/HeaderPages'
 import { MainStats } from '@/features/main/MainStats'
 import { RevenueChart } from '@/features/chart/RevenueChart'
@@ -37,9 +6,8 @@ import { TodayAppointments } from '../../features/appointments/TodayAppointments
 import { MainActions } from '../../features/main/MainActions'
 import { ServicesTopList } from '@/features/services/ServicesTopList'
 import { StaffTopList } from '../../features/staff/StaffTopList'
-import { useAuth } from '@/shared/hooks/useAuth'
-import { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { AppointmentModal } from '@/features/appointments/AppointmentModal'
+import { useState } from 'react'
 
 const revenueData = [
 	{ name: 'Пн', revenue: 2400, bookings: 12 },
@@ -175,12 +143,35 @@ const staffTopList = [
 	},
 ]
 export default function MainPage() {
+	const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false)
+	const [selectedAppointment, setSelectedAppointment] = useState(null)
+
+	const handleAppointmentSave = appointmentData => {
+		console.log('[v0] Saving appointment:', appointmentData)
+		mockAppointments.push(appointmentData)
+		// Here would be the actual save logic
+		setIsAppointmentModalOpen(false)
+		setSelectedAppointment(null)
+		setSelectedSlot(null)
+	}
+
+	const handleAppointmentDelete = appointmentId => {
+		console.log('[v0] Deleting appointment:', appointmentId)
+		// Here would be the actual delete logic
+		setIsAppointmentModalOpen(false)
+		setSelectedAppointment(null)
+	}
+
+	const handleAppointmentIsOpenModal = () => {
+		setIsAppointmentModalOpen(true)
+	}
 	return (
 		<div className='space-y-6 animate-in fade-in-0 duration-500'>
 			<HeaderPages
 				description='Добро пожаловать в BeautyCRM'
 				title='Панель управления'
 				type='main'
+				onClick={handleAppointmentIsOpenModal}
 			/>
 			<MainStats />
 
@@ -190,12 +181,23 @@ export default function MainPage() {
 			</div>
 			<div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
 				<TodayAppointments todayAppointments={todayAppointments} />
-				<MainActions />
+				<MainActions addAppointment={handleAppointmentIsOpenModal} />
 			</div>
 			<div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
 				<ServicesTopList topList={serviceTopList} />
 				<StaffTopList staffList={staffTopList} />
 			</div>
+			<AppointmentModal
+				isOpen={isAppointmentModalOpen}
+				onClose={() => {
+					setIsAppointmentModalOpen(false)
+					setSelectedAppointment(null)
+					setSelectedSlot(null)
+				}}
+				appointment={selectedAppointment}
+				onSave={handleAppointmentSave}
+				onDelete={handleAppointmentDelete}
+			/>
 		</div>
 	)
 }

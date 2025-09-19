@@ -53,9 +53,6 @@ export const TopHeader = () => {
 					>
 						View 1
 					</Button>
-					<Button variant='ghost' size='sm'>
-						<Settings className='h-4 w-4' />
-					</Button>
 				</div>
 			</div>
 
@@ -109,7 +106,7 @@ export const TopHeader = () => {
 								<span>Настройки</span>
 							</DropdownMenuItem>
 							<DropdownMenuSeparator />
-							<DropdownMenuItem onClick={console.log('exit')}>
+							<DropdownMenuItem>
 								<span>Выйти</span>
 							</DropdownMenuItem>
 						</DropdownMenuContent>
