@@ -3,6 +3,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, Request, status
 from services.studio import (
+    create_studio,
     create_studio_invite,
     get_list_studios,
     get_studio,
@@ -15,6 +16,7 @@ from shared.database import get_db
 from shared.dependencies import AuthContext, get_auth_context
 from shared.schemas.company_units.common import BaseInviteResponse
 from shared.schemas.company_units.studio import (
+    StudioCreateRequest,
     StudioFilter,
     StudioInviteCreateRequest,
     StudioListResponse,
@@ -93,3 +95,13 @@ async def get_list_studios_route(
     return await get_list_studios(
         request=request, offset=offset, limit=limit, filters=filters, db=db, auth=auth
     )
+
+
+@router.post('', response_model=StudioResponse, status_code=status.HTTP_201_CREATED)
+async def create_studio_route(
+    request: Request,
+    data: StudioCreateRequest,
+    db: AsyncSession = Depends(get_db),
+    auth: AuthContext = Depends(get_auth_context),
+):
+    return await create_studio(request=request, data=data, db=db, auth=auth)

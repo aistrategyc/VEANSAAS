@@ -72,16 +72,15 @@ async def invite_create_members(
     data: BaseInviteMemberCreateRequest,
     db: AsyncSession,
 ):
-    async with db.begin():
-        _model = OrganizationInvite if data.type == 'organization' else StudioInvite
-        invite_member = await db.get(_model, uuid)
-        if not invite_member:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail='Invite is not found'
-            )
-        await invite_member.crete_member(db=db, user_uuid=data.user_uuid)
-        invite_member.is_used = True
-        await db.commit()
+    _model = OrganizationInvite if data.type == 'organization' else StudioInvite
+    invite_member = await db.get(_model, uuid)
+    if not invite_member:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail='Invite is not found'
+        )
+    await invite_member.crete_member(db=db, user_uuid=data.user_uuid)
+    invite_member.is_used = True
+    await db.commit()
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content={'status': 'success', 'message': 'Member created successfully'},

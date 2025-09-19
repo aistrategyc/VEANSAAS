@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.config.config import settings
 from shared.dependencies import AuthContext
+from shared.models.company_units.org import Organization
 from shared.models.company_units.studio import Studio, StudioInvite, StudioMember
 from shared.models.user import User
 from shared.rabbitmq import rabbitmq
@@ -15,12 +16,16 @@ from shared.schemas.common import PaginationResponse
 from shared.schemas.company_units.common import (
     BaseInviteResponse,
 )
+from shared.schemas.company_units.enum import OrganizationPlanType
 from shared.schemas.company_units.studio import (
+    StudioCreateRequest,
     StudioFilter,
     StudioInviteCreateDB,
     StudioInviteCreateRequest,
     StudioListResponse,
+    StudioMemberCreateRequest,
     StudioResponse,
+    StudioRole,
     StudioUpdateRequest,
     StudioWithMembersResponse,
 )
@@ -164,3 +169,52 @@ async def get_studio_select_options(
     studios = query_result.scalars().all()
 
     return studios
+
+
+async def create_studio(
+    request: Request, data: StudioCreateRequest, db: AsyncSession, auth: AuthContext
+):
+    db_organization = await db.get(Organization, auth.organization_uuid)
+    if not db_organization:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail='Organization not found'
+        )
+
+    if db_organization.plan_type == OrganizationPlanType.SOLO:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail='This feature is not available on your current plan. Please upgrade to a team or business plan.',
+        )
+
+    if not auth.is_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail='BAD REQUEST'
+        )
+
+    created_by_uuid = auth.user.uuid
+
+    studio_data = data.model_dump(
+        exclude_unset=True,
+        exclude_none=True,
+    )
+
+    db_studio = Studio(
+        **studio_data,
+        organization_uuid=auth.organization_uuid,
+        created_by_uuid=created_by_uuid,
+    )
+    db.add(db_studio)
+    await db.flush()
+
+    studio_member_data = StudioMemberCreateRequest(
+        user_uuid=created_by_uuid,
+        studio_uuid=db_studio.uuid,
+        created_by_uuid=created_by_uuid,
+        roles=[StudioRole.STUDIO_OWNER],
+    )
+    db_studio_member = StudioMember(**studio_member_data.model_dump())
+
+    db.add(db_studio_member)
+
+    await db.commit()
+    return db_studio
