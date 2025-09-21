@@ -12,6 +12,7 @@ import { ThemeToggle } from '@/shared/ui/theme/ToggleTheme'
 import { Bell, Plus, Settings, Menu, User, X } from 'lucide-react'
 import { useState } from 'react'
 import NotificationDropdown from '../notification/NotificationDropdown'
+import { ChangeStudio } from './ChangeStudio'
 
 export const TopHeader = () => {
 	const user = {
@@ -44,16 +45,7 @@ export const TopHeader = () => {
 				</Button>
 
 				<h1 className='text-xl font-bold text-foreground md:text-2xl'>DAO1</h1>
-
-				<div className='hidden md:flex items-center gap-2 ml-4'>
-					<Button
-						variant='outline'
-						size='sm'
-						className='text-xs bg-transparent'
-					>
-						View 1
-					</Button>
-				</div>
+				<ChangeStudio />
 			</div>
 
 			{/* Десктопное меню */}
@@ -163,7 +155,7 @@ export const TopHeader = () => {
 								<span>Настройки</span>
 							</DropdownMenuItem>
 							<DropdownMenuSeparator />
-							<DropdownMenuItem onClick={console.log('exit')}>
+							<DropdownMenuItem>
 								<span>Выйти</span>
 							</DropdownMenuItem>
 						</DropdownMenuContent>

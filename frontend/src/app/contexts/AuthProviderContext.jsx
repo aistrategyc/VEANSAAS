@@ -6,6 +6,7 @@ import {
 } from '../../shared/helper/authHelper'
 import { AuthContext } from './AuthContext'
 import { useUser } from '../../shared/hooks/useUser'
+import { parseJwt } from '@/shared/api/api'
 export const AuthProvider = ({ children }) => {
 	const [isAuthenticated, setIsAuthenticated] = useState(false)
 	const [loading, setLoading] = useState(true)
@@ -16,6 +17,7 @@ export const AuthProvider = ({ children }) => {
 		const { expires = 7 } = options
 		setCookie('authToken', accessToken, expires)
 		setCookie('refreshToken', refreshToken)
+
 		setIsAuthenticated(true)
 	}, [])
 

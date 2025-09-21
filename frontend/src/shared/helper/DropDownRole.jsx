@@ -12,7 +12,7 @@ import { setCurrentRole } from '@/role/slice/rolesCurrentSlice'
 
 export function DropDownRole() {
 	const dispatch = useDispatch()
-	const roles = useSelector(state => state.rootReducer.roles?.roles) // из rolesSlice
+	const roles = useSelector(state => state.rootReducer.roles?.roles)
 	const currentRoleId = useSelector(
 		state => state.rootReducer.rolesCurrent.roleId
 	) // из userSlice
@@ -20,7 +20,6 @@ export function DropDownRole() {
 		dispatch(setCurrentRole(role))
 	}
 
-	// Рендер компонента
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>

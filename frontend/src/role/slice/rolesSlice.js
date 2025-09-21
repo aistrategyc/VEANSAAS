@@ -1,4 +1,6 @@
 // store/slices/rolesSlice.js
+import { parseJwt } from '@/shared/api/api'
+import { getCookie } from '@/shared/helper/authHelper'
 import { createSlice } from '@reduxjs/toolkit'
 
 // Моковые данные ролей
@@ -126,11 +128,13 @@ const initialRoles = [
 		isSystem: false,
 	},
 ]
+const permissionsAll = parseJwt(getCookie('authToken'))?.permissions
 
 const rolesSlice = createSlice({
 	name: 'roles',
 	initialState: {
 		roles: initialRoles,
+		permissions: permissionsAll,
 		loading: false,
 		error: null,
 	},

@@ -14,7 +14,6 @@ export default function VerificationEmailPage() {
 		const params = new URLSearchParams(window.location.search)
 		const token = params.get('token')
 		if (token) {
-			console.log(token)
 			await authAPI
 				.verifyToken(token)
 				.then(() => {
