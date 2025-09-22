@@ -10,11 +10,11 @@ import { getCookie } from '@/shared/helper/authHelper'
 import { api } from '@/shared/api/api'
 import { useEffect, useState } from 'react'
 
-export function ChangeStudio() {
+export const ChangeStudio = () => {
 	const [studios, setStudios] = useState([])
-	const featchStudios = async () => {
-		await api.get('/studios/').then(response => {
-			setStudios(response.data.items)
+	const fetchStudios = async () => {
+		await api.get('/studios/selection').then(response => {
+			setStudios(response.data)
 		})
 	}
 	const handleChange = studio => {
@@ -22,7 +22,7 @@ export function ChangeStudio() {
 	}
 
 	useEffect(() => {
-		featchStudios()
+		fetchStudios()
 	}, [])
 
 	return (
@@ -36,16 +36,13 @@ export function ChangeStudio() {
 			<DropdownMenuContent className='w-56'>
 				{studios.map(studio => (
 					<DropdownMenuItem
-						key={studio.id}
+						key={studio.uuid}
 						onClick={() => handleChange(studio)}
 						className='flex flex-col items-start py-2 cursor-pointer'
 					>
 						<span className='font-medium'>{studio.name}</span>
 					</DropdownMenuItem>
 				))}
-				<DropdownMenuItem onClick={() => handleChange({ uuid: 'ddd' })}>
-					nema
-				</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>
 	)
