@@ -1,91 +1,119 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import {
-	Building2,
-	Search,
-	Filter,
-	Plus,
-	Eye,
-	Edit,
-	Trash2,
-	MapPin,
-	Phone,
-	Users,
-	Clock,
-	DollarSign,
-} from 'lucide-react'
+import { Building2, Users, Clock, DollarSign } from 'lucide-react'
 import { HeaderPages } from '@/features/headerPages/HeaderPages'
 import { StatsList } from '@/features/stats/StatsList'
 import { FiltersPages } from '@/features/filtersPages/FiltersPages'
 import { StudiosGrid } from '@/features/studios/StudiosGrid'
+import { useState, useEffect } from 'react'
+import { StudioModal } from '@/features/studios/StudioModal'
+import { api } from '@/shared/api/api'
 
 export default function StudiosPage() {
-	const studios = [
+	const [studios, setStudios] = useState([])
+	const [filteredStudios, setFilteredStudios] = useState([])
+	const [searchTerm, setSearchTerm] = useState('')
+	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+	const [editingStudio, setEditingStudio] = useState(null)
+	const [isLoading, setIsLoading] = useState(true)
+
+	const fetchStudios = async () => {
+		try {
+			setIsLoading(true)
+			const response = await api.get('/studios')
+			const studiosData = response.data.items.map((studio, index) => ({
+				...studio,
+				id: index + 1,
+				manager: 'Менеджер не указан',
+				staff: studio.members_count || 0,
+				rooms: 0,
+				todayRevenue: '$0',
+				monthRevenue: '$0',
+				occupancy: 0,
+				status: 'active',
+				services: ['Услуги не указаны'],
+				address: studio.address || 'Адрес не указан',
+				phone: studio.phone_number || 'Телефон не указан',
+			}))
+			setStudios(studiosData)
+			setFilteredStudios(studiosData)
+		} catch (error) {
+			console.error('Ошибка при загрузке студий:', error)
+		} finally {
+			setIsLoading(false)
+		}
+	}
+
+	useEffect(() => {
+		fetchStudios()
+	}, [])
+	useEffect(() => {
+		if (searchTerm.trim() === '') {
+			setFilteredStudios(studios)
+		} else {
+			const filtered = studios.filter(studio =>
+				studio.name.toLowerCase().includes(searchTerm.toLowerCase())
+			)
+			setFilteredStudios(filtered)
+		}
+	}, [searchTerm, studios])
+
+	const statsStudiosList = [
 		{
 			id: 1,
-			name: 'Beauty Studio Центр',
-			address: 'ул. Тверская, 15',
-			phone: '+7 (495) 123-45-67',
-			manager: 'Елена Петрова',
-			staff: 12,
-			rooms: 8,
-			todayRevenue: '$67,500',
-			monthRevenue: '$1,250,000',
-			occupancy: 85,
-			status: 'active',
-			services: ['Парикмахерские', 'Маникюр', 'Косметология'],
+			icon: Building2,
+			count: studios.length.toString(),
+			name: 'Всего студий',
 		},
 		{
 			id: 2,
-			name: 'Tattoo & Piercing Studio',
-			address: 'ул. Арбат, 28',
-			phone: '+7 (495) 234-56-78',
-			manager: 'Дмитрий Волков',
-			staff: 6,
-			rooms: 4,
-			todayRevenue: '$45,000',
-			monthRevenue: '$890,000',
-			occupancy: 92,
-			status: 'active',
-			services: ['Татуировки', 'Пирсинг'],
+			icon: Users,
+			count: studios
+				.reduce((sum, studio) => sum + (studio.staff || 0), 0)
+				.toString(),
+			name: 'Всего сотрудников',
 		},
-		{
-			id: 3,
-			name: 'Laser Beauty Clinic',
-			address: 'пр. Мира, 45',
-			phone: '+7 (495) 345-67-89',
-			manager: 'Анна Сидорова',
-			staff: 8,
-			rooms: 6,
-			todayRevenue: '$52,300',
-			monthRevenue: '$980,000',
-			occupancy: 78,
-			status: 'active',
-			services: ['Лазерная эпиляция', 'Косметология'],
-		},
-		{
-			id: 4,
-			name: 'Barbershop Classic',
-			address: 'ул. Покровка, 12',
-			phone: '+7 (495) 456-78-90',
-			manager: 'Михаил Козлов',
-			staff: 5,
-			rooms: 3,
-			todayRevenue: '$28,900',
-			monthRevenue: '$560,000',
-			occupancy: 95,
-			status: 'maintenance',
-			services: ['Мужские стрижки', 'Бритье'],
-		},
+		{ id: 3, icon: DollarSign, count: '$0', name: 'Выручка сегодня' },
+		{ id: 4, icon: Clock, count: '0%', name: 'Средняя загрузка' },
 	]
-	const statsStudiosList = [
-		{ id: 1, icon: Building2, count: '4', name: 'Всего студий' },
-		{ id: 2, icon: Users, count: '31', name: 'Всего сотрудников' },
-		{ id: 3, icon: DollarSign, count: '$193,700', name: 'Выручка сегодня' },
-		{ id: 4, icon: Clock, count: '87%', name: 'Средняя загрузка' },
-	]
+
+	const onSaveData = async data => {
+		if (editingStudio) {
+			await api.patch(
+				'/studios',
+				{ name: data.name },
+				{
+					params: {
+						uuid: editingStudio.uuid,
+					},
+				}
+			)
+			console.log('Студия успешно обновлена', data)
+			setEditingStudio(null)
+		} else {
+			await api.post('/studios', data)
+			console.log('Студия успешно создана', data)
+		}
+		await fetchStudios()
+		setIsCreateModalOpen(false)
+	}
+
+	const handleStudioIsOpenModal = () => {
+		setEditingStudio(null)
+		setIsCreateModalOpen(true)
+	}
+
+	const handleEditStudio = studio => {
+		setEditingStudio(studio)
+		setIsCreateModalOpen(true)
+	}
+
+	const handleSearch = term => {
+		setSearchTerm(term)
+	}
+
+	const handleCloseModal = () => {
+		setIsCreateModalOpen(false)
+		setEditingStudio(null)
+	}
 
 	return (
 		<div className='space-y-6 animate-in fade-in-0 duration-500'>
@@ -93,13 +121,32 @@ export default function StudiosPage() {
 				description='Управление филиалами и студиями'
 				nameButton='Добавить студию'
 				title='Студии'
+				onClick={handleStudioIsOpenModal}
 			/>
 			<StatsList stats={statsStudiosList} />
 			<FiltersPages
-				placeholder='Поиск по названию, адресу или менеджеру...'
+				placeholder='Поиск по названию...'
 				type='studio'
+				onSearch={handleSearch}
 			/>
-			<StudiosGrid studios={studios} />
+
+			{isLoading ? (
+				<div className='flex justify-center items-center py-8'>
+					<div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary'></div>
+				</div>
+			) : (
+				<StudiosGrid
+					studios={filteredStudios}
+					onEditStudio={handleEditStudio}
+				/>
+			)}
+
+			<StudioModal
+				isOpen={isCreateModalOpen}
+				onClose={handleCloseModal}
+				onSave={onSaveData}
+				studio={editingStudio}
+			/>
 		</div>
 	)
 }
