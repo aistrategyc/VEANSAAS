@@ -14,6 +14,8 @@ from shared.schemas.company_units.enum import StudioRole
 
 class StudioBase(BaseModel):
     name: str = Field(max_length=255)
+    phone_number: str | None = Field(default=None, max_length=24)
+    address: str | None = Field(default=None, max_length=255)
     organization_uuid: UUID | None = Field(default=None)
     created_by_uuid: UUID | str | None = Field(default=None)
 
@@ -52,6 +54,9 @@ class StudioInviteCreateDB(BaseInviteCreateDB):
 
 class StudioUpdateRequest(BaseModel):
     name: str | None = Field(default=None, max_length=244)
+    phone_number: str | None = Field(default=None, max_length=24)
+    address: str | None = Field(default=None, max_length=255)
+    is_active: bool | None = Field(default=None)
 
 
 class StudioFilter(BaseModel):

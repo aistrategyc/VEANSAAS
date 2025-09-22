@@ -5,22 +5,25 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from shared.database import Base
+from shared.models.company_units.common import BaseInvite
 from shared.models.mixins import (
+    PhoneNumberMixin,
     created_at,
     created_by_uuid,
     updated_at,
     uuid_primary_key,
 )
-from shared.models.company_units.common import BaseInvite
 from shared.schemas.company_units.studio import StudioRole
 
 
-class Studio(Base):
+class Studio(Base, PhoneNumberMixin):
     __tablename__ = 'studios'
     __table_args__ = {'schema': 'organization_service'}
 
     uuid: Mapped[uuid_primary_key]
     name: Mapped[str] = mapped_column(String(255))
+    phone_number: Mapped[str | None] = mapped_column(String(24), nullable=True)
+    address: Mapped[str | None] = mapped_column(String(255), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, server_default=true())
     organization_uuid: Mapped[UUID | None] = mapped_column(
         Uuid(as_uuid=True),
