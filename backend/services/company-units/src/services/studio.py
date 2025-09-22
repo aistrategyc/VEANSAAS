@@ -29,6 +29,7 @@ from shared.schemas.company_units.studio import (
     StudioUpdateRequest,
     StudioWithMembersResponse,
 )
+from shared.utils import update_model_from_dict
 
 
 async def create_studio_invite(
@@ -94,11 +95,8 @@ async def update_studio(
         exclude_unset=True,
         exclude_none=True,
     )
-    if not update_data:
-        return studio_db
 
-    for field, value in update_data.items():
-        setattr(studio_db, field, value)
+    await update_model_from_dict(studio_db, update_data)
     await db.commit()
 
     return studio_db

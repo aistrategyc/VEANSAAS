@@ -37,4 +37,6 @@ roles:
       - report.download
       - settings.edit
       - org:update
+      - services:create
       - services-categories:create
+      - services-categories:update

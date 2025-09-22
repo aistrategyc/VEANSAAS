@@ -22,6 +22,7 @@ from shared.schemas.company_units.studio import (
     StudioResponse,
     StudioRole,
 )
+from shared.utils import update_model_from_dict
 
 
 async def create_organization(
@@ -103,11 +104,7 @@ async def update_organization(
         exclude_unset=True,
         exclude_none=True,
     )
-    if not update_data:
-        return organization_db
-
-    for field, value in update_data.items():
-        setattr(organization_db, field, value)
+    await update_model_from_dict(organization_db, update_data)
     await db.commit()
 
     return organization_db
