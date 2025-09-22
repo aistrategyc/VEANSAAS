@@ -6,6 +6,8 @@ from services.service import (
     create_service,
     crete_category,
     get_list_categories,
+    get_list_services,
+    get_service,
     update_category,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -33,6 +35,19 @@ async def create_service_route(
     auth: AuthContext = Depends(get_auth_context),
 ):
     return await create_service(request=request, data=data, db=db, auth=auth)
+
+
+@router.get(
+    '',
+    response_model=List[ServiceResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def get_list_services_route(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    auth: AuthContext = Depends(get_auth_context),
+):
+    return await get_list_services(request=request, db=db, auth=auth)
 
 
 @router.post(
@@ -79,3 +94,17 @@ async def update_category_route(
     return await update_category(
         request=request, uuid=uuid, data=data, db=db, auth=auth
     )
+
+
+@router.get(
+    '/{uuid}',
+    response_model=ServiceResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def get_service_route(
+    request: Request,
+    uuid: UUID,
+    db: AsyncSession = Depends(get_db),
+    auth: AuthContext = Depends(get_auth_context),
+):
+    return await get_service(request=request, uuid=uuid, db=db, auth=auth)

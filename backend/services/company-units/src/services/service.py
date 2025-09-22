@@ -45,11 +45,17 @@ async def update_category(
     db: AsyncSession,
     auth: AuthContext,
 ):
-    db_service_category = await db.get(ServiceCategory, uuid)
+    result = await db.execute(
+        select(ServiceCategory).where(
+            ServiceCategory.uuid == uuid,
+            ServiceCategory.organization_uuid == auth.organization_uuid,
+        )
+    )
+    db_service_category = result.scalar_one_or_none()
 
     if not db_service_category:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail='Studio not found'
+            status_code=status.HTTP_404_NOT_FOUND, detail='Service category not found'
         )
 
     update_data = data.model_dump(
@@ -75,4 +81,29 @@ async def create_service(
     db.add(db_service)
 
     await db.commit()
+    return db_service
+
+
+async def get_list_services(request: Request, db: AsyncSession, auth: AuthContext):
+    result = await db.execute(
+        select(Service).where(Service.organization_uuid == auth.organization_uuid)
+    )
+    db_service = result.scalars().all()
+    return db_service
+
+
+async def get_service(
+    request: Request, uuid: UUID, db: AsyncSession, auth: AuthContext
+):
+    result = await db.execute(
+        select(Service).where(
+            Service.uuid == uuid, Service.organization_uuid == auth.organization_uuid
+        )
+    )
+    db_service = result.scalar_one_or_none()
+
+    if not db_service:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail='Service not found'
+        )
     return db_service
