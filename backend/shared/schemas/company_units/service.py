@@ -3,8 +3,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from shared.schemas.common import TimestampMixin, UUIDMixin
-from shared.schemas.company_units.enum import AttributeType
+from shared.schemas.mixins import TimestampMixin, UUIDMixin
+from shared.enums.company_units import AttributeType
 
 
 class ServiceBase(BaseModel):

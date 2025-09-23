@@ -4,8 +4,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from shared.schemas.company_units.common import BaseInviteCreateRequest
-from shared.schemas.company_units.enum import OrganizationPlanType, OrganizationRole
+from shared.schemas.company_units.invite import BaseInviteCreateRequest
+from shared.enums.company_units import OrganizationPlanType, OrganizationRole
 from shared.schemas.company_units.studio import StudioCreateRequest, StudioResponse
 
 

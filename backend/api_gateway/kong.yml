@@ -25,13 +25,13 @@ services:
               secret_is_base64: false
               anonymous: null
 
-  - name: company-units-service
-    url: http://backend-company-units:9003
+  - name: customer-service
+    url: http://backend-customer:9005/api/v1/customers
     routes:
-      - name: company-units-studios-route
-        paths: ['/api/v1/studios', '/api/v1/services', '/api/v1/orgs']
+      - name: customer-route
+        paths: ['/api/v1/customers']
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
-        strip_path: false
+        strip_path: true
         plugins:
           - name: jwt
             config:
@@ -39,9 +39,19 @@ services:
               claims_to_verify: ['exp']
               key_claim_name: 'iss'
               secret_is_base64: false
+              anonymous: null
 
-      - name: company-units-invites-route
-        paths: ['/api/v1/invites']
+  - name: company-units-service
+    url: http://backend-company-units:9003
+    routes:
+      - name: company-units-route
+        paths:
+          [
+            '/api/v1/studios',
+            '/api/v1/services',
+            '/api/v1/orgs',
+            '/api/v1/invites',
+          ]
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
         strip_path: false
         plugins:

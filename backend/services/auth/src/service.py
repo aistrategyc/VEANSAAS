@@ -16,7 +16,7 @@ from utils import (
 
 from shared.config.config import settings
 from shared.rabbitmq import rabbitmq
-from shared.schemas.company_units.common import BaseInviteMemberCreateRequest
+from shared.schemas.company_units.invite import BaseInviteMemberCreateRequest
 from shared.schemas.user import UserCreateInternal, UserVerificationEmail
 from shared.service_clients.company_units import (
     CompanyUnitsInviteServiceClient,

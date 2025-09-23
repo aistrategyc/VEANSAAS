@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.database import get_db
 from shared.dependencies import AuthContext, get_service_token
-from shared.schemas.company_units.common import (
+from shared.schemas.company_units.invite import (
     BaseInviteMemberCreateRequest,
     BaseInviteValidateResponse,
 )
