@@ -77,7 +77,15 @@ export default function StudiosPage() {
 
 	const onSaveData = async data => {
 		if (editingStudio) {
-			await api.patch(`/studios/${editingStudio.uuid}`, { name: data.name })
+			await api.patch(
+				`/studios/${editingStudio.uuid}`,
+				{ name: data.name },
+				{
+					headers: {
+						'X-Studio-UUID': editingStudio.uuid,
+					},
+				}
+			)
 			console.log('Студия успешно обновлена', data)
 			setEditingStudio(null)
 		} else {
