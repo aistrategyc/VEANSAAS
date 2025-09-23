@@ -4,11 +4,9 @@ from uuid import UUID
 from fastapi import Depends, Header, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from sqlalchemy.ext.asyncio import AsyncSession
+from pydantic import BaseModel
 
 from shared.config.config import settings
-from shared.database import get_db
-from shared.models.user import User
 from shared.service_clients.company_units import (
     CompanyUnitsInviteServiceClient,
     CompanyUnitsOrganizationServiceClient,
@@ -16,6 +14,12 @@ from shared.service_clients.company_units import (
 from shared.service_clients.user import UserServiceClient
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
+
+
+class UserInfo(BaseModel):
+    uuid: UUID | str
+    is_active: bool
+    is_verified: bool
 
 
 class AuthContext:
@@ -32,8 +36,13 @@ class AuthContext:
         return self._type == 'user'
 
     @property
-    def user(self):
-        return self._payload.get('user') if self.is_user else None
+    def user(self) -> UserInfo | None:
+        self._user_info = UserInfo(
+            uuid=self._payload.get('user_uuid'),
+            is_active=self._payload.get('is_active', False),
+            is_verified=self._payload.get('is_verified', False),
+        )
+        return self._user_info
 
     @property
     def raw_payload(self):
@@ -52,21 +61,9 @@ class AuthContext:
         roles_data = self._payload.get('roles', {}).get('studios', {})
         return list(roles_data.keys())
 
-    @property
-    def roles(self) -> set:
-        roles_data = self._payload.get('roles', {})
-        unique_roles = set()
-        for category in roles_data.values():
-            if isinstance(category, dict):
-                for roles_list in category.values():
-                    unique_roles.update(roles_list)
-
-        return self._payload.get('roles', {})
-
 
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
-    db: AsyncSession = Depends(get_db),
     studio_uuid: str | None = Header(None, alias='X-Studio-UUID'),
 ) -> AuthContext:
     try:
@@ -80,32 +77,35 @@ async def get_current_user(
                 status_code=status.HTTP_403_FORBIDDEN, detail='Invalid token type'
             )
         user_uuid = payload.get('user_uuid')
+        is_active = payload.get('is_active', False)
+        is_verified = payload.get('is_verified', False)
         if not user_uuid:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid token payload'
             )
 
-        user = await db.get(User, user_uuid)
-
-        if not user:
+        if not user_uuid:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail='User not found'
             )
 
-        if not user.is_active:
+        if not is_active:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail='User account is deactivated',
             )
 
-        if not user.is_verified:
+        if not is_verified:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail='User account is not verified',
             )
 
         return AuthContext(
-            payload={**payload, 'user': user, 'studio_uuid': studio_uuid}
+            payload={
+                **payload,
+                'studio_uuid': studio_uuid,
+            }
         )
     except JWTError:
         raise HTTPException(
@@ -146,7 +146,6 @@ async def get_service_token(token: str = Depends(oauth2_scheme)) -> AuthContext:
 
 async def get_auth_context(
     token: str = Depends(oauth2_scheme),
-    db: AsyncSession = Depends(get_db),
     studio_uuid: str | None = Header(None, alias='X-Studio-UUID'),
 ) -> AuthContext:
     try:
@@ -155,7 +154,7 @@ async def get_auth_context(
         pass
 
     try:
-        return await get_current_user(token=token, db=db, studio_uuid=studio_uuid)
+        return await get_current_user(token=token, studio_uuid=studio_uuid)
     except HTTPException:
         pass
 

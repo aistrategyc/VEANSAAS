@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, Request, status
 from services.invite import invite_create_members, invite_validate
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from shared.dependencies import AuthContext, get_db, get_service_token
+from shared.database import get_db
+from shared.dependencies import AuthContext, get_service_token
 from shared.schemas.company_units.common import (
     BaseInviteMemberCreateRequest,
     BaseInviteValidateResponse,

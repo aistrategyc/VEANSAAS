@@ -43,6 +43,8 @@ async def get_user_for_auth(request: Request, username: str, db: AsyncSession):
     auth_user_response = AuthUserResponse(
         uuid=db_user.uuid,
         username=db_user.username,
+        is_active=db_user.is_active,
+        is_verified=db_user.is_verified,
         email=str(db_user.email),
         hashed_password=db_user.hashed_password,
         roles={'studios': studios_role, 'orgs': organizations_role},
@@ -133,7 +135,13 @@ async def get_my_user(request: Request, auth: AuthContext, db: AsyncSession):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail='User not found'
         )
-    return auth.user
+
+    db_user = await db.get(User, auth.user.uuid)
+    if not db_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail='User not found'
+        )
+    return db_user
 
 
 async def verification_email(
