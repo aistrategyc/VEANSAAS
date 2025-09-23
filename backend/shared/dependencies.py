@@ -61,6 +61,17 @@ class AuthContext:
         roles_data = self._payload.get('roles', {}).get('studios', {})
         return list(roles_data.keys())
 
+    @property
+    def roles(self) -> set:
+        roles_data = self._payload.get('roles', {})
+        unique_roles = set()
+        for category in roles_data.values():
+            if isinstance(category, dict):
+                for roles_list in category.values():
+                    unique_roles.update(roles_list)
+
+        return self._payload.get('roles', {})
+
 
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
