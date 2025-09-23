@@ -137,6 +137,8 @@ async def login(
 
     user_date = {
         'sub': user.uuid,
+        'is_active': user.is_active,
+        'is_verified': user.is_verified,
         'user_uuid': user.uuid,
         'organization_uuid': list(user.roles['orgs'].keys())[0],
         'username': user.username,

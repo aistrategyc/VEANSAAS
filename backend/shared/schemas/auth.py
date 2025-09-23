@@ -11,6 +11,8 @@ class UserAuth(BaseModel):
 class AuthUserResponse(BaseModel):
     uuid: UUID | str
     username: str
+    is_active: bool
+    is_verified: bool
     email: EmailStr | str
     roles: dict
     hashed_password: str

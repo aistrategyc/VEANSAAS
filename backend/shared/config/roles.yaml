@@ -37,4 +37,15 @@ roles:
       - report.download
       - settings.edit
       - org:update
+      - services:create
+      - services:update
+      - services:delete
+      - services-categories:delete
       - services-categories:create
+      - services-categories:update
+      - services-attributes:create
+      - services-attributes:delete
+      - services-attributes:update
+      - services-attribute-options:update
+      - services-attribute-options:delete
+      - services-attribute-options:create
