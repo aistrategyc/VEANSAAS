@@ -67,5 +67,5 @@ plugins:
     config:
       origins: ['*']
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
-      headers: ['Content-Type', 'Authorization']
+      headers: ['Content-Type', 'Authorization', 'x-studio-uuid']
       credentials: true
