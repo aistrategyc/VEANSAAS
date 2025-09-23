@@ -17,7 +17,6 @@ config.set_main_option(
     'sqlalchemy.url',
     customer_settings.DATABASE_URL + '?async_fallback=True',
 )
-print(Base.metadata.tables.keys(), 'print(Base.metadata.tables.keys())')
 
 
 if config.config_file_name is not None:
