@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from shared.schemas.company_units.common import (
+from shared.schemas.company_units.invite import (
     BaseInviteMemberCreateRequest,
     BaseInviteValidateResponse,
 )

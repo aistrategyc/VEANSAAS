@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.database import get_db
 from shared.dependencies import AuthContext, get_auth_context
-from shared.schemas.company_units.common import BaseInviteResponse
+from shared.schemas.company_units.invite import BaseInviteResponse
 from shared.schemas.company_units.studio import (
     StudioCreateRequest,
     StudioFilter,

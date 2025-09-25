@@ -9,6 +9,12 @@ build:
 migrate:
 	docker compose exec admin-panel alembic upgrade head
 
+migrate-customer:
+	docker compose exec -w /app/services/customer backend-customer alembic upgrade head
+
+create-migration-customer:
+	docker compose exec -w /app/services/customer backend-customer alembic revision --autogenerate
+
 create-migration:
 	docker compose exec admin-panel alembic revision --autogenerate
 

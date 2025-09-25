@@ -9,7 +9,7 @@ from shared.models.company_units.org import (
     OrganizationInvite,
 )
 from shared.models.company_units.studio import StudioInvite
-from shared.schemas.company_units.common import (
+from shared.schemas.company_units.invite import (
     BaseInviteMemberCreateRequest,
     BaseInviteValidateResponse,
 )
