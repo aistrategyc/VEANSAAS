@@ -1,7 +1,12 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, Request, status
-from services.appointment import change_status, create_appointment, list_appointments
+from services.appointment import (
+    change_status,
+    create_appointment,
+    get_appointment,
+    list_appointments,
+)
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.database import get_db
@@ -15,6 +20,20 @@ from shared.schemas.company_units.appointment import (
 )
 
 router = APIRouter(prefix='/appointments', tags=['Appointments'])
+
+
+@router.get(
+    '/{uuid}',
+    response_model=AppointmentResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def get_appointment_route(
+    request: Request,
+    uuid: UUID,
+    db: AsyncSession = Depends(get_db),
+    auth: AuthContext = Depends(get_auth_context),
+):
+    return await get_appointment(request=request, uuid=uuid, db=db, auth=auth)
 
 
 @router.get('', response_model=AppointmentListResponse, status_code=status.HTTP_200_OK)

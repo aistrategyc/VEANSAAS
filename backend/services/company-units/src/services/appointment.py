@@ -77,7 +77,6 @@ async def change_status(
     db: AsyncSession,
     auth: AuthContext,
 ):
-    print(auth.studio_uuid, 'auth.studio_uuid')
     result = await db.execute(
         select(Appointment).where(
             Appointment.uuid == uuid, Appointment.studio_uuid == auth.studio_uuid
@@ -99,3 +98,25 @@ async def change_status(
     await db.commit()
 
     return db_status
+
+
+async def get_appointment(
+    request: Request,
+    uuid: UUID,
+    db: AsyncSession,
+    auth: AuthContext,
+):
+    result = await db.execute(
+        select(Appointment).where(
+            Appointment.uuid == uuid, Appointment.studio_uuid == auth.studio_uuid
+        )
+    )
+
+    db_appointment = result.scalar_one_or_none()
+
+    if not db_appointment:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail='Appointment not found'
+        )
+
+    return db_appointment
