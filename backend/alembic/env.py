@@ -5,6 +5,11 @@ from sqlalchemy import engine_from_config, pool
 from alembic import context
 from shared.config.config import settings
 from shared.database import Base
+from shared.models.company_units.appointment import (  # noqa
+    Appointment,
+    AppointmentPrepayment,
+    AppointmentStatus,
+)
 from shared.models.company_units.org import Organization, OrganizationMember  # noqa
 from shared.models.company_units.service import (
     AttributeOption,  # noqa

@@ -51,6 +51,7 @@ services:
             '/api/v1/services',
             '/api/v1/orgs',
             '/api/v1/invites',
+            '/api/v1/appointments'
           ]
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
         strip_path: false
