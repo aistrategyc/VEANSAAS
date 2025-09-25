@@ -1,60 +1,27 @@
+// pages/StudiosPage.js
 import { Building2, Users, Clock, DollarSign } from 'lucide-react'
 import { HeaderPages } from '@/features/headerPages/HeaderPages'
 import { StatsList } from '@/features/stats/StatsList'
 import { FiltersPages } from '@/features/filtersPages/FiltersPages'
 import { StudiosGrid } from '@/features/studios/StudiosGrid'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { StudioModal } from '@/features/studios/StudioModal'
-import { api } from '@/shared/api/api'
+import { useDispatch, useSelector } from 'react-redux'
+import { saveStudio, setSearchTerm } from '@/shared/slices/studiosSlice'
+import { Loader } from '@/shared/ui/loader/Loader'
+import { useUser } from '@/shared/hooks/useUser'
 
 export default function StudiosPage() {
-	const [studios, setStudios] = useState([])
-	const [filteredStudios, setFilteredStudios] = useState([])
-	const [searchTerm, setSearchTerm] = useState('')
+	const dispatch = useDispatch()
+
+	const { isLoading, isLoaded } = useSelector(
+		state => state.rootReducer.studios
+	)
+
+	const { studios, filteredStudios } = useUser()
+
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
 	const [editingStudio, setEditingStudio] = useState(null)
-	const [isLoading, setIsLoading] = useState(true)
-
-	const fetchStudios = async () => {
-		try {
-			setIsLoading(true)
-			const response = await api.get('/studios')
-			const studiosData = response.data.items.map((studio, index) => ({
-				...studio,
-				id: index + 1,
-				manager: 'Менеджер не указан',
-				staff: studio.members_count || 0,
-				rooms: 0,
-				todayRevenue: '$0',
-				monthRevenue: '$0',
-				occupancy: 0,
-				status: 'active',
-				services: ['Услуги не указаны'],
-				address: studio.address || 'Адрес не указан',
-				phone: studio.phone_number || 'Телефон не указан',
-			}))
-			setStudios(studiosData)
-			setFilteredStudios(studiosData)
-		} catch (error) {
-			console.error('Ошибка при загрузке студий:', error)
-		} finally {
-			setIsLoading(false)
-		}
-	}
-
-	useEffect(() => {
-		fetchStudios()
-	}, [])
-	useEffect(() => {
-		if (searchTerm.trim() === '') {
-			setFilteredStudios(studios)
-		} else {
-			const filtered = studios.filter(studio =>
-				studio.name.toLowerCase().includes(searchTerm.toLowerCase())
-			)
-			setFilteredStudios(filtered)
-		}
-	}, [searchTerm, studios])
 
 	const statsStudiosList = [
 		{
@@ -76,26 +43,10 @@ export default function StudiosPage() {
 	]
 
 	const onSaveData = async data => {
-		if (editingStudio) {
-			await api.patch(
-				`/studios/${editingStudio.uuid}`,
-				{ name: data.name },
-				{
-					headers: {
-						'X-Studio-UUID': editingStudio.uuid,
-					},
-				}
-			)
-			console.log('Студия успешно обновлена', data)
-			setEditingStudio(null)
-		} else {
-			await api.post('/studios', data)
-			console.log('Студия успешно создана', data)
-		}
-		await fetchStudios()
+		await dispatch(saveStudio({ studioData: data, editingStudio })).unwrap()
 		setIsCreateModalOpen(false)
+		setEditingStudio(null)
 	}
-
 	const handleStudioIsOpenModal = () => {
 		setEditingStudio(null)
 		setIsCreateModalOpen(true)
@@ -107,12 +58,16 @@ export default function StudiosPage() {
 	}
 
 	const handleSearch = term => {
-		setSearchTerm(term)
+		dispatch(setSearchTerm(term))
 	}
 
 	const handleCloseModal = () => {
 		setIsCreateModalOpen(false)
 		setEditingStudio(null)
+	}
+
+	if (!isLoaded && isLoading) {
+		return <Loader />
 	}
 
 	return (
@@ -130,16 +85,7 @@ export default function StudiosPage() {
 				onSearch={handleSearch}
 			/>
 
-			{isLoading ? (
-				<div className='flex justify-center items-center py-8'>
-					<div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary'></div>
-				</div>
-			) : (
-				<StudiosGrid
-					studios={filteredStudios}
-					onEditStudio={handleEditStudio}
-				/>
-			)}
+			<StudiosGrid studios={filteredStudios} onEditStudio={handleEditStudio} />
 
 			<StudioModal
 				isOpen={isCreateModalOpen}

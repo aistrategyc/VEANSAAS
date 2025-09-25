@@ -12,6 +12,7 @@ import { fetchUserData } from '../../shared/slices/userSlice'
 import { Link } from 'react-router'
 import { Button } from '@/components/ui/button'
 import { useState } from 'react'
+import { fetchStudios } from '@/shared/slices/studiosSlice'
 
 export const LoginForm = () => {
 	const {
@@ -39,6 +40,7 @@ export const LoginForm = () => {
 					expires: 7,
 				})
 				dispatch(fetchUserData()).unwrap()
+				dispatch(fetchStudios()).unwrap()
 				reset()
 			})
 			.catch(err => {
