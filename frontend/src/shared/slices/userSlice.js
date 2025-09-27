@@ -11,11 +11,8 @@ export const fetchUserData = createAsyncThunk(
 			if (!token) {
 				return rejectWithValue('Token error')
 			}
-			const response = await api.get('/users/me', {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
+			const response = await api.get('/users/me')
+
 			return response.data
 		} catch (error) {
 			return rejectWithValue(error)
@@ -31,11 +28,6 @@ const userSLice = createSlice({
 		error: null,
 	},
 	reducers: {
-		logout: state => {
-			state.data = null
-			state.error = null
-			localStorage.removeItem('token')
-		},
 		updateUserData: (state, action) => {
 			if (state.data) {
 				state.data = { ...state.data, ...action.payload }

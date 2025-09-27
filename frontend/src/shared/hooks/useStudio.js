@@ -1,25 +1,21 @@
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchUserData, logout } from '../../shared/slices/userSlice'
+import { fetchUserData, logout } from '../slices/userSlice'
 import { fetchStudios } from '../slices/studiosSlice'
 
 export const useUser = () => {
 	const dispatch = useDispatch()
-	const user = useSelector(state => state.rootReducer.user.data)
 	const studios = useSelector(state => state.rootReducer.studios.items)
 	const filteredStudios = useSelector(
 		state => state.rootReducer.studios.filteredItems
 	)
-	const loading = useSelector(state => state.rootReducer.user.isLoading)
-	const error = useSelector(state => state.rootReducer.user.error)
+	const loading = useSelector(state => state.rootReducer.studios.isLoading)
+	const error = useSelector(state => state.rootReducer.studios.error)
 
 	return {
-		user,
 		loading,
 		error,
 		studios,
 		filteredStudios,
-		fetchUser: () => dispatch(fetchUserData()),
 		fetchStudios: () => dispatch(fetchStudios()),
-		logout: () => dispatch(logout()),
 	}
 }

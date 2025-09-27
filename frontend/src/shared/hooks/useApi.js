@@ -58,7 +58,6 @@ export const useApi = () => {
 	}, [])
 
 	return {
-		
 		data,
 		error,
 		loading,

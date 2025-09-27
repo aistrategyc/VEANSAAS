@@ -91,8 +91,7 @@ export function CalendarToolbar({
 	}
 
 	return (
-		<div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 bg-card rounded-lg border'>
-			{/* Date Navigation */}
+		<div className='flex flex-col  sm:flex-row items-start sm:items-center justify-between gap-4 p-4 bg-card rounded-lg border'>
 			<div className='flex items-center gap-2'>
 				<Button
 					variant='outline'
@@ -140,9 +139,9 @@ export function CalendarToolbar({
 			</div>
 
 			{/* View Controls */}
-			<div className='flex items-center gap-4'>
+			<div className='flex flex-wrap items-center gap-4'>
 				{/* Resource Type Toggle */}
-				<div className='flex items-center gap-2'>
+				<div className='flex flex-wrap items-center gap-2'>
 					<Button
 						variant={resourceType === 'master' ? 'default' : 'outline'}
 						size='sm'
