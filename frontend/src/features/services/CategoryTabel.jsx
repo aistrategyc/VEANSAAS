@@ -1,5 +1,3 @@
-// pages/categories.jsx
-'use client'
 
 import { useState } from 'react'
 import { CategoryModal } from '@/components/categories/CategoryModal'
@@ -42,8 +40,6 @@ export default function CategoriesTabel() {
 				onSaveAttribute={handleSaveAttribute}
 				onDeleteAttribute={handleDeleteAttribute}
 			/>
-
-			{/* Ваш существующий код для управления категориями */}
 
 			<CategoryModal
 				isOpen={isCategoryModalOpen}

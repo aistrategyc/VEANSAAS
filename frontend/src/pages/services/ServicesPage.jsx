@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -25,6 +25,7 @@ import { ServiceModal } from '@/features/services/ServicesModal'
 import { CategoryModal } from '@/features/services/CategoryModal'
 import { ServicesTable } from '@/features/services/ServicesTable'
 import { AttributesManager } from '@/features/services/AttributesManager'
+import { api } from '@/shared/api/api'
 
 export default function ServicesPage() {
 	const user = {
@@ -50,6 +51,22 @@ export default function ServicesPage() {
 
 	const [editingCategory, setEditingCategory] = useState(null)
 
+	useEffect(() => {
+		const fetchCategory = async () => {
+			const response = await api.get(
+				'/categories',
+			
+				{
+					headers: {
+						'X-Studio-UUID': "084809d3-a2cf-47fb-a069-1e74ab7869b6",
+					},
+				}
+			)
+			consol.log(response)
+		}
+
+		fetchCategory()
+	}, [])
 	const handleSaveAttribute = attributeData => {
 		setAttributes(prev => {
 			const existingIndex = prev.findIndex(attr => attr.id === attributeData.id)
