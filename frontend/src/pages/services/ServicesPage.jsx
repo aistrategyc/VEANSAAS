@@ -54,11 +54,11 @@ export default function ServicesPage() {
 	useEffect(() => {
 		const fetchCategory = async () => {
 			const response = await api.get(
-				'/categories',
-			
+				'services/categories',
+
 				{
 					headers: {
-						'X-Studio-UUID': "084809d3-a2cf-47fb-a069-1e74ab7869b6",
+						'X-Studio-UUID': '084809d3-a2cf-47fb-a069-1e74ab7869b6',
 					},
 				}
 			)

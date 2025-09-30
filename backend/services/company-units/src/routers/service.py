@@ -72,49 +72,6 @@ async def get_list_services_route(
     return await get_list_services(request=request, db=db, auth=auth)
 
 
-@router.get(
-    '/{uuid}',
-    response_model=ServiceResponse,
-    status_code=status.HTTP_200_OK,
-    name='Service get',
-)
-async def get_service_route(
-    request: Request,
-    uuid: UUID,
-    db: AsyncSession = Depends(get_db),
-    auth: AuthContext = Depends(get_auth_context),
-):
-    return await get_service(request=request, uuid=uuid, db=db, auth=auth)
-
-
-@router.patch(
-    '/{uuid}',
-    response_model=ServiceResponse,
-    status_code=status.HTTP_200_OK,
-    name='Service update',
-)
-@requires_permission('services:update', scope='orgs')
-async def update_service_route(
-    request: Request,
-    uuid: UUID,
-    data: ServiceUpdate,
-    db: AsyncSession = Depends(get_db),
-    auth: AuthContext = Depends(get_auth_context),
-):
-    return await update_service(request=request, data=data, uuid=uuid, db=db, auth=auth)
-
-
-@router.delete('/{uuid}', status_code=status.HTTP_204_NO_CONTENT, name='Service delete')
-@requires_permission('services:delete', scope='orgs')
-async def delete_service_route(
-    request: Request,
-    uuid: UUID,
-    db: AsyncSession = Depends(get_db),
-    auth: AuthContext = Depends(get_auth_context),
-):
-    return await delete_service(request=request, uuid=uuid, db=db, auth=auth)
-
-
 @router.post(
     '/categories',
     response_model=ServiceCategoryResponse,
@@ -271,3 +228,46 @@ async def create_attribute_options_route(
     auth: AuthContext = Depends(get_auth_context),
 ):
     return await create_attribute_options(request=request, data=data, db=db, auth=auth)
+
+
+@router.get(
+    '/{uuid}',
+    response_model=ServiceResponse,
+    status_code=status.HTTP_200_OK,
+    name='Service get',
+)
+async def get_service_route(
+    request: Request,
+    uuid: UUID,
+    db: AsyncSession = Depends(get_db),
+    auth: AuthContext = Depends(get_auth_context),
+):
+    return await get_service(request=request, uuid=uuid, db=db, auth=auth)
+
+
+@router.patch(
+    '/{uuid}',
+    response_model=ServiceResponse,
+    status_code=status.HTTP_200_OK,
+    name='Service update',
+)
+@requires_permission('services:update', scope='orgs')
+async def update_service_route(
+    request: Request,
+    uuid: UUID,
+    data: ServiceUpdate,
+    db: AsyncSession = Depends(get_db),
+    auth: AuthContext = Depends(get_auth_context),
+):
+    return await update_service(request=request, data=data, uuid=uuid, db=db, auth=auth)
+
+
+@router.delete('/{uuid}', status_code=status.HTTP_204_NO_CONTENT, name='Service delete')
+@requires_permission('services:delete', scope='orgs')
+async def delete_service_route(
+    request: Request,
+    uuid: UUID,
+    db: AsyncSession = Depends(get_db),
+    auth: AuthContext = Depends(get_auth_context),
+):
+    return await delete_service(request=request, uuid=uuid, db=db, auth=auth)
