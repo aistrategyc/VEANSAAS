@@ -1,10 +1,11 @@
 from decimal import Decimal
+from typing import List
 from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from shared.schemas.mixins import TimestampMixin, UUIDMixin
 from shared.enums.company_units import AttributeType
+from shared.schemas.mixins import TimestampMixin, UUIDMixin
 
 
 class ServiceBase(BaseModel):
@@ -33,10 +34,6 @@ class ServiceCategoryBase(BaseModel):
     name: str = Field(max_length=255)
     description: str | None = Field(default=None)
     is_active: bool = Field(default=True)
-
-
-class ServiceCategoryCreate(ServiceCategoryBase):
-    pass
 
 
 class ServiceCategoryUpdate(ServiceCategoryBase):
@@ -85,3 +82,7 @@ class AttributeOptionResponse(AttributeOptionBase, UUIDMixin, TimestampMixin):
 
 class AttributeOptionUpdate(AttributeOptionBase):
     pass
+
+
+class ServiceCategoryCreate(ServiceCategoryBase):
+    attributes: List[CategoryAttributeBase] | None = Field(default=None)

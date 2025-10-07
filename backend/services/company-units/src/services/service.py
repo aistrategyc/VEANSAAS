@@ -28,12 +28,27 @@ from shared.utils import update_model_from_dict
 async def crete_category(
     request: Request, data: ServiceCategoryCreate, db: AsyncSession, auth: AuthContext
 ):
-    service_category_data = data.model_dump()
+    service_category_data = data.model_dump(exclude={'attributes'})
     db_service_category = ServiceCategory(
         **service_category_data,
         organization_uuid=auth.organization_uuid,
     )
     db.add(db_service_category)
+
+    if data.attributes:
+        await db.flush()
+        attribute_data_list = [item.model_dump() for item in data.attributes]
+
+        db_attributes = []
+        for attribute_data in attribute_data_list:
+            db_attribute = CategoryAttribute(
+                **attribute_data,
+                category_uuid=db_service_category.uuid,
+                organization_uuid=auth.organization_uuid,
+            )
+            db_attributes.append(db_attribute)
+
+        db.add_all(db_attributes)
 
     await db.commit()
     return db_service_category
