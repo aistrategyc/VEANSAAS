@@ -97,6 +97,27 @@ services:
       - ./backend/.env
       - ./backend/services/notification/.env
 
+
+  backend-customer:
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    build:
+      context: ./backend
+      dockerfile: services/customer/Dockerfile
+    entrypoint: /app/services/customer/entrypoint.sh
+    container_name: customer-svc
+    ports:
+      - '9005:9005'
+    volumes:
+      - ./backend/shared:/app/shared
+      - ./backend/services/customer/src:/app/services/customer/src
+      - ./backend/services/customer/alembic.ini:/app/services/customer/alembic.ini
+      - ./backend/services/customer/alembic:/app/services/customer/alembic
+    env_file:
+      - ./backend/.env
+      - ./backend/services/customer/.env
+
   frontend:
     build:
       context: ./frontend

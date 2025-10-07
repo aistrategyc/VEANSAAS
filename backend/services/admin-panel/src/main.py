@@ -30,3 +30,7 @@ admin.add_view(admin_view.AttributeOptionAdmin)
 admin.add_view(admin_view.CategoryAttributeAdmin)
 admin.add_view(admin_view.ServiceAdmin)
 admin.add_view(admin_view.ServiceCategoryAdmin)
+
+admin.add_view(admin_view.AppointmentAdmin)
+admin.add_view(admin_view.AppointmentPrepaymentAdmin)
+admin.add_view(admin_view.AppointmentStatusAdmin)

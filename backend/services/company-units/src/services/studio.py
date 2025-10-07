@@ -12,11 +12,11 @@ from shared.models.company_units.org import Organization
 from shared.models.company_units.studio import Studio, StudioInvite, StudioMember
 from shared.models.user import User
 from shared.rabbitmq import rabbitmq
-from shared.schemas.common import PaginationResponse
-from shared.schemas.company_units.common import (
+from shared.schemas.mixins import PaginationResponse
+from shared.schemas.company_units.invite import (
     BaseInviteResponse,
 )
-from shared.schemas.company_units.enum import OrganizationPlanType
+from shared.enums.company_units import OrganizationPlanType
 from shared.schemas.company_units.studio import (
     StudioCreateRequest,
     StudioFilter,
