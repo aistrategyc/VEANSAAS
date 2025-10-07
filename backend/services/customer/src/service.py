@@ -8,8 +8,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from shared.dependencies import AuthContext
 from shared.schemas.customer import (
     CustomerCreate,
+    CustomerFilter,
     CustomerListResponse,
     CustomerResponse,
+    CustomerSelectOptionsResponse,
+    CustomerSelectResponse,
     CustomerUpdate,
 )
 from shared.schemas.mixins import PaginationResponse
@@ -112,3 +115,44 @@ async def update_customer(
     await db.commit()
 
     return db_customer
+
+
+async def search_customer(
+    request: Request,
+    offset: int,
+    limit: int,
+    filters: CustomerFilter,
+    db: AsyncSession,
+    auth: AuthContext,
+):
+    base_condition = Customer.organization_uuid == auth.organization_uuid
+    conditions = [base_condition]
+
+    if filters.email:
+        conditions.append(Customer.email.ilike(f'%{filters.email}%'))
+
+    if filters.phone_number:
+        conditions.append(Customer.phone_number.ilike(f'%{filters.phone_number}%'))
+
+    query = select(
+        Customer,
+    ).where(*conditions)
+
+    count_query = select(func.count()).where(*conditions).select_from(Customer)
+
+    query_result = await db.execute(query)
+    customers = query_result.scalars().all()
+
+    total_count = await db.scalar(count_query) or 0
+
+    return CustomerSelectOptionsResponse(
+        items=[
+            CustomerSelectResponse.model_validate(customer) for customer in customers
+        ],
+        pagination=PaginationResponse(
+            count=total_count,
+            offset=offset,
+            limit=limit,
+            has_more=(offset + limit) < total_count,
+        ),
+    )

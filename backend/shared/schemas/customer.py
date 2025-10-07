@@ -45,3 +45,24 @@ class CustomerResponse(CustomerBase, UUIDMixin, TimestampMixin):
 class CustomerListResponse(BaseModel):
     items: List[CustomerResponse]
     pagination: PaginationResponse
+
+
+class CustomerSelectResponse(BaseModel):
+    uuid: UUID
+    phone_number: str | None = Field(default=None)
+    email: EmailStr | None = Field(default=None)
+    first_name: str
+    last_name: str | None = Field(default=None)
+
+    class Config:
+        from_attributes = True
+
+
+class CustomerSelectOptionsResponse(BaseModel):
+    items: List[CustomerSelectResponse]
+    pagination: PaginationResponse
+
+
+class CustomerFilter(BaseModel):
+    phone_number: str | None = Field(default=None)
+    email: str | None = Field(default=None)
