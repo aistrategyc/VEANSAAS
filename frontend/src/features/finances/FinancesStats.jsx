@@ -1,5 +1,11 @@
 import { Card, CardContent } from '@/components/ui/card'
-import { ArrowUpRight, DollarSign, TrendingDown, TrendingUp, Wallet } from 'lucide-react'
+import {
+	ArrowUpRight,
+	DollarSign,
+	TrendingDown,
+	TrendingUp,
+	Wallet,
+} from 'lucide-react'
 import React from 'react'
 
 export const FinancesStats = () => {
@@ -12,7 +18,7 @@ export const FinancesStats = () => {
 							<TrendingUp className='h-4 w-4 text-green-500' />
 							<div>
 								<p className='text-2xl font-bold text-card-foreground'>
-									₽650,000
+									$650,000
 								</p>
 								<p className='text-sm text-muted-foreground'>Доходы за месяц</p>
 							</div>
@@ -34,7 +40,7 @@ export const FinancesStats = () => {
 							<TrendingDown className='h-4 w-4 text-red-500' />
 							<div>
 								<p className='text-2xl font-bold text-card-foreground'>
-									₽380,000
+									$380,000
 								</p>
 								<p className='text-sm text-muted-foreground'>
 									Расходы за месяц
@@ -57,7 +63,7 @@ export const FinancesStats = () => {
 						<DollarSign className='h-4 w-4 text-blue-500' />
 						<div>
 							<p className='text-2xl font-bold text-card-foreground'>
-								₽270,000
+								$270,000
 							</p>
 							<p className='text-sm text-muted-foreground'>Прибыль за месяц</p>
 						</div>
@@ -76,7 +82,7 @@ export const FinancesStats = () => {
 					<div className='flex items-center gap-2'>
 						<Wallet className='h-4 w-4 text-purple-500' />
 						<div>
-							<p className='text-2xl font-bold text-card-foreground'>₽45,230</p>
+							<p className='text-2xl font-bold text-card-foreground'>$45,230</p>
 							<p className='text-sm text-muted-foreground'>Выручка сегодня</p>
 						</div>
 					</div>

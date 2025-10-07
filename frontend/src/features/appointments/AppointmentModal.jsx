@@ -283,7 +283,7 @@ export function AppointmentModal({
 							{selectedService && (
 								<div className='text-sm text-muted-foreground'>
 									<div>Длительность: {selectedService.duration} минут</div>
-									<div>Цена: {selectedService.price} ₽</div>
+									<div>Цена: {selectedService.price} $</div>
 								</div>
 							)}
 						</div>

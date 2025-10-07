@@ -86,7 +86,7 @@ export default function DashboardPageNew() {
 				/>
 				<MetricCard
 					title='Доход за месяц'
-					value={`₽${data.monthlyRevenue.toLocaleString()}`}
+					value={`$${data.monthlyRevenue.toLocaleString()}`}
 					icon={DollarSign}
 					trend={{ value: 15, label: 'с прошлого месяца', isPositive: true }}
 				/>
@@ -136,7 +136,7 @@ export default function DashboardPageNew() {
 				/>
 				<MetricCard
 					title='Мой доход'
-					value={`₽${data.myRevenue.toLocaleString()}`}
+					value={`$${data.myRevenue.toLocaleString()}`}
 					icon={DollarSign}
 				/>
 				<MetricCard
