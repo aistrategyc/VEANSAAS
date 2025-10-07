@@ -195,7 +195,7 @@ export function ClientModal({ isOpen, onClose, client, onSave }) {
                 id="phone"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                placeholder="+7 (999) 123-45-67"
+                placeholder="+48 (999) 123-45-67"
                 className={errors.phone ? "border-destructive" : ""}
               />
               {errors.phone && <p className="text-sm text-destructive">{errors.phone}</p>}
