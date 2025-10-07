@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
 import {
 	Dialog,
 	DialogContent,
@@ -17,327 +18,253 @@ import {
 	SelectValue,
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { AlertTriangle } from 'lucide-react'
+import { Form } from '@/shared/ui/form/Form'
+import { Trash2 } from 'lucide-react'
 
-const QUALIFICATION_OPTIONS = [
-	'HAIR_STYLING',
-	'COLORING',
-	'MANICURE',
-	'PEDICURE',
-	'MASSAGE',
-	'FACIAL',
-	'WAXING',
-	'EYEBROW',
-	'EYELASH',
-]
-
-const SPACE_TYPE_OPTIONS = ['CHAIR', 'ROOM', 'STATION']
-
-export function ServiceModal({ isOpen, onClose, service, categories, onSave }) {
-	const [formData, setFormData] = useState({
-		name: '',
-		description: '',
-		categoryId: '',
-		duration: 60,
-		price: 0,
-		currency: 'USD',
-		requiredQualifications: [],
-		compatibleSpaceTypes: [],
-		bufferTime: 15,
-		isActive: true,
+export function ServiceModal({
+	isOpen,
+	onClose,
+	service,
+	categories,
+	onSave,
+	onEdit,
+	onDelete,
+}) {
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+		reset,
+		setValue,
+		watch,
+	} = useForm({
+		mode: 'onChange',
+		defaultValues: {
+			name: '',
+			description: '',
+			base_price: 0,
+			is_active: true,
+			category_uuid: '',
+		},
 	})
 
-	const [errors, setErrors] = useState({})
+	// Следим за состоянием формы
+	const is_active = watch('is_active')
+	const category_uuid = watch('category_uuid')
 
 	useEffect(() => {
+		if (isOpen) {
+			if (service) {
+				reset({
+					name: service.name,
+					description: service.description || '',
+					base_price: service.base_price,
+					is_active: service.is_active,
+					category_uuid: service.category_uuid,
+				})
+			} else {
+				reset({
+					name: '',
+					description: '',
+					base_price: 0,
+					is_active: true,
+					category_uuid: '',
+				})
+			}
+		}
+	}, [service, isOpen, reset])
+
+	const onSubmit = data => {
 		if (service) {
-			setFormData({
-				name: service.name,
-				description: service.description || '',
-				categoryId: service.categoryId,
-				duration: service.duration,
-				price: service.price,
-				currency: service.currency,
-				requiredQualifications: service.requiredQualifications,
-				compatibleSpaceTypes: service.compatibleSpaceTypes,
-				bufferTime: service.bufferTime || 15,
-				isActive: service.isActive,
-			})
+			onEdit(service, data)
 		} else {
-			setFormData({
-				name: '',
-				description: '',
-				categoryId: '',
-				duration: 60,
-				price: 0,
-				currency: 'RUB',
-				requiredQualifications: [],
-				compatibleSpaceTypes: [],
-				bufferTime: 15,
-				isActive: true,
-			})
+			onSave(data)
 		}
-		setErrors({})
-	}, [service, isOpen])
-
-	const validateForm = () => {
-		const newErrors = {}
-
-		if (!formData.name.trim()) {
-			newErrors.name = 'Название услуги обязательно'
-		}
-		if (!formData.categoryId) {
-			newErrors.categoryId = 'Выберите категорию'
-		}
-		if (formData.duration <= 0) {
-			newErrors.duration = 'Длительность должна быть больше 0'
-		}
-		if (formData.price < 0) {
-			newErrors.price = 'Цена не может быть отрицательной'
-		}
-		if (formData.requiredQualifications.length === 0) {
-			newErrors.requiredQualifications = 'Выберите хотя бы одну квалификацию'
-		}
-		if (formData.compatibleSpaceTypes.length === 0) {
-			newErrors.compatibleSpaceTypes = 'Выберите хотя бы один тип места'
-		}
-
-		setErrors(newErrors)
-		return Object.keys(newErrors).length === 0
 	}
 
-	const handleSave = () => {
-		if (!validateForm()) return
-
-		const serviceData = {
-			...formData,
-			description: formData.description || undefined,
+	const handleDelete = () => {
+		if (service && onDelete) {
+			onDelete(service)
 		}
-
-		onSave(serviceData)
-	}
-
-	const toggleQualification = qualification => {
-		setFormData(prev => ({
-			...prev,
-			requiredQualifications: prev.requiredQualifications.includes(
-				qualification
-			)
-				? prev.requiredQualifications.filter(q => q !== qualification)
-				: [...prev.requiredQualifications, qualification],
-		}))
-	}
-
-	const toggleSpaceType = spaceType => {
-		setFormData(prev => ({
-			...prev,
-			compatibleSpaceTypes: prev.compatibleSpaceTypes.includes(spaceType)
-				? prev.compatibleSpaceTypes.filter(s => s !== spaceType)
-				: [...prev.compatibleSpaceTypes, spaceType],
-		}))
 	}
 
 	return (
 		<Dialog open={isOpen} onOpenChange={onClose}>
-			<DialogContent className='max-w-2xl max-h-[90vh] overflow-y-auto'>
-				<DialogHeader>
-					<DialogTitle>
+			<DialogContent className='max-w-md max-h-[90vh] overflow-y-auto'>
+				<DialogHeader className='pb-2'>
+					<DialogTitle className='text-xl font-semibold'>
 						{service ? 'Редактировать услугу' : 'Новая услуга'}
 					</DialogTitle>
 				</DialogHeader>
 
-				<div className='space-y-6'>
-					{Object.keys(errors).length > 0 && (
-						<Alert variant='destructive'>
-							<AlertTriangle className='h-4 w-4' />
-							<AlertDescription>
-								<ul className='list-disc list-inside space-y-1'>
-									{Object.values(errors).map((error, index) => (
-										<li key={index}>{error}</li>
-									))}
-								</ul>
-							</AlertDescription>
-						</Alert>
-					)}
-
+				<Form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
 					{/* Basic Information */}
-					<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-						<div className='space-y-2'>
-							<Label htmlFor='name'>Название услуги *</Label>
+					<div className='space-y-4'>
+						<div className='space-y-3'>
+							<Label htmlFor='name' className='text-sm font-medium'>
+								Название услуги *
+							</Label>
 							<Input
 								id='name'
-								value={formData.name}
-								onChange={e =>
-									setFormData({ ...formData, name: e.target.value })
-								}
+								{...register('name', {
+									required: 'Название услуги обязательно',
+								})}
 								placeholder='Введите название услуги'
-								className={errors.name ? 'border-destructive' : ''}
+								className={`h-11 ${
+									errors.name
+										? 'border-destructive focus-visible:ring-destructive'
+										: ''
+								}`}
 							/>
+							{errors.name && (
+								<p className='text-sm text-destructive mt-1'>
+									{errors.name.message}
+								</p>
+							)}
 						</div>
 
-						<div className='space-y-2'>
-							<Label htmlFor='category'>Категория *</Label>
+						<div className='space-y-3'>
+							<Label htmlFor='category_uuid' className='text-sm font-medium'>
+								Категория *
+							</Label>
 							<Select
-								value={formData.categoryId}
-								onValueChange={value =>
-									setFormData({ ...formData, categoryId: value })
-								}
+								value={category_uuid}
+								onValueChange={value => setValue('category_uuid', value)}
 							>
 								<SelectTrigger
-									className={errors.categoryId ? 'border-destructive' : ''}
+									className={`h-11 ${
+										errors.category_uuid
+											? 'border-destructive focus:ring-destructive'
+											: ''
+									}`}
 								>
 									<SelectValue placeholder='Выберите категорию' />
 								</SelectTrigger>
 								<SelectContent>
 									{categories.map(category => (
-										<SelectItem key={category.id} value={category.id}>
-											<div className='flex items-center space-x-2'>
-												<div
-													className='w-3 h-3 rounded-full'
-													style={{ backgroundColor: category.color }}
-												/>
-												<span>{category.name}</span>
+										<SelectItem
+											key={category.uuid}
+											value={category.uuid}
+											className='py-3'
+										>
+											<div className='flex items-center space-x-3'>
+												{category.color && (
+													<div
+														className='w-3 h-3 rounded-full flex-shrink-0'
+														style={{ backgroundColor: category.color }}
+													/>
+												)}
+												<span className='truncate'>{category.name}</span>
 											</div>
 										</SelectItem>
 									))}
 								</SelectContent>
 							</Select>
+							{errors.category_uuid && (
+								<p className='text-sm text-destructive mt-1'>
+									{errors.category_uuid.message}
+								</p>
+							)}
 						</div>
-					</div>
 
-					{/* Description */}
-					<div className='space-y-2'>
-						<Label htmlFor='description'>Описание</Label>
-						<Textarea
-							id='description'
-							value={formData.description}
-							onChange={e =>
-								setFormData({ ...formData, description: e.target.value })
-							}
-							placeholder='Описание услуги...'
-							rows={3}
-						/>
-					</div>
-
-					{/* Duration and Price */}
-					<div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-						<div className='space-y-2'>
-							<Label htmlFor='duration'>Длительность (мин) *</Label>
-							<Input
-								id='duration'
-								type='number'
-								value={formData.duration}
-								onChange={e =>
-									setFormData({ ...formData, duration: Number(e.target.value) })
-								}
-								min='1'
-								className={errors.duration ? 'border-destructive' : ''}
+						<div className='space-y-3'>
+							<Label htmlFor='description' className='text-sm font-medium'>
+								Описание
+							</Label>
+							<Textarea
+								id='description'
+								{...register('description')}
+								placeholder='Описание услуги...'
+								rows={3}
+								className='resize-none min-h-[80px]'
 							/>
 						</div>
 
-						<div className='space-y-2'>
-							<Label htmlFor='price'>Цена *</Label>
-							<Input
-								id='price'
-								type='number'
-								value={formData.price}
-								onChange={e =>
-									setFormData({ ...formData, price: Number(e.target.value) })
-								}
-								min='0'
-								step='0.01'
-								className={errors.price ? 'border-destructive' : ''}
-							/>
-						</div>
-
-						<div className='space-y-2'>
-							<Label htmlFor='bufferTime'>Время подготовки (мин)</Label>
-							<Input
-								id='bufferTime'
-								type='number'
-								value={formData.bufferTime}
-								onChange={e =>
-									setFormData({
-										...formData,
-										bufferTime: Number(e.target.value),
-									})
-								}
-								min='0'
-							/>
-						</div>
-					</div>
-
-					{/* Required Qualifications */}
-					<div className='space-y-2'>
-						<Label>Требуемые квалификации *</Label>
-						<div className='grid grid-cols-2 md:grid-cols-3 gap-2'>
-							{QUALIFICATION_OPTIONS.map(qualification => (
-								<div
-									key={qualification}
-									className={`p-2 border rounded-md cursor-pointer transition-colors ${
-										formData.requiredQualifications.includes(qualification)
-											? 'bg-primary text-primary-foreground border-primary'
-											: 'hover:bg-muted'
+						<div className='space-y-3'>
+							<Label htmlFor='base_price' className='text-sm font-medium'>
+								Цена *
+							</Label>
+							<div className='relative'>
+								<Input
+									id='base_price'
+									type='number'
+									{...register('base_price', {
+										required: 'Цена обязательна',
+										min: {
+											value: 0,
+											message: 'Цена не может быть отрицательной',
+										},
+										valueAsNumber: true,
+									})}
+									min='0'
+									step='10'
+									className={`h-11 pl-8 ${
+										errors.base_price
+											? 'border-destructive focus-visible:ring-destructive'
+											: ''
 									}`}
-									onClick={() => toggleQualification(qualification)}
-								>
-									<div className='text-sm font-medium'>{qualification}</div>
-								</div>
-							))}
+								/>
+								<span className='absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm'>
+									$
+								</span>
+							</div>
+							{errors.base_price && (
+								<p className='text-sm text-destructive mt-1'>
+									{errors.base_price.message}
+								</p>
+							)}
 						</div>
-						{errors.requiredQualifications && (
-							<p className='text-sm text-destructive'>
-								{errors.requiredQualifications}
-							</p>
-						)}
-					</div>
 
-					{/* Compatible Space Types */}
-					<div className='space-y-2'>
-						<Label>Совместимые типы мест *</Label>
-						<div className='grid grid-cols-3 gap-2'>
-							{SPACE_TYPE_OPTIONS.map(spaceType => (
-								<div
-									key={spaceType}
-									className={`p-2 border rounded-md cursor-pointer transition-colors ${
-										formData.compatibleSpaceTypes.includes(spaceType)
-											? 'bg-primary text-primary-foreground border-primary'
-											: 'hover:bg-muted'
-									}`}
-									onClick={() => toggleSpaceType(spaceType)}
+						<div className='flex items-center space-x-3 p-3 bg-muted/30 rounded-lg border'>
+							<Switch
+								id='is_active'
+								checked={is_active}
+								onCheckedChange={checked => setValue('is_active', checked)}
+							/>
+							<div className='space-y-0.5'>
+								<Label
+									htmlFor='is_active'
+									className='text-sm font-medium cursor-pointer'
 								>
-									<div className='text-sm font-medium'>{spaceType}</div>
-								</div>
-							))}
+									Активная услуга
+								</Label>
+								<p className='text-xs text-muted-foreground'>
+									{is_active
+										? 'Услуга доступна для записи'
+										: 'Услуга временно недоступна'}
+								</p>
+							</div>
 						</div>
-						{errors.compatibleSpaceTypes && (
-							<p className='text-sm text-destructive'>
-								{errors.compatibleSpaceTypes}
-							</p>
-						)}
-					</div>
-
-					{/* Status */}
-					<div className='flex items-center space-x-2'>
-						<Switch
-							id='isActive'
-							checked={formData.isActive}
-							onCheckedChange={checked =>
-								setFormData({ ...formData, isActive: checked })
-							}
-						/>
-						<Label htmlFor='isActive'>Активная услуга</Label>
 					</div>
 
 					{/* Actions */}
-					<div className='flex items-center justify-end space-x-2 pt-4'>
-						<Button variant='outline' onClick={onClose}>
+					<div className='flex items-center justify-end space-x-3 pt-6 border-t'>
+						{service && (
+							<Button
+								type='button'
+								variant='destructive'
+								onClick={handleDelete}
+								className='flex items-center gap-2 mr-auto'
+								size='sm'
+							>
+								<Trash2 className='h-4 w-4' />
+								Удалить
+							</Button>
+						)}
+						<Button
+							type='button'
+							variant='outline'
+							onClick={onClose}
+							size='sm'
+							className='px-6'
+						>
 							Отмена
 						</Button>
-						<Button onClick={handleSave}>Сохранить</Button>
+						<Button type='submit' size='sm' className='px-6'>
+							{service ? 'Сохранить' : 'Создать'}
+						</Button>
 					</div>
-				</div>
+				</Form>
 			</DialogContent>
 		</Dialog>
 	)

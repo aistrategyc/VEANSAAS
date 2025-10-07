@@ -29,8 +29,8 @@ export function ServicesTable({
 	const canDelete =
 		currentUser?.role === 'Admin' || currentUser?.role === 'MasterOwner'
 
-	const getCategoryById = categoryId => {
-		return categories.find(c => c.id === categoryId)
+	const getCategoryByUuid = categoryUuid => {
+		return categories.find(c => c.uuid === categoryUuid)
 	}
 
 	if (services.length === 0) {
@@ -48,113 +48,114 @@ export function ServicesTable({
 
 	return (
 		<Card>
+			<CardHeader className='pb-3'>
+				<CardTitle className='text-xl'>Услуги</CardTitle>
+				<CardDescription>
+					Список всех услуг салона ({services.length})
+				</CardDescription>
+			</CardHeader>
 			<CardContent className='p-0'>
 				<div className='rounded-md border'>
 					<Table>
 						<TableHeader>
 							<TableRow>
-								<TableHead>Название</TableHead>
+								<TableHead className='pl-6'>Название</TableHead>
 								<TableHead>Категория</TableHead>
-								<TableHead>Длительность</TableHead>
 								<TableHead>Цена</TableHead>
 								<TableHead>Статус</TableHead>
-								<TableHead>Квалификации</TableHead>
 								{(canEdit || canDelete) && (
-									<TableHead className='w-[100px]'>Действия</TableHead>
+									<TableHead className='w-[120px] text-right pr-6'>
+										Действия
+									</TableHead>
 								)}
 							</TableRow>
 						</TableHeader>
 						<TableBody>
 							{services.map(service => {
-								const category = getCategoryById(service.categoryId)
+								const category = getCategoryByUuid(service.category_uuid)
 								return (
-									<TableRow key={service.id}>
-										<TableCell>
-											<div>
-												<div className='font-medium'>{service.name}</div>
+									<TableRow
+										key={service.uuid}
+										className='group hover:bg-muted/50'
+									>
+										<TableCell className='pl-6'>
+											<div className='space-y-1'>
+												<div className='font-medium text-base'>
+													{service.name}
+												</div>
 												{service.description && (
-													<div className='text-sm text-muted-foreground line-clamp-1'>
+													<div className='text-sm text-muted-foreground line-clamp-2 max-w-md'>
 														{service.description}
 													</div>
 												)}
 											</div>
 										</TableCell>
 										<TableCell>
-											{category && (
-												<Badge
-													variant='secondary'
-													className='flex items-center space-x-1 w-fit'
-												>
-													<div
-														className='w-2 h-2 rounded-full'
-														style={{ backgroundColor: category.color }}
-													/>
-													<span>{category.name}</span>
+											{category ? (
+												<div className='flex items-center space-x-2'>
+													{category.color && (
+														<div
+															className='w-3 h-3 rounded-full flex-shrink-0'
+															style={{ backgroundColor: category.color }}
+														/>
+													)}
+													<span className='text-sm font-medium'>
+														{category.name}
+													</span>
+												</div>
+											) : (
+												<Badge variant='outline' className='text-xs'>
+													Без категории
 												</Badge>
 											)}
 										</TableCell>
 										<TableCell>
 											<div className='flex flex-col'>
-												<span>{service.duration} мин</span>
-												{service.bufferTime && service.bufferTime > 0 && (
+												<span className='font-semibold text-base'>
+													{service.base_price} $
+												</span>
+												{parseFloat(service.base_price) === 0 && (
 													<span className='text-xs text-muted-foreground'>
-														+{service.bufferTime} мин подготовка
+														Бесплатно
 													</span>
 												)}
 											</div>
 										</TableCell>
 										<TableCell>
-											<span className='font-medium'>
-												{service.price.toLocaleString()} ₽
-											</span>
-										</TableCell>
-										<TableCell>
 											<Badge
-												variant={service.isActive ? 'default' : 'secondary'}
+												variant={service.is_active ? 'default' : 'secondary'}
+												className={
+													service.is_active
+														? 'bg-green-100 text-green-800 hover:bg-green-100 border-green-200'
+														: 'bg-gray-100 text-gray-600 hover:bg-gray-100'
+												}
 											>
-												{service.isActive ? 'Активна' : 'Неактивна'}
+												{service.is_active ? 'Активна' : 'Неактивна'}
 											</Badge>
-										</TableCell>
-										<TableCell>
-											<div className='flex flex-wrap gap-1'>
-												{service.requiredQualifications
-													.slice(0, 2)
-													.map(qual => (
-														<Badge
-															key={qual}
-															variant='outline'
-															className='text-xs'
-														>
-															{qual}
-														</Badge>
-													))}
-												{service.requiredQualifications.length > 2 && (
-													<Badge variant='outline' className='text-xs'>
-														+{service.requiredQualifications.length - 2}
-													</Badge>
-												)}
-											</div>
 										</TableCell>
 										{(canEdit || canDelete) && (
 											<TableCell>
-												<div className='flex items-center gap-2'>
+												<div className='flex items-center justify-end space-x-1 pr-2 opacity-0 group-hover:opacity-100 transition-opacity'>
 													{canEdit && (
 														<Button
 															variant='ghost'
 															size='sm'
 															onClick={() => onEdit(service)}
+															className='h-8 w-8 p-0 hover:bg-primary/10'
 														>
 															<Edit className='h-4 w-4' />
+															<span className='sr-only'>Редактировать</span>
 														</Button>
 													)}
 													{canDelete && (
 														<Button
 															variant='ghost'
 															size='sm'
-															onClick={() => onDelete(service.id)}
-															className='text-destructive hover:text-destructive'
+															onClick={() => onDelete(service)}
+															className='h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10'
 														>
 															<Trash2 className='h-4 w-4' />
+															<span className='sr-only'>Удалить</span>
 														</Button>
 													)}
 												</div>

@@ -17,14 +17,10 @@ import {
 } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Plus, Search, Scissors, Tag } from 'lucide-react'
-
-import { RoleGuard } from '@/components/ui/role-guard'
-import { mockServices, mockServiceCategories } from '@/lib/mock-data-services'
+import { Plus, Search, Scissors, Tag, Folder } from 'lucide-react'
 import { ServiceModal } from '@/features/services/ServicesModal'
 import { CategoryModal } from '@/features/services/CategoryModal'
 import { ServicesTable } from '@/features/services/ServicesTable'
-import { AttributesManager } from '@/features/services/AttributesManager'
 import { api } from '@/shared/api/api'
 
 export default function ServicesPage() {
@@ -38,73 +34,44 @@ export default function ServicesPage() {
 		createdAt: '2024-01-01T00:00:00Z',
 		updatedAt: '2024-01-01T00:00:00Z',
 	}
-	const [services, setServices] = useState(mockServices)
-	const [categories, setCategories] = useState(mockServiceCategories)
+	const [services, setServices] = useState([])
+	const [categories, setCategories] = useState([])
 	const [searchQuery, setSearchQuery] = useState('')
 	const [categoryFilter, setCategoryFilter] = useState('all')
+	const [statusFilter, setStatusFilter] = useState('active')
+
 	const [selectedService, setSelectedService] = useState(null)
 	const [selectedCategory, setSelectedCategory] = useState(null)
 	const [isServiceModalOpen, setIsServiceModalOpen] = useState(false)
 	const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false)
 
-	const [attributes, setAttributes] = useState([])
-
 	const [editingCategory, setEditingCategory] = useState(null)
 
 	useEffect(() => {
-		const fetchCategory = async () => {
-			const response = await api.get(
-				'services/categories',
+		const fetchData = async () => {
+			const responseCategory = await api.get('services/categories')
+			const responseServices = await api.get('services')
 
-				{
-					headers: {
-						'X-Studio-UUID': '084809d3-a2cf-47fb-a069-1e74ab7869b6',
-					},
-				}
-			)
-			consol.log(response)
+			setCategories(responseCategory.data)
+			setServices(responseServices.data)
 		}
-
-		fetchCategory()
+		fetchData()
 	}, [])
-	const handleSaveAttribute = attributeData => {
-		setAttributes(prev => {
-			const existingIndex = prev.findIndex(attr => attr.id === attributeData.id)
-			if (existingIndex >= 0) {
-				return prev.map((attr, index) =>
-					index === existingIndex ? attributeData : attr
-				)
-			}
-			return [
-				...prev,
-				{ ...attributeData, id: attributeData.id || Date.now().toString() },
-			]
-		})
-	}
 
-	const handleDeleteAttribute = attributeId => {
-		setAttributes(prev => prev.filter(attr => attr.id !== attributeId))
-		// Также удалить атрибут из всех категорий
-		setCategories(prev =>
-			prev.map(category => ({
-				...category,
-				attributeIds:
-					category.attributeIds?.filter(id => id !== attributeId) || [],
-			}))
-		)
-	}
-
-	// Filter services
 	const filteredServices = services.filter(service => {
 		const matchesSearch =
 			searchQuery === '' ||
-			service.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			service.description?.toLowerCase().includes(searchQuery.toLowerCase())
+			service.name.toLowerCase().includes(searchQuery.toLowerCase())
 
 		const matchesCategory =
-			categoryFilter === 'all' || service.categoryId === categoryFilter
+			categoryFilter === 'all' || service.category_uuid === categoryFilter
 
-		return matchesSearch && matchesCategory && service.isActive
+		const matchesStatus =
+			statusFilter === 'all' ||
+			(statusFilter === 'active' && service.is_active) ||
+			(statusFilter === 'inactive' && !service.is_active)
+
+		return matchesSearch && matchesCategory && matchesStatus
 	})
 
 	const handleCreateService = () => {
@@ -117,37 +84,24 @@ export default function ServicesPage() {
 		setIsServiceModalOpen(true)
 	}
 
-	const handleSaveService = serviceData => {
-		if (selectedService) {
-			setServices(prev =>
-				prev.map(service =>
-					service.id === selectedService.id
-						? { ...service, ...serviceData }
-						: service
-				)
-			)
-		} else {
-			const newService = {
-				id: `serv${Date.now()}`,
-				organizationId: 'org1',
-				isActive: true,
-				createdAt: new Date().toISOString(),
-				updatedAt: new Date().toISOString(),
-				currency: 'RUB',
-				...serviceData,
-			}
-			setServices(prev => [newService, ...prev])
-		}
+	const handleSaveService = async serviceData => {
+		await api.post('/services', serviceData)
+
+		setIsServiceModalOpen(false)
+		setSelectedService(null)
+	}
+	const handleEditSaveService = async (editService, data) => {
+		await api.patch(`/services/${editService.uuid}`, data)
+
 		setIsServiceModalOpen(false)
 		setSelectedService(null)
 	}
 
-	const handleDeleteService = serviceId => {
-		setServices(prev =>
-			prev.map(service =>
-				service.id === serviceId ? { ...service, isActive: false } : service
-			)
-		)
+	const handleDeleteService = async deleteService => {
+		await api.delete(`/services/${deleteService.uuid}`)
+
+		setIsServiceModalOpen(false)
+		setSelectedService(null)
 	}
 
 	const handleCreateCategory = () => {
@@ -160,48 +114,58 @@ export default function ServicesPage() {
 		setIsCategoryModalOpen(true)
 	}
 
-	const handleSaveCategory = categoryData => {
-		// Ваша логика сохранения категории
-		if (editingCategory) {
-			setCategories(prev =>
-				prev.map(cat =>
-					cat.id === editingCategory.id
-						? { ...categoryData, id: editingCategory.id }
-						: cat
-				)
-			)
-		} else {
-			setCategories(prev => [
-				...prev,
-				{ ...categoryData, id: Date.now().toString() },
-			])
-		}
+	const handleSaveCategory = async categoryData => {
+		await api.post('/services/categories', categoryData)
+
+		setIsCategoryModalOpen(false)
+		setEditingCategory(null)
+	}
+	const handleSaveEditCategory = async (editCategory, data) => {
+		await api.patch(`/services/categories/${editCategory.uuid}`, data)
+
+		setIsCategoryModalOpen(false)
+		setEditingCategory(null)
+	}
+	const handleDeleteCategory = async editCategory => {
+		await api.delete(`/services/categories/${editCategory.uuid}`)
+
 		setIsCategoryModalOpen(false)
 		setEditingCategory(null)
 	}
 
-	const handleDeleteCategory = categoryId => {
-		setCategories(prev =>
-			prev.map(category =>
-				category.id === categoryId ? { ...category, isActive: false } : category
-			)
-		)
-	}
+	const activeServices = services.filter(s => s.is_active)
 
 	const stats = {
-		totalServices: services.filter(s => s.isActive).length,
-		totalCategories: categories.filter(c => c.isActive).length,
-		averagePrice: Math.round(
-			services.reduce((sum, s) => sum + s.price, 0) / services.length
-		),
-		averageDuration: Math.round(
-			services.reduce((sum, s) => sum + s.duration, 0) / services.length
-		),
+		//
+		totalServices: activeServices.length,
+		totalCategories: categories.filter(c => c.is_active).length,
+
+		averagePrice:
+			activeServices.length > 0
+				? Math.round(
+						activeServices.reduce(
+							(sum, s) => sum + parseFloat(s.base_price || 0),
+							0
+						) / activeServices.length
+				  )
+				: 0,
+		minPrice:
+			activeServices.length > 0
+				? Math.min(...activeServices.map(s => parseFloat(s.base_price) || 0))
+				: 0,
+		maxPrice:
+			activeServices.length > 0
+				? Math.max(...activeServices.map(s => parseFloat(s.base_price) || 0))
+				: 0,
+
+		servicesWithDescription: activeServices.filter(
+			s => s.description && s.description.trim() !== ''
+		).length,
+		categorizedServices: activeServices.filter(s => s.category_uuid).length,
 	}
 
 	return (
 		<div className='space-y-6'>
-			{/* Header */}
 			<div className='flex items-center justify-between'>
 				<div>
 					<h1 className='text-3xl font-bold tracking-tight'>Услуги</h1>
@@ -231,6 +195,7 @@ export default function ServicesPage() {
 					</CardHeader>
 					<CardContent>
 						<div className='text-2xl font-bold'>{stats.totalServices}</div>
+						<p className='text-xs text-muted-foreground'>активных услуг</p>
 					</CardContent>
 				</Card>
 				<Card>
@@ -240,30 +205,36 @@ export default function ServicesPage() {
 					</CardHeader>
 					<CardContent>
 						<div className='text-2xl font-bold'>{stats.totalCategories}</div>
+						<p className='text-xs text-muted-foreground'>активных категорий</p>
 					</CardContent>
 				</Card>
 				<Card>
 					<CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
 						<CardTitle className='text-sm font-medium'>Средняя цена</CardTitle>
-						<span className='text-xs text-muted-foreground'>₽</span>
+						<span className='text-xs text-muted-foreground'>$</span>
 					</CardHeader>
 					<CardContent>
-						<div className='text-2xl font-bold'>
-							{stats.averagePrice.toLocaleString()} ₽
-						</div>
+						<div className='text-2xl font-bold'>{stats.averagePrice} $</div>
+						<p className='text-xs text-muted-foreground'>средняя стоимость</p>
 					</CardContent>
 				</Card>
 				<Card>
 					<CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-						<CardTitle className='text-sm font-medium'>
-							Средняя длительность
-						</CardTitle>
-						<span className='text-xs text-muted-foreground'>мин</span>
+						<CardTitle className='text-sm font-medium'>С категориями</CardTitle>
+						<Folder className='h-4 w-4 text-muted-foreground' />
 					</CardHeader>
 					<CardContent>
 						<div className='text-2xl font-bold'>
-							{stats.averageDuration} мин
+							{stats.categorizedServices}
 						</div>
+						<p className='text-xs text-muted-foreground'>
+							{stats.totalServices > 0
+								? Math.round(
+										(stats.categorizedServices / stats.totalServices) * 100
+								  )
+								: 0}
+							% услуг с категориями
+						</p>
 					</CardContent>
 				</Card>
 			</div>
@@ -306,9 +277,9 @@ export default function ServicesPage() {
 									<SelectContent>
 										<SelectItem value='all'>Все категории</SelectItem>
 										{categories
-											.filter(c => c.isActive)
+											.filter(c => c.is_active)
 											.map(category => (
-												<SelectItem key={category.id} value={category.id}>
+												<SelectItem key={category.uuid} value={category.uuid}>
 													{category.name}
 												</SelectItem>
 											))}
@@ -318,7 +289,6 @@ export default function ServicesPage() {
 						</CardContent>
 					</Card>
 
-					{/* Services Table */}
 					<ServicesTable
 						services={filteredServices}
 						categories={categories}
@@ -329,12 +299,6 @@ export default function ServicesPage() {
 				</TabsContent>
 
 				<TabsContent value='categories' className='space-y-4'>
-					<AttributesManager
-						attributes={attributes}
-						onSaveAttribute={handleSaveAttribute}
-						onDeleteAttribute={handleDeleteAttribute}
-					/>
-
 					<CategoryModal
 						isOpen={isCategoryModalOpen}
 						onClose={() => {
@@ -342,29 +306,25 @@ export default function ServicesPage() {
 							setEditingCategory(null)
 						}}
 						category={editingCategory}
-						attributes={attributes}
 						onSave={handleSaveCategory}
-						onSaveAttribute={handleSaveAttribute}
+						onEdit={handleSaveEditCategory}
+						onDelete={handleDeleteCategory}
 					/>
 					<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
 						{categories
-							.filter(c => c.isActive)
+							.filter(c => c.is_active)
 							.map(category => {
 								const categoryServices = services.filter(
-									s => s.categoryId === category.id && s.isActive
+									s => s.category_uuid === category.uuid && s.is_active
 								)
 								return (
 									<Card
-										key={category.id}
+										key={category.uuid}
 										className='cursor-pointer hover:shadow-md transition-shadow'
 									>
 										<CardHeader className='pb-3'>
 											<div className='flex items-center justify-between'>
 												<div className='flex items-center space-x-2'>
-													<div
-														className='w-4 h-4 rounded-full'
-														style={{ backgroundColor: category.color }}
-													/>
 													<CardTitle className='text-lg'>
 														{category.name}
 													</CardTitle>
@@ -413,8 +373,10 @@ export default function ServicesPage() {
 					setSelectedService(null)
 				}}
 				service={selectedService}
-				categories={categories.filter(c => c.isActive)}
+				categories={categories.filter(c => c.is_active)}
 				onSave={handleSaveService}
+				onEdit={handleEditSaveService}
+				onDelete={handleDeleteService}
 			/>
 
 			<CategoryModal
@@ -425,6 +387,8 @@ export default function ServicesPage() {
 				}}
 				category={selectedCategory}
 				onSave={handleSaveCategory}
+				onEdit={handleSaveEditCategory}
+				onDelete={handleDeleteCategory}
 			/>
 		</div>
 	)
