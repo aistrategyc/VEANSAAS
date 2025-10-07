@@ -15,7 +15,7 @@ export function DropDownRole() {
 	const roles = useSelector(state => state.rootReducer.roles?.roles)
 	const currentRoleId = useSelector(
 		state => state.rootReducer.rolesCurrent.roleId
-	) // из userSlice
+	)
 	const handleChange = role => {
 		dispatch(setCurrentRole(role))
 	}

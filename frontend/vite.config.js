@@ -6,6 +6,9 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vite.dev/config/
 export default defineConfig({
 	plugins: [tailwindcss(), react()],
+	optimizeDeps: {
+		exclude: ['cmdk'], // Add the problematic package here
+	},
 	server: {
 		proxy: {
 			'/api': {

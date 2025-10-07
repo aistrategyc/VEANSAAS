@@ -42,10 +42,7 @@ export const schemaRegisterSimple = yup.object().shape({
 	phone_number: yup
 		.string()
 		.required('Phone number is required')
-		.matches(
-			/^\+?[0-9]{10,15}$/,
-			'Please enter a valid phone number (10-15 digits, optional + prefix)'
-		),
+		.matches(/^\+?[0-9]{10,15}$/, 'Please enter a valid phone number'),
 	password: passwordSchema,
 	confirmPassword: yup
 		.string()
