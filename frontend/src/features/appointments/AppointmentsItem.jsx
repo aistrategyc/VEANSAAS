@@ -2,6 +2,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Clock, Edit, Eye, Trash2 } from 'lucide-react'
 import React from 'react'
+import { Link } from 'react-router'
 
 export const AppointmentsItem = ({
 	id,
@@ -66,7 +67,9 @@ export const AppointmentsItem = ({
 				</Badge>
 				<div className='flex items-center gap-1'>
 					<Button size='sm' variant='ghost'>
-						<Eye className='h-4 w-4' />
+						<Link to='/records/1'>
+							<Eye className='h-4 w-4' />
+						</Link>
 					</Button>
 					<Button size='sm' variant='ghost'>
 						<Edit className='h-4 w-4' />

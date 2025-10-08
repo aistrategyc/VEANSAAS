@@ -29,6 +29,7 @@ import { format } from 'date-fns'
 import { ru } from 'date-fns/locale'
 import { EmptyState } from '@/components/ui/empty-state'
 import { PermissionGuard } from '@/role/PermissionGuard'
+import { Link } from 'react-router'
 
 export function ClientsTable({ clients, onEdit, onDelete }) {
 	const [sortField, setSortField] = useState('createdAt')
@@ -120,7 +121,9 @@ export function ClientsTable({ clients, onEdit, onDelete }) {
 											</Avatar>
 											<div>
 												<div className='font-medium'>
-													{client.firstName} {client.lastName}
+													<Link to='/clients/1'>
+														{client.firstName} {client.lastName}
+													</Link>
 												</div>
 												{client.preferences?.preferredMasters && (
 													<div className='text-sm text-muted-foreground'>

@@ -20,13 +20,13 @@ import { RegisterSimple } from '@/pages/auth/RegisterSimple'
 import DashboardPage from '@/pages/dashboard/DashboardPage'
 import UserManager from '@/role/UserManager'
 import ProfileLayout from '@/features/clients/ClientCard'
-import ClientsPagTest from '@/pages/clients/ClientsPage'
 import CompatibilityPage from '@/pages/сompatibility/CompatibilityPage'
 import ReportsPage from '@/pages/reports/ReportsPage'
 import LocationsPage from '@/pages/locations/LocationsPage'
 import SchedulePage from '@/pages/schedule/SchedulePage'
-import CalendarPageNew from '@/pages/calendar/CalendarPage'
 import DashboardPageNew from '@/pages/dashboard/DashboardPageNew'
+import ClientDetailPage from '@/features/clients/ClientDetailPage'
+import AppointmentDetailPage from '@/features/appointments/AppointmentDetailPage'
 
 export const RouterProvider = () => {
 	const { isAuthenticated, loading } = useAuth()
@@ -65,6 +65,8 @@ export const RouterProvider = () => {
 				{ path: 'schedule', element: <SchedulePage /> },
 				{ path: 'dashboard-test', element: <DashboardPageNew /> },
 				{ path: 'compatibility', element: <CompatibilityPage /> },
+				{ path: 'clients/1', element: <ClientDetailPage /> },
+				{ path: 'records/1', element: <AppointmentDetailPage /> },
 
 				{ path: '*', element: <Navigate to='/' replace /> },
 			],
