@@ -13,6 +13,7 @@ from services.service import (
     delete_service,
     get_list_categories,
     get_list_services,
+    get_list_services_detail,
     get_service,
     update_attribute,
     update_attribute_options,
@@ -34,6 +35,7 @@ from shared.schemas.company_units.service import (
     ServiceCategoryResponse,
     ServiceCategoryUpdate,
     ServiceCreate,
+    ServiceDetailResponse,
     ServiceResponse,
     ServiceUpdate,
 )
@@ -56,6 +58,20 @@ async def create_service_route(
     auth: AuthContext = Depends(get_auth_context),
 ):
     return await create_service(request=request, data=data, db=db, auth=auth)
+
+
+@router.get(
+    '/selection',
+    response_model=List[ServiceDetailResponse],
+    status_code=status.HTTP_200_OK,
+    name='Service list',
+)
+async def get_list_services_detail_route(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    auth: AuthContext = Depends(get_auth_context),
+):
+    return await get_list_services_detail(request=request, db=db, auth=auth)
 
 
 @router.get(

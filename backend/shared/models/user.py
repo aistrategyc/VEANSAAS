@@ -25,13 +25,13 @@ class User(Base, PhoneNumberMixin):
     hashed_password: Mapped[str] = mapped_column(String(255))
     studio_memberships: Mapped[list['StudioMember']] = relationship(
         back_populates='user',
-        lazy='selectin',
+        lazy='noload',
         foreign_keys='StudioMember.user_uuid',
         cascade='all, delete',
     )
     organization_memberships: Mapped[list['OrganizationMember']] = relationship(
         back_populates='user',
-        lazy='selectin',
+        lazy='noload',
         foreign_keys='OrganizationMember.user_uuid',
         passive_deletes=True,
         cascade='all, delete',

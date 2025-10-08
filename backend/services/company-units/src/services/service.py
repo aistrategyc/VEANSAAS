@@ -4,6 +4,7 @@ from uuid import UUID
 from fastapi import HTTPException, Request, Response, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from shared.dependencies import AuthContext
 from shared.models.company_units.service import (
@@ -337,3 +338,19 @@ async def create_attribute_options(
     await db.commit()
 
     return db_attribute_options
+
+
+async def get_list_services_detail(
+    request: Request, db: AsyncSession, auth: AuthContext
+):
+    result = await db.execute(
+        select(Service)
+        .where(Service.organization_uuid == auth.organization_uuid)
+        .options(
+            selectinload(Service.category)
+            .selectinload(ServiceCategory.attributes)
+            .selectinload(CategoryAttribute.attribute_options)
+        )
+    )
+    db_service = result.scalars().all()
+    return db_service

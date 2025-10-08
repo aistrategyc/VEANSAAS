@@ -55,13 +55,16 @@ class StudioMember(Base):
     user: Mapped['User'] = relationship(
         back_populates='studio_memberships',
         foreign_keys=[user_uuid],
+        cascade='all, delete',
     )
     studio_uuid: Mapped[UUID] = mapped_column(
         Uuid(as_uuid=True),
         ForeignKey('organization_service.studios.uuid', ondelete='CASCADE'),
     )
     studio: Mapped['Studio'] = relationship(
-        back_populates='studio_memberships', foreign_keys=[studio_uuid]
+        back_populates='studio_memberships',
+        foreign_keys=[studio_uuid],
+        cascade='all, delete',
     )
 
     roles: Mapped[list[StudioRole]] = mapped_column(JSON)
