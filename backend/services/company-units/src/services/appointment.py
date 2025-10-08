@@ -6,7 +6,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.dependencies import AuthContext
 from shared.enums.appointment import AppointmentStatusEnum
-from shared.models.company_units.appointment import Appointment
+from shared.models.company_units.appointment import (
+    Appointment,
+    AppointmentAttributeValue,
+)
 from shared.schemas.company_units.appointment import (
     AppointmentCreate,
     AppointmentListResponse,
@@ -52,7 +55,7 @@ async def list_appointments(
 async def create_appointment(
     request: Request, data: AppointmentCreate, db: AsyncSession, auth: AuthContext
 ):
-    appointment_data = data.model_dump()
+    appointment_data = data.model_dump(exclude={'attributes'})
 
     db_appointment = Appointment(
         **appointment_data, studio_uuid=auth.studio_uuid, created_by_uuid=auth.user.uuid
@@ -65,6 +68,20 @@ async def create_appointment(
         data=AppointmentStatusCreate(status=AppointmentStatusEnum.CONFIRMED),
     )
     db.add(db_status)
+
+    if data.attributes:
+        attribute_data_list = [item.model_dump() for item in data.attributes]
+
+        db_attributes = []
+        for attribute_data in attribute_data_list:
+            db_attribute = AppointmentAttributeValue(
+                **attribute_data,
+                created_by_uuid=auth.user.uuid,
+                appointment_uuid=db_appointment.uuid,
+            )
+            db_attributes.append(db_attribute)
+
+        db.add_all(db_attributes)
 
     await db.commit()
     return db_appointment

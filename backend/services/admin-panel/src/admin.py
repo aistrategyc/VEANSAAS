@@ -2,6 +2,7 @@ from sqladmin import ModelView
 
 from shared.models.company_units.appointment import (
     Appointment,
+    AppointmentAttributeValue,
     AppointmentPrepayment,
     AppointmentStatus,
 )
@@ -145,4 +146,8 @@ class AppointmentStatusAdmin(ModelView, model=AppointmentStatus):
 
 
 class AppointmentPrepaymentAdmin(ModelView, model=AppointmentPrepayment):
+    category = 'Appointments'
+
+
+class AppointmentAttributeValueAdmin(ModelView, model=AppointmentAttributeValue):
     category = 'Appointments'
