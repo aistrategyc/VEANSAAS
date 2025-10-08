@@ -224,6 +224,7 @@ export function ClientModal({ isOpen, onClose, client, onSave }) {
 							)}
 						</div>
 
+<<<<<<< HEAD
 						<div className='space-y-2'>
 							<Label htmlFor='phone'>Телефон</Label>
 							<Input
@@ -240,6 +241,20 @@ export function ClientModal({ isOpen, onClose, client, onSave }) {
 							)}
 						</div>
 					</div>
+=======
+            <div className="space-y-2">
+              <Label htmlFor="phone">Телефон</Label>
+              <Input
+                id="phone"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                placeholder="+48 (999) 123-45-67"
+                className={errors.phone ? "border-destructive" : ""}
+              />
+              {errors.phone && <p className="text-sm text-destructive">{errors.phone}</p>}
+            </div>
+          </div>
+>>>>>>> main
 
 					{/* Personal Information */}
 					<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>

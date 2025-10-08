@@ -62,7 +62,7 @@ export function ImportModal({ isOpen, onClose, onImportComplete }) {
         firstName: "Анна",
         lastName: "Петрова",
         email: "anna.petrova@email.com",
-        phone: "+7 (916) 123-45-67",
+        phone: "+48 (916) 123-45-67",
         organizationId: "org1",
         isActive: true,
         createdAt: "2024-01-01T00:00:00Z",

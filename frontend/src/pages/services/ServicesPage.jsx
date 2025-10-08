@@ -354,7 +354,7 @@ export default function ServicesPage() {
 													{Math.min(
 														...categoryServices.map(s => s.price)
 													).toLocaleString()}{' '}
-													₽
+													$
 												</div>
 											</div>
 										</CardContent>

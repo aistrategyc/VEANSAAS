@@ -1,5 +1,10 @@
 from sqladmin import ModelView
 
+from shared.models.company_units.appointment import (
+    Appointment,
+    AppointmentPrepayment,
+    AppointmentStatus,
+)
 from shared.models.company_units.org import (
     Organization,
     OrganizationInvite,
@@ -129,3 +134,15 @@ class ServiceCategoryAdmin(ModelView, model=ServiceCategory):
         'is_active',
     ]
     can_export = False
+
+
+class AppointmentAdmin(ModelView, model=Appointment):
+    category = 'Appointments'
+
+
+class AppointmentStatusAdmin(ModelView, model=AppointmentStatus):
+    category = 'Appointments'
+
+
+class AppointmentPrepaymentAdmin(ModelView, model=AppointmentPrepayment):
+    category = 'Appointments'

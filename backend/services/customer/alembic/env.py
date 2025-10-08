@@ -1,31 +1,23 @@
+import os
+import sys
 from logging.config import fileConfig
 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
+
+from config import customer_settings
+from database import Base
+from models import Customer  # noqa
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-from shared.config.config import settings
-from shared.database import Base
-from shared.models.company_units.appointment import (  # noqa
-    Appointment,
-    AppointmentPrepayment,
-    AppointmentStatus,
-)
-from shared.models.company_units.org import Organization, OrganizationMember  # noqa
-from shared.models.company_units.service import (
-    AttributeOption,  # noqa
-    CategoryAttribute,  # noqa
-    Service,  # noqa
-    ServiceCategory,  # noqa
-)
-from shared.models.company_units.studio import Studio, StudioMember  # noqa
-from shared.models.user import User  # noqa
 
 config = context.config
 
 config.set_main_option(
     'sqlalchemy.url',
-    settings.DATABASE_URL + '?async_fallback=True',
+    customer_settings.DATABASE_URL + '?async_fallback=True',
 )
+
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)

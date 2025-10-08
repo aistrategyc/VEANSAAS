@@ -4,12 +4,12 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from shared.schemas.common import PaginationResponse
-from shared.schemas.company_units.common import (
+from shared.schemas.mixins import PaginationResponse
+from shared.schemas.company_units.invite import (
     BaseInviteCreateDB,
     BaseInviteCreateRequest,
 )
-from shared.schemas.company_units.enum import StudioRole
+from shared.enums.company_units import StudioRole
 
 
 class StudioBase(BaseModel):
