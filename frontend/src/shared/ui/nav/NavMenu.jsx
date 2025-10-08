@@ -158,7 +158,7 @@ export const NavMenu = ({ isCollapsed }) => {
 	}
 
 	return (
-		<nav className='flex-1 px-4 py-2'>
+		<nav className='flex-1 px-4 py-2 h-screen overflow-y-auto'>
 			<ul className='space-y-1'>
 				{menuItems.map(item => (
 					<Item

@@ -30,6 +30,7 @@ import {
 	Wallet,
 } from 'lucide-react'
 import { Link, useParams, useRouteError } from 'react-router'
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 
 const clientDetails = {
 	id: 'c1',
@@ -686,17 +687,21 @@ export default function ClientDetailPage() {
 					{/* Правая колонка */}
 					<div className='lg:col-span-2'>
 						<Tabs defaultValue='appointments' className='space-y-6'>
-							<TabsList className='w-full bg-background border'>
-								<TabsTrigger value='appointments'>История записей</TabsTrigger>
-								<TabsTrigger value='communications'>Коммуникации</TabsTrigger>
-								<TabsTrigger value='referrals'>Рефералы</TabsTrigger>
-								<TabsTrigger value='preferences'>Предпочтения</TabsTrigger>
-								<TabsTrigger value='purchases'>Покупки</TabsTrigger>
-								<TabsTrigger value='agreements'>Соглашения</TabsTrigger>
-								<TabsTrigger value='carts'>Корзины</TabsTrigger>
-								<TabsTrigger value='notes'>Заметки</TabsTrigger>
-							</TabsList>
-
+							<ScrollArea className='w-full whitespace-nowrap'>
+								<TabsList className='w-full bg-background border inline-flex min-w-max'>
+									<TabsTrigger value='appointments'>
+										История записей
+									</TabsTrigger>
+									<TabsTrigger value='communications'>Коммуникации</TabsTrigger>
+									<TabsTrigger value='referrals'>Рефералы</TabsTrigger>
+									<TabsTrigger value='preferences'>Предпочтения</TabsTrigger>
+									<TabsTrigger value='purchases'>Покупки</TabsTrigger>
+									<TabsTrigger value='agreements'>Соглашения</TabsTrigger>
+									<TabsTrigger value='carts'>Корзины</TabsTrigger>
+									<TabsTrigger value='notes'>Заметки</TabsTrigger>
+								</TabsList>
+								<ScrollBar orientation='horizontal' />
+							</ScrollArea>
 							<TabsContent value='appointments' className='space-y-4'>
 								{client.appointments.map(appointment => (
 									<Card
