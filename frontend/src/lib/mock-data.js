@@ -430,15 +430,12 @@ export const mockLocationsNew = [
 	},
 ]
 
-// lib/mock-data.js
-
-// Клиенты
 export const mockClients = [
 	{
 		id: '1',
 		firstName: 'Анна',
-		lastName: 'Иванова',
-		phone: '+7 (900) 123-45-67',
+		lastName: 'Петрова',
+		phone: '+48 3242 1333 1',
 		email: 'anna@example.com',
 		notes: 'Постоянный клиент, предпочитает вечерние визиты',
 		birthDate: '1990-05-15',
@@ -449,7 +446,7 @@ export const mockClients = [
 		id: '2',
 		firstName: 'Екатерина',
 		lastName: 'Петрова',
-		phone: '+7 (900) 234-56-78',
+		phone: '+48 3242 1333 1',
 		email: 'ekaterina@example.com',
 		notes: 'Новый клиент, записалась по акции',
 		birthDate: '1985-12-03',
@@ -460,7 +457,7 @@ export const mockClients = [
 		id: '3',
 		firstName: 'Ольга',
 		lastName: 'Сидорова',
-		phone: '+7 (900) 345-67-89',
+		phone: '+48 3242 1333 1',
 		email: 'olga@example.com',
 		notes: 'VIP клиент, предпочитает утренние часы',
 		birthDate: '1988-08-20',
@@ -471,7 +468,7 @@ export const mockClients = [
 		id: '4',
 		firstName: 'Мария',
 		lastName: 'Кузнецова',
-		phone: '+7 (900) 456-78-90',
+		phone: '+48 3242 1333 1',
 		email: 'maria@example.com',
 		notes: 'Приходит с подругами',
 		birthDate: '1992-03-10',
@@ -482,7 +479,7 @@ export const mockClients = [
 		id: '5',
 		firstName: 'Александра',
 		lastName: 'Смирнова',
-		phone: '+7 (900) 567-89-01',
+		phone: '+48 3242 1333 1',
 		email: 'alexandra@example.com',
 		notes: 'Любит подробные консультации',
 		birthDate: '1995-11-25',

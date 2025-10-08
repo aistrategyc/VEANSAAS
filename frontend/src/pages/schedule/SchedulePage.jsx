@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { RoleGuard } from '@/components/ui/role-guard'
 import {
 	Calendar,
@@ -99,13 +99,13 @@ const mockScheduleData = [
 const getStatusColor = status => {
 	switch (status) {
 		case 'confirmed':
-			return 'bg-green-100 text-green-800 border-green-200'
+			return 'bg-green-500/20 text-green-600 border-green-500/30'
 		case 'pending':
-			return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+			return 'bg-amber-500/20 text-amber-600 border-amber-500/30'
 		case 'available':
-			return 'bg-gray-100 text-gray-600 border-gray-200'
+			return 'bg-blue-500/20 text-blue-600 border-blue-500/30'
 		default:
-			return 'bg-gray-100 text-gray-600 border-gray-200'
+			return 'bg-gray-500/20 text-gray-600 border-gray-500/30'
 	}
 }
 
@@ -173,179 +173,214 @@ export default function SchedulePage() {
 
 	return (
 		<RoleGuard allowedRoles={['Master', 'Student', 'admin', 'MasterOwner']}>
-			<div className='space-y-6'>
-				{/* Header */}
-				<div className='flex items-center justify-between'>
-					<div>
-						<h1 className='text-3xl font-bold text-foreground'>
-							{isOwnSchedule ? 'Мое расписание' : 'Расписание команды'}
-						</h1>
-						<p className='text-muted-foreground'>
-							{isOwnSchedule
-								? 'Ваши записи и свободное время'
-								: 'Расписание всех мастеров'}
-						</p>
+			<div className='min-h-screen bg-background p-6'>
+				<div className='mx-auto space-y-6'>
+					<div className='flex items-center justify-between'>
+						<div>
+							<h1 className='text-3xl font-bold text-foreground'>
+								{isOwnSchedule ? 'Мое расписание' : 'Расписание команды'}
+							</h1>
+							<p className='text-muted-foreground'>
+								{isOwnSchedule
+									? 'Ваши записи и свободное время'
+									: 'Расписание всех мастеров'}
+							</p>
+						</div>
+						{user?.role !== 'Student' && (
+							<Button className='bg-primary hover:bg-primary/90'>
+								<Plus className='w-4 h-4 mr-2' />
+								Добавить запись
+							</Button>
+						)}
 					</div>
-					{user?.role !== 'Student' && (
-						<Button>
-							<Plus className='w-4 h-4 mr-2' />
-							Добавить запись
-						</Button>
-					)}
-				</div>
 
-				{/* Stats Cards */}
-				<div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
-					<Card>
-						<CardContent className='p-6'>
-							<div className='flex items-center space-x-2'>
-								<Calendar className='w-5 h-5 text-primary' />
-								<div>
-									<p className='text-2xl font-bold'>{stats.totalSlots}</p>
-									<p className='text-sm text-muted-foreground'>Всего слотов</p>
+					{/* Stats Cards */}
+					<div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
+						<Card className='crypto-card'>
+							<CardContent className='p-6'>
+								<div className='flex items-center space-x-2'>
+									<Calendar className='w-5 h-5 text-primary' />
+									<div>
+										<p className='text-2xl font-bold text-card-foreground'>
+											{stats.totalSlots}
+										</p>
+										<p className='text-sm text-muted-foreground'>
+											Всего слотов
+										</p>
+									</div>
 								</div>
-							</div>
-						</CardContent>
-					</Card>
+							</CardContent>
+						</Card>
 
-					<Card>
-						<CardContent className='p-6'>
-							<div className='flex items-center space-x-2'>
-								<Clock className='w-5 h-5 text-green-600' />
-								<div>
-									<p className='text-2xl font-bold'>{stats.confirmedSlots}</p>
-									<p className='text-sm text-muted-foreground'>Подтверждено</p>
+						<Card className='crypto-card'>
+							<CardContent className='p-6'>
+								<div className='flex items-center space-x-2'>
+									<Clock className='w-5 h-5 text-green-500' />
+									<div>
+										<p className='text-2xl font-bold text-card-foreground'>
+											{stats.confirmedSlots}
+										</p>
+										<p className='text-sm text-muted-foreground'>
+											Подтверждено
+										</p>
+									</div>
 								</div>
-							</div>
-						</CardContent>
-					</Card>
+							</CardContent>
+						</Card>
 
-					<Card>
-						<CardContent className='p-6'>
-							<div className='flex items-center space-x-2'>
-								<Clock className='w-5 h-5 text-yellow-600' />
-								<div>
-									<p className='text-2xl font-bold'>{stats.pendingSlots}</p>
-									<p className='text-sm text-muted-foreground'>Ожидает</p>
+						<Card className='crypto-card'>
+							<CardContent className='p-6'>
+								<div className='flex items-center space-x-2'>
+									<Clock className='w-5 h-5 text-amber-500' />
+									<div>
+										<p className='text-2xl font-bold text-card-foreground'>
+											{stats.pendingSlots}
+										</p>
+										<p className='text-sm text-muted-foreground'>Ожидает</p>
+									</div>
 								</div>
-							</div>
-						</CardContent>
-					</Card>
+							</CardContent>
+						</Card>
 
-					<Card>
-						<CardContent className='p-6'>
-							<div className='flex items-center space-x-2'>
-								<Clock className='w-5 h-5 text-gray-600' />
-								<div>
-									<p className='text-2xl font-bold'>{stats.availableSlots}</p>
-									<p className='text-sm text-muted-foreground'>Свободно</p>
+						<Card className='crypto-card'>
+							<CardContent className='p-6'>
+								<div className='flex items-center space-x-2'>
+									<Clock className='w-5 h-5 text-blue-500' />
+									<div>
+										<p className='text-2xl font-bold text-card-foreground'>
+											{stats.availableSlots}
+										</p>
+										<p className='text-sm text-muted-foreground'>Свободно</p>
+									</div>
 								</div>
+							</CardContent>
+						</Card>
+					</div>
+
+					{/* Date Navigation */}
+					<Card className='crypto-card'>
+						<CardContent className='p-6'>
+							<div className='flex items-center justify-between mb-6'>
+								<Button
+									variant='outline'
+									onClick={() => navigateDate('prev')}
+									className='border-border text-muted-foreground hover:bg-accent'
+								>
+									<ChevronLeft className='w-4 h-4 mr-2' />
+									Предыдущий день
+								</Button>
+
+								<h2 className='text-xl font-semibold text-card-foreground'>
+									{selectedDate.toLocaleDateString('ru-RU', {
+										weekday: 'long',
+										year: 'numeric',
+										month: 'long',
+										day: 'numeric',
+									})}
+								</h2>
+
+								<Button
+									variant='outline'
+									onClick={() => navigateDate('next')}
+									className='border-border text-muted-foreground hover:bg-accent'
+								>
+									Следующий день
+									<ChevronRight className='w-4 h-4 ml-2' />
+								</Button>
 							</div>
-						</CardContent>
-					</Card>
-				</div>
 
-				{/* Date Navigation */}
-				<Card>
-					<CardContent className='p-6'>
-						<div className='flex items-center justify-between mb-6'>
-							<Button variant='outline' onClick={() => navigateDate('prev')}>
-								<ChevronLeft className='w-4 h-4 mr-2' />
-								Предыдущий день
-							</Button>
-
-							<h2 className='text-xl font-semibold'>
-								{selectedDate.toLocaleDateString('ru-RU', {
-									weekday: 'long',
-									year: 'numeric',
-									month: 'long',
-									day: 'numeric',
-								})}
-							</h2>
-
-							<Button variant='outline' onClick={() => navigateDate('next')}>
-								Следующий день
-								<ChevronRight className='w-4 h-4 ml-2' />
-							</Button>
-						</div>
-
-						{/* Schedule Grid */}
-						<div className='space-y-6'>
-							{filteredSchedule.map(masterSchedule => (
-								<Card key={masterSchedule.id}>
-									<CardHeader className='pb-4'>
-										<div className='flex items-center space-x-3'>
-											<Avatar className='w-10 h-10'>
-												<AvatarFallback>
-													{masterSchedule.masterName
-														.split(' ')
-														.map(n => n[0])
-														.join('')}
-												</AvatarFallback>
-											</Avatar>
-											<div>
-												<CardTitle className='text-lg'>
-													{masterSchedule.masterName}
-												</CardTitle>
-												<CardDescription>Мастер</CardDescription>
-											</div>
-										</div>
-									</CardHeader>
-									<CardContent>
-										<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
-											{masterSchedule.timeSlots.map((slot, index) => (
-												<div
-													key={index}
-													className={`p-4 rounded-lg border-2 ${getStatusColor(
-														slot.status
-													)}`}
-												>
-													<div className='flex items-center justify-between mb-2'>
-														<span className='font-semibold'>{slot.time}</span>
-														<Badge variant='outline' className='text-xs'>
-															{slot.duration} мин
-														</Badge>
-													</div>
-
-													{slot.clientName ? (
-														<div className='space-y-2'>
-															<div className='flex items-center space-x-2'>
-																<User className='w-4 h-4' />
-																<span className='text-sm font-medium'>
-																	{slot.clientName}
-																</span>
-															</div>
-															<div className='text-sm text-muted-foreground'>
-																{slot.serviceName}
-															</div>
-															<div className='flex items-center space-x-2'>
-																<MapPin className='w-4 h-4' />
-																<span className='text-xs'>{slot.location}</span>
-															</div>
-														</div>
-													) : (
-														<div className='text-center py-4'>
-															<Clock className='w-6 h-6 mx-auto mb-2 text-muted-foreground' />
-															<p className='text-sm text-muted-foreground'>
-																Свободное время
-															</p>
-														</div>
-													)}
-
-													<div className='mt-3 pt-2 border-t'>
-														<Badge variant='outline' className='text-xs'>
-															{getStatusLabel(slot.status)}
-														</Badge>
-													</div>
+							{/* Schedule Grid */}
+							<div className='space-y-6'>
+								{filteredSchedule.map(masterSchedule => (
+									<Card key={masterSchedule.id} className='crypto-card'>
+										<CardHeader className='pb-4'>
+											<div className='flex items-center space-x-3'>
+												<Avatar className='w-10 h-10'>
+													<AvatarImage
+														src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${masterSchedule.masterName}`}
+														alt={masterSchedule.masterName}
+													/>
+													<AvatarFallback>
+														{masterSchedule.masterName
+															.split(' ')
+															.map(n => n[0])
+															.join('')}
+													</AvatarFallback>
+												</Avatar>
+												<div>
+													<CardTitle className='text-lg text-card-foreground'>
+														{masterSchedule.masterName}
+													</CardTitle>
+													<CardDescription>Мастер</CardDescription>
 												</div>
-											))}
-										</div>
-									</CardContent>
-								</Card>
-							))}
-						</div>
-					</CardContent>
-				</Card>
+											</div>
+										</CardHeader>
+										<CardContent>
+											<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
+												{masterSchedule.timeSlots.map((slot, index) => (
+													<Card
+														key={index}
+														className={`border-2 transition-all hover:border-primary/50 ${getStatusColor(
+															slot.status
+														)}`}
+													>
+														<CardContent className='p-4'>
+															<div className='flex items-center justify-between mb-3'>
+																<span className='font-semibold text-card-foreground'>
+																	{slot.time}
+																</span>
+																<Badge variant='outline' className='text-xs'>
+																	{slot.duration} мин
+																</Badge>
+															</div>
+
+															{slot.clientName ? (
+																<div className='space-y-2'>
+																	<div className='flex items-center space-x-2'>
+																		<User className='w-4 h-4 text-muted-foreground' />
+																		<span className='text-sm font-medium text-card-foreground'>
+																			{slot.clientName}
+																		</span>
+																	</div>
+																	<div className='text-sm text-muted-foreground'>
+																		{slot.serviceName}
+																	</div>
+																	<div className='flex items-center space-x-2'>
+																		<MapPin className='w-4 h-4 text-muted-foreground' />
+																		<span className='text-xs text-muted-foreground'>
+																			{slot.location}
+																		</span>
+																	</div>
+																</div>
+															) : (
+																<div className='text-center py-4'>
+																	<Clock className='w-6 h-6 mx-auto mb-2 text-muted-foreground' />
+																	<p className='text-sm text-muted-foreground'>
+																		Свободное время
+																	</p>
+																</div>
+															)}
+
+															<div className='mt-3 pt-3 border-t border-border/50'>
+																<Badge
+																	className={`${getStatusColor(
+																		slot.status
+																	)} border-none`}
+																>
+																	{getStatusLabel(slot.status)}
+																</Badge>
+															</div>
+														</CardContent>
+													</Card>
+												))}
+											</div>
+										</CardContent>
+									</Card>
+								))}
+							</div>
+						</CardContent>
+					</Card>
+				</div>
 			</div>
 		</RoleGuard>
 	)
