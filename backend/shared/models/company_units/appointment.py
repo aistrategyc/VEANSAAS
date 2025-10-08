@@ -95,3 +95,27 @@ class AppointmentPrepayment(Base):
     created_by_uuid: Mapped[created_by_uuid]
     created_at: Mapped[created_at]
     updated_at: Mapped[updated_at]
+
+
+class AppointmentAttributeValue(Base):
+    __tablename__ = 'appointment_attribute_values'
+    __table_args__ = {'schema': 'organization_service'}
+
+    uuid: Mapped[uuid_primary_key]
+    appointment_uuid: Mapped[UUID] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey('organization_service.appointments.uuid', ondelete='CASCADE'),
+    )
+    attribute_uuid: Mapped[UUID] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey('organization_service.category_attributes.uuid', ondelete='CASCADE'),
+    )
+    value: Mapped[str | None] = mapped_column(Text, nullable=True)
+    option_uuid: Mapped[UUID | None] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey('organization_service.attribute_options.uuid', ondelete='CASCADE'),
+        nullable=True,
+    )
+    created_by_uuid: Mapped[created_by_uuid]
+    created_at: Mapped[created_at]
+    updated_at: Mapped[updated_at]
