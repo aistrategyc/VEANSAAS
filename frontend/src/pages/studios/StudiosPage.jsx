@@ -1,17 +1,16 @@
-// pages/StudiosPage.js
 import { Building2, Users, Clock, DollarSign } from 'lucide-react'
 import { HeaderPages } from '@/features/headerPages/HeaderPages'
 import { StatsList } from '@/features/stats/StatsList'
 import { FiltersPages } from '@/features/filtersPages/FiltersPages'
 import { StudiosGrid } from '@/features/studios/StudiosGrid'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { StudioModal } from '@/features/studios/StudioModal'
 import { useDispatch, useSelector } from 'react-redux'
 import { saveStudio, setSearchTerm } from '@/shared/slices/studiosSlice'
 import { Loader } from '@/shared/ui/loader/Loader'
 import { useUser } from '@/shared/hooks/useUser'
 
-export default function StudiosPage() {
+const StudiosPage = () => {
 	const dispatch = useDispatch()
 
 	const { isLoading, isLoaded } = useSelector(
@@ -19,27 +18,28 @@ export default function StudiosPage() {
 	)
 
 	const { studios, filteredStudios } = useUser()
+	console.log(studios, 'studios')
 
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
 	const [editingStudio, setEditingStudio] = useState(null)
-
+	console.log(studios, 'studios')
 	const statsStudiosList = [
-		{
-			id: 1,
-			icon: Building2,
-			count: studios.length.toString(),
-			name: 'Всего студий',
-		},
-		{
-			id: 2,
-			icon: Users,
-			count: studios
-				.reduce((sum, studio) => sum + (studio.staff || 0), 0)
-				.toString(),
-			name: 'Всего сотрудников',
-		},
-		{ id: 3, icon: DollarSign, count: '$0', name: 'Выручка сегодня' },
-		{ id: 4, icon: Clock, count: '0%', name: 'Средняя загрузка' },
+		// {
+		// 	id: 1,
+		// 	icon: Building2,
+		// 	count: studios.length.toString(),
+		// 	name: 'Всего студий',
+		// },
+		// {
+		// 	id: 2,
+		// 	icon: Users,
+		// 	count: studios
+		// 		.reduce((sum, studio) => sum + (studio.staff || 0), 0)
+		// 		.toString(),
+		// 	name: 'Всего сотрудников',
+		// },
+		// { id: 3, icon: DollarSign, count: '$0', name: 'Выручка сегодня' },
+		// { id: 4, icon: Clock, count: '0%', name: 'Средняя загрузка' },
 	]
 
 	const onSaveData = async data => {
@@ -85,7 +85,7 @@ export default function StudiosPage() {
 				onSearch={handleSearch}
 			/>
 
-			<StudiosGrid studios={filteredStudios} onEditStudio={handleEditStudio} />
+			<StudiosGrid studios={studios} onEditStudio={handleEditStudio} />
 
 			<StudioModal
 				isOpen={isCreateModalOpen}
@@ -96,3 +96,5 @@ export default function StudiosPage() {
 		</div>
 	)
 }
+
+export default StudiosPage

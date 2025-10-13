@@ -7,7 +7,6 @@ import {
 import { AuthContext } from './AuthContext'
 import { useUser } from '../../shared/hooks/useUser'
 import { useDispatch } from 'react-redux'
-import { fetchStudios } from '@/shared/slices/studiosSlice'
 
 export const AuthProvider = ({ children }) => {
 	const [isAuthenticated, setIsAuthenticated] = useState(false)

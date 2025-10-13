@@ -2,27 +2,14 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { api } from '../api/api'
 
 export const fetchStudios = createAsyncThunk(
-	'studios/fetchStudios',
+	'studios/fetchStudiosV2',
 	async (_, { rejectWithValue }) => {
-		try {
-			const response = await api.get('/studios')
-			return response.data.items.map((studio, index) => ({
-				...studio,
-				id: index + 1,
-				manager: 'Менеджер не указан',
-				staff: studio.members_count || 0,
-				rooms: 0,
-				todayRevenue: '$0',
-				monthRevenue: '$0',
-				occupancy: 0,
-				status: 'active',
-				services: ['Услуги не указаны'],
-				address: studio.address || 'Адрес не указан',
-				phone: studio.phone_number || 'Телефон не указан',
-			}))
-		} catch (error) {
-			return rejectWithValue(error.response?.data || 'Ошибка загрузки студий')
-		}
+		return api
+			.get('/studios')
+			.then(response => response.data)
+			.catch(error => {
+				return rejectWithValue(error.response?.data || 'Ошибка загрузки студий')
+			})
 	}
 )
 
@@ -62,43 +49,17 @@ const studiosSlice = createSlice({
 	name: 'studios',
 	initialState: {
 		items: [],
-		filteredItems: [],
-		searchTerm: '',
 		isLoading: false,
 		isLoaded: false,
 		error: null,
 	},
 	reducers: {
-		setSearchTerm: (state, action) => {
-			state.searchTerm = action.payload
-			if (action.payload.trim() === '') {
-				state.filteredItems = state.items
-			} else {
-				state.filteredItems = state.items.filter(studio =>
-					studio.name.toLowerCase().includes(action.payload.toLowerCase())
-				)
-			}
-		},
 		clearError: state => {
 			state.error = null
 		},
 	},
 	extraReducers: builder => {
 		builder
-			.addCase(fetchStudios.pending, state => {
-				state.isLoading = true
-				state.error = null
-			})
-			.addCase(fetchStudios.fulfilled, (state, action) => {
-				state.isLoading = false
-				state.items = action.payload
-				state.filteredItems = action.payload
-				state.isLoaded = true
-			})
-			.addCase(fetchStudios.rejected, (state, action) => {
-				state.isLoading = false
-				state.error = action.payload
-			})
 			.addCase(saveStudio.pending, state => {
 				state.isLoading = true
 				state.error = null
@@ -107,20 +68,17 @@ const studiosSlice = createSlice({
 				state.isLoading = false
 
 				if (action.payload.type === 'update') {
-					// Находим индекс студии в основном массиве
 					const index = state.items.findIndex(
 						s => s.uuid === action.payload.studio.uuid
 					)
 					if (index !== -1) {
-						// Сохраняем локальные поля (revenue, staff, etc.), которые не приходят с сервера
 						const existingStudio = state.items[index]
 						state.items[index] = {
-							...existingStudio, // Сохраняем существующие данные
-							...action.payload.studio, // Обновляем данными с сервера
-							name: action.payload.studio.name, // Гарантируем обновление имени
+							...existingStudio,
+							...action.payload.studio,
+							name: action.payload.studio.name,
 						}
 
-						// Обновляем в отфильтрованном списке
 						const filteredIndex = state.filteredItems.findIndex(
 							s => s.uuid === action.payload.studio.uuid
 						)
@@ -154,6 +112,18 @@ const studiosSlice = createSlice({
 				}
 			})
 			.addCase(saveStudio.rejected, (state, action) => {
+				state.isLoading = false
+				state.error = action.payload
+			})
+			.addCase(fetchStudios.pending, state => {
+				state.isLoading = true
+				state.error = null
+			})
+			.addCase(fetchStudios.fulfilled, (state, action) => {
+				state.isLoading = false
+				state.items = action.payload
+			})
+			.addCase(fetchStudios.rejected, (state, action) => {
 				state.isLoading = false
 				state.error = action.payload
 			})

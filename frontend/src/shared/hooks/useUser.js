@@ -6,9 +6,6 @@ export const useUser = () => {
 	const dispatch = useDispatch()
 	const user = useSelector(state => state.rootReducer.user.data)
 	const studios = useSelector(state => state.rootReducer.studios.items)
-	const filteredStudios = useSelector(
-		state => state.rootReducer.studios.filteredItems
-	)
 	const loading = useSelector(state => state.rootReducer.user.isLoading)
 	const error = useSelector(state => state.rootReducer.user.error)
 
@@ -17,7 +14,6 @@ export const useUser = () => {
 		loading,
 		error,
 		studios,
-		filteredStudios,
 		fetchUser: () => dispatch(fetchUserData()),
 		fetchStudios: () => dispatch(fetchStudios()),
 		logout: () => dispatch(logout()),

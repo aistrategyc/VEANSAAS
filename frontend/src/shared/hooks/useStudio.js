@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { fetchUserData, logout } from '../slices/userSlice'
 import { fetchStudios } from '../slices/studiosSlice'
 
-export const useUser = () => {
+export const useStudio = () => {
 	const dispatch = useDispatch()
 	const studios = useSelector(state => state.rootReducer.studios.items)
 	const filteredStudios = useSelector(
