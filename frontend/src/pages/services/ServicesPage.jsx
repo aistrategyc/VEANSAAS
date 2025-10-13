@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -21,9 +22,41 @@ import { Plus, Search, Scissors, Tag, Folder } from 'lucide-react'
 import { ServiceModal } from '@/features/services/ServicesModal'
 import { CategoryModal } from '@/features/services/CategoryModal'
 import { ServicesTable } from '@/features/services/ServicesTable'
-import { api } from '@/shared/api/api'
+
+// Импорты Redux
+import {
+	fetchServices,
+	createService,
+	updateService,
+	deleteService,
+	setSearchQuery,
+	setCategoryFilter,
+	setStatusFilter,
+} from '@/shared/slices/servicesSlice'
+import {
+	fetchCategories,
+	createCategory,
+	updateCategory,
+	deleteCategory,
+} from '@/shared/slices/categoriesSlice'
 
 export default function ServicesPage() {
+	const dispatch = useDispatch()
+
+	// Селекторы для Redux состояния
+	const {
+		items: services,
+		filteredItems: filteredServices,
+		searchQuery,
+		categoryFilter,
+		statusFilter,
+		isLoading: servicesLoading,
+	} = useSelector(state => state.rootReducer.services)
+
+	const { items: categories, isLoading: categoriesLoading } = useSelector(
+		state => state.rootReducer.categories
+	)
+
 	const user = {
 		id: '1',
 		email: 'admin@salon.com',
@@ -34,46 +67,19 @@ export default function ServicesPage() {
 		createdAt: '2024-01-01T00:00:00Z',
 		updatedAt: '2024-01-01T00:00:00Z',
 	}
-	const [services, setServices] = useState([])
-	const [categories, setCategories] = useState([])
-	const [searchQuery, setSearchQuery] = useState('')
-	const [categoryFilter, setCategoryFilter] = useState('all')
-	const [statusFilter, setStatusFilter] = useState('active')
 
 	const [selectedService, setSelectedService] = useState(null)
 	const [selectedCategory, setSelectedCategory] = useState(null)
 	const [isServiceModalOpen, setIsServiceModalOpen] = useState(false)
 	const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false)
 
-	const [editingCategory, setEditingCategory] = useState(null)
-
+	// Загрузка данных при монтировании
 	useEffect(() => {
-		const fetchData = async () => {
-			const responseCategory = await api.get('services/categories')
-			const responseServices = await api.get('services')
+		dispatch(fetchServices())
+		dispatch(fetchCategories())
+	}, [dispatch])
 
-			setCategories(responseCategory.data)
-			setServices(responseServices.data)
-		}
-		fetchData()
-	}, [])
-
-	const filteredServices = services.filter(service => {
-		const matchesSearch =
-			searchQuery === '' ||
-			service.name.toLowerCase().includes(searchQuery.toLowerCase())
-
-		const matchesCategory =
-			categoryFilter === 'all' || service.category_uuid === categoryFilter
-
-		const matchesStatus =
-			statusFilter === 'all' ||
-			(statusFilter === 'active' && service.is_active) ||
-			(statusFilter === 'inactive' && !service.is_active)
-
-		return matchesSearch && matchesCategory && matchesStatus
-	})
-
+	// Обработчики для услуг
 	const handleCreateService = () => {
 		setSelectedService(null)
 		setIsServiceModalOpen(true)
@@ -85,25 +91,28 @@ export default function ServicesPage() {
 	}
 
 	const handleSaveService = async serviceData => {
-		await api.post('/services', serviceData)
-
+		await dispatch(createService(serviceData))
 		setIsServiceModalOpen(false)
-		setSelectedService(null)
 	}
-	const handleEditSaveService = async (editService, data) => {
-		await api.patch(`/services/${editService.uuid}`, data)
 
+	const handleEditSaveService = async (editService, data) => {
+		await dispatch(
+			updateService({
+				uuid: editService.uuid,
+				serviceData: data,
+			})
+		)
 		setIsServiceModalOpen(false)
 		setSelectedService(null)
 	}
 
 	const handleDeleteService = async deleteService => {
-		await api.delete(`/services/${deleteService.uuid}`)
-
+		await dispatch(deleteService(deleteService.uuid))
 		setIsServiceModalOpen(false)
 		setSelectedService(null)
 	}
 
+	// Обработчики для категорий
 	const handleCreateCategory = () => {
 		setSelectedCategory(null)
 		setIsCategoryModalOpen(true)
@@ -115,31 +124,43 @@ export default function ServicesPage() {
 	}
 
 	const handleSaveCategory = async categoryData => {
-		await api.post('/services/categories', categoryData)
-
+		await dispatch(createCategory(categoryData))
 		setIsCategoryModalOpen(false)
-		setEditingCategory(null)
 	}
+
 	const handleSaveEditCategory = async (editCategory, data) => {
-		await api.patch(`/services/categories/${editCategory.uuid}`, data)
-
+		await dispatch(
+			updateCategory({
+				uuid: editCategory.uuid,
+				categoryData: data,
+			})
+		)
 		setIsCategoryModalOpen(false)
-		setEditingCategory(null)
+		setSelectedCategory(null)
 	}
+
 	const handleDeleteCategory = async editCategory => {
-		await api.delete(`/services/categories/${editCategory.uuid}`)
-
+		await dispatch(deleteCategory(editCategory.uuid))
 		setIsCategoryModalOpen(false)
-		setEditingCategory(null)
+		setSelectedCategory(null)
 	}
 
+	// Обработчики фильтров
+	const handleSearchChange = e => {
+		dispatch(setSearchQuery(e.target.value))
+	}
+
+	const handleCategoryFilterChange = value => {
+		dispatch(setCategoryFilter(value))
+	}
+
+	// Статистика
 	const activeServices = services.filter(s => s.is_active)
+	const activeCategories = categories.filter(c => c.is_active)
 
 	const stats = {
-		//
 		totalServices: activeServices.length,
-		totalCategories: categories.filter(c => c.is_active).length,
-
+		totalCategories: activeCategories.length,
 		averagePrice:
 			activeServices.length > 0
 				? Math.round(
@@ -157,11 +178,14 @@ export default function ServicesPage() {
 			activeServices.length > 0
 				? Math.max(...activeServices.map(s => parseFloat(s.base_price) || 0))
 				: 0,
-
 		servicesWithDescription: activeServices.filter(
 			s => s.description && s.description.trim() !== ''
 		).length,
 		categorizedServices: activeServices.filter(s => s.category_uuid).length,
+	}
+
+	if (servicesLoading || categoriesLoading) {
+		return <div>Загрузка...</div>
 	}
 
 	return (
@@ -262,27 +286,25 @@ export default function ServicesPage() {
 										<Input
 											placeholder='Поиск по названию или описанию...'
 											value={searchQuery}
-											onChange={e => setSearchQuery(e.target.value)}
+											onChange={handleSearchChange}
 											className='pl-10'
 										/>
 									</div>
 								</div>
 								<Select
 									value={categoryFilter}
-									onValueChange={setCategoryFilter}
+									onValueChange={handleCategoryFilterChange}
 								>
 									<SelectTrigger className='w-[200px]'>
 										<SelectValue placeholder='Категория' />
 									</SelectTrigger>
 									<SelectContent>
 										<SelectItem value='all'>Все категории</SelectItem>
-										{categories
-											.filter(c => c.is_active)
-											.map(category => (
-												<SelectItem key={category.uuid} value={category.uuid}>
-													{category.name}
-												</SelectItem>
-											))}
+										{activeCategories.map(category => (
+											<SelectItem key={category.uuid} value={category.uuid}>
+												{category.name}
+											</SelectItem>
+										))}
 									</SelectContent>
 								</Select>
 							</div>
@@ -291,7 +313,7 @@ export default function ServicesPage() {
 
 					<ServicesTable
 						services={filteredServices}
-						categories={categories}
+						categories={activeCategories}
 						onEdit={handleEditService}
 						onDelete={handleDeleteService}
 						currentUser={user}
@@ -299,68 +321,53 @@ export default function ServicesPage() {
 				</TabsContent>
 
 				<TabsContent value='categories' className='space-y-4'>
-					<CategoryModal
-						isOpen={isCategoryModalOpen}
-						onClose={() => {
-							setIsCategoryModalOpen(false)
-							setEditingCategory(null)
-						}}
-						category={editingCategory}
-						onSave={handleSaveCategory}
-						onEdit={handleSaveEditCategory}
-						onDelete={handleDeleteCategory}
-					/>
 					<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-						{categories
-							.filter(c => c.is_active)
-							.map(category => {
-								const categoryServices = services.filter(
-									s => s.category_uuid === category.uuid && s.is_active
-								)
-								return (
-									<Card
-										key={category.uuid}
-										className='cursor-pointer hover:shadow-md transition-shadow'
-									>
-										<CardHeader className='pb-3'>
-											<div className='flex items-center justify-between'>
-												<div className='flex items-center space-x-2'>
-													<CardTitle className='text-lg'>
-														{category.name}
-													</CardTitle>
-												</div>
+						{activeCategories.map(category => {
+							const categoryServices = services.filter(
+								s => s.category_uuid === category.uuid && s.is_active
+							)
+							return (
+								<Card
+									key={category.uuid}
+									className='cursor-pointer hover:shadow-md transition-shadow'
+								>
+									<CardHeader className='pb-3'>
+										<div className='flex items-center justify-between'>
+											<div className='flex items-center space-x-2'>
+												<CardTitle className='text-lg'>
+													{category.name}
+												</CardTitle>
+											</div>
 
-												<Button
-													variant='ghost'
-													size='sm'
-													onClick={() => handleEditCategory(category)}
-												>
-													Изменить
-												</Button>
+											<Button
+												variant='ghost'
+												size='sm'
+												onClick={() => handleEditCategory(category)}
+											>
+												Изменить
+											</Button>
+										</div>
+										{category.description && (
+											<CardDescription>{category.description}</CardDescription>
+										)}
+									</CardHeader>
+									<CardContent>
+										<div className='flex items-center justify-between'>
+											<Badge variant='secondary'>
+												{categoryServices.length} услуг
+											</Badge>
+											<div className='text-sm text-muted-foreground'>
+												от{' '}
+												{Math.min(
+													...categoryServices.map(s => s.price)
+												).toLocaleString()}{' '}
+												$
 											</div>
-											{category.description && (
-												<CardDescription>
-													{category.description}
-												</CardDescription>
-											)}
-										</CardHeader>
-										<CardContent>
-											<div className='flex items-center justify-between'>
-												<Badge variant='secondary'>
-													{categoryServices.length} услуг
-												</Badge>
-												<div className='text-sm text-muted-foreground'>
-													от{' '}
-													{Math.min(
-														...categoryServices.map(s => s.price)
-													).toLocaleString()}{' '}
-													$
-												</div>
-											</div>
-										</CardContent>
-									</Card>
-								)
-							})}
+										</div>
+									</CardContent>
+								</Card>
+							)
+						})}
 					</div>
 				</TabsContent>
 			</Tabs>
@@ -373,7 +380,7 @@ export default function ServicesPage() {
 					setSelectedService(null)
 				}}
 				service={selectedService}
-				categories={categories.filter(c => c.is_active)}
+				categories={activeCategories}
 				onSave={handleSaveService}
 				onEdit={handleEditSaveService}
 				onDelete={handleDeleteService}
