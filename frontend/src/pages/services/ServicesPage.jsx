@@ -1,14 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select'
 import {
 	Card,
 	CardContent,
@@ -18,7 +10,7 @@ import {
 } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Plus, Search, Scissors, Tag, Folder } from 'lucide-react'
+import { Plus, Scissors, Tag, Folder } from 'lucide-react'
 import { ServiceModal } from '@/features/services/ServicesModal'
 import { CategoryModal } from '@/features/services/CategoryModal'
 import { ServicesTable } from '@/features/services/ServicesTable'
@@ -31,7 +23,7 @@ import {
 	deleteService,
 	setSearchQuery,
 	setCategoryFilter,
-	setStatusFilter,
+	clearFilters,
 } from '@/shared/slices/servicesSlice'
 import {
 	fetchCategories,
@@ -39,6 +31,8 @@ import {
 	updateCategory,
 	deleteCategory,
 } from '@/shared/slices/categoriesSlice'
+import { Filters } from '@/features/services/Filters'
+import { Loader } from '@/shared/ui/loader/Loader'
 
 export default function ServicesPage() {
 	const dispatch = useDispatch()
@@ -49,7 +43,6 @@ export default function ServicesPage() {
 		filteredItems: filteredServices,
 		searchQuery,
 		categoryFilter,
-		statusFilter,
 		isLoading: servicesLoading,
 	} = useSelector(state => state.rootReducer.services)
 
@@ -57,29 +50,16 @@ export default function ServicesPage() {
 		state => state.rootReducer.categories
 	)
 
-	const user = {
-		id: '1',
-		email: 'admin@salon.com',
-		name: 'Анна Администратор',
-		role: 'Admin',
-		organizationId: 'org1',
-		isActive: true,
-		createdAt: '2024-01-01T00:00:00Z',
-		updatedAt: '2024-01-01T00:00:00Z',
-	}
-
 	const [selectedService, setSelectedService] = useState(null)
 	const [selectedCategory, setSelectedCategory] = useState(null)
 	const [isServiceModalOpen, setIsServiceModalOpen] = useState(false)
 	const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false)
 
-	// Загрузка данных при монтировании
 	useEffect(() => {
 		dispatch(fetchServices())
 		dispatch(fetchCategories())
 	}, [dispatch])
 
-	// Обработчики для услуг
 	const handleCreateService = () => {
 		setSelectedService(null)
 		setIsServiceModalOpen(true)
@@ -90,13 +70,13 @@ export default function ServicesPage() {
 		setIsServiceModalOpen(true)
 	}
 
-	const handleSaveService = async serviceData => {
-		await dispatch(createService(serviceData))
+	const handleSaveService = serviceData => {
+		dispatch(createService(serviceData))
 		setIsServiceModalOpen(false)
 	}
 
-	const handleEditSaveService = async (editService, data) => {
-		await dispatch(
+	const handleEditSaveService = (editService, data) => {
+		dispatch(
 			updateService({
 				uuid: editService.uuid,
 				serviceData: data,
@@ -123,13 +103,13 @@ export default function ServicesPage() {
 		setIsCategoryModalOpen(true)
 	}
 
-	const handleSaveCategory = async categoryData => {
-		await dispatch(createCategory(categoryData))
+	const handleSaveCategory = categoryData => {
+		dispatch(createCategory(categoryData))
 		setIsCategoryModalOpen(false)
 	}
 
-	const handleSaveEditCategory = async (editCategory, data) => {
-		await dispatch(
+	const handleSaveEditCategory = (editCategory, data) => {
+		dispatch(
 			updateCategory({
 				uuid: editCategory.uuid,
 				categoryData: data,
@@ -139,8 +119,8 @@ export default function ServicesPage() {
 		setSelectedCategory(null)
 	}
 
-	const handleDeleteCategory = async editCategory => {
-		await dispatch(deleteCategory(editCategory.uuid))
+	const handleDeleteCategory = editCategory => {
+		dispatch(deleteCategory(editCategory.uuid))
 		setIsCategoryModalOpen(false)
 		setSelectedCategory(null)
 	}
@@ -152,6 +132,10 @@ export default function ServicesPage() {
 
 	const handleCategoryFilterChange = value => {
 		dispatch(setCategoryFilter(value))
+	}
+
+	const handleClearFilters = () => {
+		dispatch(clearFilters())
 	}
 
 	// Статистика
@@ -170,22 +154,11 @@ export default function ServicesPage() {
 						) / activeServices.length
 				  )
 				: 0,
-		minPrice:
-			activeServices.length > 0
-				? Math.min(...activeServices.map(s => parseFloat(s.base_price) || 0))
-				: 0,
-		maxPrice:
-			activeServices.length > 0
-				? Math.max(...activeServices.map(s => parseFloat(s.base_price) || 0))
-				: 0,
-		servicesWithDescription: activeServices.filter(
-			s => s.description && s.description.trim() !== ''
-		).length,
 		categorizedServices: activeServices.filter(s => s.category_uuid).length,
 	}
 
 	if (servicesLoading || categoriesLoading) {
-		return <div>Загрузка...</div>
+		return <Loader />
 	}
 
 	return (
@@ -209,8 +182,6 @@ export default function ServicesPage() {
 					</Button>
 				</div>
 			</div>
-
-			{/* Stats Cards */}
 			<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
 				<Card>
 					<CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
@@ -270,59 +241,26 @@ export default function ServicesPage() {
 				</TabsList>
 
 				<TabsContent value='services' className='space-y-4'>
-					{/* Filters */}
-					<Card>
-						<CardHeader>
-							<CardTitle>Поиск и фильтры</CardTitle>
-							<CardDescription>
-								Найдите нужные услуги по различным критериям
-							</CardDescription>
-						</CardHeader>
-						<CardContent>
-							<div className='flex flex-col sm:flex-row gap-4'>
-								<div className='flex-1'>
-									<div className='relative'>
-										<Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
-										<Input
-											placeholder='Поиск по названию или описанию...'
-											value={searchQuery}
-											onChange={handleSearchChange}
-											className='pl-10'
-										/>
-									</div>
-								</div>
-								<Select
-									value={categoryFilter}
-									onValueChange={handleCategoryFilterChange}
-								>
-									<SelectTrigger className='w-[200px]'>
-										<SelectValue placeholder='Категория' />
-									</SelectTrigger>
-									<SelectContent>
-										<SelectItem value='all'>Все категории</SelectItem>
-										{activeCategories.map(category => (
-											<SelectItem key={category.uuid} value={category.uuid}>
-												{category.name}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-							</div>
-						</CardContent>
-					</Card>
+					<Filters
+						searchQuery={searchQuery}
+						onSearchChange={handleSearchChange}
+						categoryFilter={categoryFilter}
+						onCategoryFilterChange={handleCategoryFilterChange}
+						categories={activeCategories}
+						onClearFilters={handleClearFilters}
+					/>
 
 					<ServicesTable
 						services={filteredServices}
-						categories={activeCategories}
+						categories={categories}
 						onEdit={handleEditService}
 						onDelete={handleDeleteService}
-						currentUser={user}
 					/>
 				</TabsContent>
 
 				<TabsContent value='categories' className='space-y-4'>
 					<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-						{activeCategories.map(category => {
+						{categories.map(category => {
 							const categoryServices = services.filter(
 								s => s.category_uuid === category.uuid && s.is_active
 							)
@@ -359,7 +297,7 @@ export default function ServicesPage() {
 											<div className='text-sm text-muted-foreground'>
 												от{' '}
 												{Math.min(
-													...categoryServices.map(s => s.price)
+													...categoryServices.map(s => s.base_price)
 												).toLocaleString()}{' '}
 												$
 											</div>
@@ -372,7 +310,6 @@ export default function ServicesPage() {
 				</TabsContent>
 			</Tabs>
 
-			{/* Modals */}
 			<ServiceModal
 				isOpen={isServiceModalOpen}
 				onClose={() => {
