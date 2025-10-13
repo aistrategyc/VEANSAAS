@@ -32,6 +32,7 @@ from shared.schemas.company_units.service import (
     CategoryAttributeResponse,
     CategoryAttributeUpdate,
     ServiceCategoryCreate,
+    ServiceCategoryDetailResponse,
     ServiceCategoryResponse,
     ServiceCategoryUpdate,
     ServiceCreate,
@@ -90,7 +91,7 @@ async def get_list_services_route(
 
 @router.post(
     '/categories',
-    response_model=ServiceCategoryResponse,
+    response_model=ServiceCategoryDetailResponse,
     status_code=status.HTTP_201_CREATED,
     name='Category create',
 )
@@ -106,7 +107,7 @@ async def crete_category_route(
 
 @router.get(
     '/categories',
-    response_model=List[ServiceCategoryResponse],
+    response_model=List[ServiceCategoryDetailResponse],
     status_code=status.HTTP_200_OK,
     name='Category list',
 )
