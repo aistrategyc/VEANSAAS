@@ -3,22 +3,19 @@ import {
 	deleteCookie,
 	getCookie,
 	setCookie,
-} from '../../shared/helper/authHelper'
+} from '@/shared/helper/cookie-utils'
 import { AuthContext } from './AuthContext'
-import { useUser } from '../../shared/hooks/useUser'
-import { useDispatch } from 'react-redux'
+import { useUser } from '@/shared/hooks/useUser'
 
 export const AuthProvider = ({ children }) => {
 	const [isAuthenticated, setIsAuthenticated] = useState(false)
-	const [loading, setLoading] = useState(true)
+	const [isLoading, setIsLoading] = useState(true)
 
 	const { fetchUser, fetchStudios } = useUser()
 
-	const login = useCallback((accessToken, refreshToken, options = {}) => {
-		const { expires = 7 } = options
-		setCookie('authToken', accessToken, expires)
-		setCookie('refreshToken', refreshToken)
-
+	const setAuth = useCallback((accessToken, refreshToken) => {
+		setCookie('authToken', accessToken, 7)
+		setCookie('refreshToken', refreshToken, 30)
 		setIsAuthenticated(true)
 	}, [])
 
@@ -29,6 +26,7 @@ export const AuthProvider = ({ children }) => {
 	}, [])
 
 	useEffect(() => {
+		setIsLoading(true)
 		const token = getCookie('authToken')
 		if (token) {
 			setIsAuthenticated(true)
@@ -38,13 +36,13 @@ export const AuthProvider = ({ children }) => {
 			setIsAuthenticated(false)
 		}
 
-		setLoading(false)
+		setIsLoading(false)
 	}, [])
 
 	const value = {
 		isAuthenticated,
-		loading,
-		login,
+		isLoading,
+		setAuth,
 		logout,
 	}
 

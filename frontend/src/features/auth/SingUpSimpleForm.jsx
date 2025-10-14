@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 
 import { schemaRegisterSimple } from './lib/validation'
-import { useSignupByInvite } from './lib/api'
+import { useSignupByInvite } from './model/api'
 import { Form } from '@/shared/ui/form/Form'
 import { FormInput } from '@/shared/ui/input/FormInput'
 import { useSearchParams } from 'react-router-dom'

@@ -1,6 +1,6 @@
 // store/slices/rolesSlice.js
-import { parseJwt } from '@/shared/api/api'
-import { getCookie } from '@/shared/helper/authHelper'
+import { parseJwt } from '@/shared/helper/jwt-helpers'
+import { getCookie } from '@/shared/helper/cookie-utils'
 import { createSlice } from '@reduxjs/toolkit'
 
 // Моковые данные ролей

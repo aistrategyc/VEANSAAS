@@ -1,4 +1,4 @@
-import { api } from '@/shared/api/api'
+import api from '@/shared/api/client'
 import { useNavigate } from 'react-router'
 import { useDispatch } from 'react-redux'
 import { useState } from 'react'
@@ -11,22 +11,20 @@ export const useLogin = () => {
 	const [isLoading, setIsLoading] = useState(false)
 	const [error, setError] = useState()
 	const dispatch = useDispatch()
-	const { login } = useAuth()
+	const { setAuth } = useAuth()
 
 	const fetchLogin = ({ data, reset }) => {
 		setIsLoading(true)
 		api
 			.post('/auth/login', data)
 			.then(response => {
-				login(response.data.access_token, response.data.refresh_token, {
-					expires: 7,
-				})
+				setAuth(response.data.access_token, response.data.refresh_token)
 				dispatch(fetchUserData()).unwrap()
 				dispatch(fetchStudios()).unwrap()
 				reset()
 			})
 			.catch(err => {
-				setError(err.response.data.detail)
+				setError(err?.response?.data?.detail)
 			})
 			.finally(() => {
 				setIsLoading(false)

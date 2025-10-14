@@ -6,7 +6,7 @@ import { schemaLogin } from './lib/validation'
 import { Loader } from '@/shared/ui/loader/Loader'
 import { Link } from 'react-router'
 import { Button } from '@/components/ui/button'
-import { useLogin } from './lib/api'
+import { useLogin } from './model/api'
 
 export const LoginForm = () => {
 	const { fetchLogin, isLoading, error } = useLogin()
@@ -29,7 +29,7 @@ export const LoginForm = () => {
 	}
 	return (
 		<Form
-			onSubmit={handleSubmit(data => fetchLogin(data, reset))}
+			onSubmit={handleSubmit(data => fetchLogin({ data: data, reset: reset }))}
 			className='space-y-4'
 		>
 			{error && <p className='text-red-500 text-sm h-5 ml-2'>{error}</p>}

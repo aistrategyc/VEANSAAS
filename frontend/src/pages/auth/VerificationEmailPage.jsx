@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import {
 	Card,
 	CardHeader,
@@ -7,22 +6,22 @@ import {
 	CardContent,
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { authAPI } from '@/shared/api/api'
+import { useSearchParams } from 'react-router-dom'
+import api from '@/shared/api/client'
 
-export default function VerificationEmailPage() {
-	async function onVerification() {
-		const params = new URLSearchParams(window.location.search)
-		const token = params.get('token')
-		if (token) {
-			await authAPI
-				.verifyToken(token)
-				.then(() => {
-					console.log('успех')
-				})
-				.catch(err => {
-					console.log(err)
-				})
-		}
+const VerificationEmailPage = () => {
+	const [searchParams] = useSearchParams()
+	const verifyToken = searchParams.get('token')
+
+	const fetchVerifyEmail = () => {
+		api
+			.get('/auth/verify-email', {
+				params: {
+					token: verifyToken,
+				},
+			})
+			.then(() => console.log('SUCCESS'))
+			.catch(error => console.log(error))
 	}
 
 	return (
@@ -37,7 +36,7 @@ export default function VerificationEmailPage() {
 							</CardDescription>
 						</CardHeader>
 						<CardContent>
-							<Button onClick={() => onVerification()} className='w-full'>
+							<Button onClick={fetchVerifyEmail} className='w-full'>
 								Verification me
 							</Button>
 						</CardContent>
@@ -47,3 +46,5 @@ export default function VerificationEmailPage() {
 		</div>
 	)
 }
+
+export default VerificationEmailPage

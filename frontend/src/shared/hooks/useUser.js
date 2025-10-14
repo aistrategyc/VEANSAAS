@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchUserData, logout } from '../../shared/slices/userSlice'
-import { fetchStudios } from '../slices/studiosSlice'
+import { fetchUserData, logout } from '@/shared/slices/userSlice'
+import { fetchStudios } from '@/shared/slices/studiosSlice'
 
 export const useUser = () => {
 	const dispatch = useDispatch()

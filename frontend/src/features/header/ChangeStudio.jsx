@@ -6,8 +6,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { ChevronDown } from 'lucide-react'
-import { getCookie } from '@/shared/helper/authHelper'
-import { api } from '@/shared/api/api'
+import api from '@/shared/api/client'
 import { useEffect, useState } from 'react'
 
 export const ChangeStudio = () => {
