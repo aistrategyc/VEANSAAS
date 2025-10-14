@@ -2,14 +2,14 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import api from '@/shared/api/client'
 
 export const fetchStudios = createAsyncThunk(
-	'studios/fetchStudiosV2',
+	'studios/fetchStudios',
 	async (_, { rejectWithValue }) => {
-		return api
-			.get('/studios')
-			.then(response => response.data)
-			.catch(error => {
-				return rejectWithValue(error.response?.data || 'Ошибка загрузки студий')
-			})
+		try {
+			const response = await api.get('/studios')
+			return response.data
+		} catch (error) {
+			return rejectWithValue(error.response?.data || 'Ошибка загрузки студий')
+		}
 	}
 )
 
@@ -18,7 +18,6 @@ export const saveStudio = createAsyncThunk(
 	async ({ studioData, editingStudio }, { rejectWithValue }) => {
 		try {
 			if (editingStudio) {
-				// Отправляем запрос на обновление
 				const response = await api.patch(
 					`/studios/${editingStudio.uuid}`,
 					{ name: studioData.name },

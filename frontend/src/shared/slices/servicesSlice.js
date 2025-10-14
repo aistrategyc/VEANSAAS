@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import api from '@/shared/api/client'
 
-// Асинхронные действия для услуг
 export const fetchServices = createAsyncThunk(
 	'services/fetchServices',
 	async (_, { rejectWithValue }) => {

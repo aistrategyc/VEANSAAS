@@ -17,12 +17,11 @@ const StudiosPage = () => {
 		state => state.rootReducer.studios
 	)
 
-	const { studios, filteredStudios } = useUser()
-	console.log(studios, 'studios')
+	const { studios } = useUser()
 
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
 	const [editingStudio, setEditingStudio] = useState(null)
-	console.log(studios, 'studios')
+
 	const statsStudiosList = [
 		// {
 		// 	id: 1,

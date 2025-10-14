@@ -6,16 +6,10 @@ export const fetchUserData = createAsyncThunk(
 	'user/fetchUserData',
 	async (_, { rejectWithValue }) => {
 		try {
-			const token = getCookie('authToken')
-
-			if (!token) {
-				return rejectWithValue('Token error')
-			}
 			const response = await api.get('/users/me')
-
 			return response.data
 		} catch (error) {
-			return rejectWithValue(error)
+			return rejectWithValue(error.response?.data || 'Error')
 		}
 	}
 )
@@ -52,5 +46,5 @@ const userSLice = createSlice({
 	},
 })
 
-export const { logout, updateUserData } = userSLice.actions
+export const { updateUserData } = userSLice.actions
 export default userSLice.reducer
