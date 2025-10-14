@@ -1,24 +1,19 @@
-import { useForm, useWatch } from 'react-hook-form'
-import { FormInput } from 'shared/ui/input/FormInput'
-import { Form } from 'shared/ui/form/Form'
-import { useNavigate } from 'react-router'
+import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { schemaRegister } from 'shared/schema/schema'
-import { showAlert } from '../../shared/ui/alert/Alerts'
-import { useApi } from '../../shared/hooks/useApi'
-import { Loader } from '../../shared/ui/loader/Loader'
+import { FormInput } from '@/shared/ui/input/FormInput'
+import { Form } from '@/shared/ui/form/Form'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { cn } from '@/lib/utils'
 import { SelectForm } from '@/shared/ui/select/Select'
-import { useState } from 'react'
-
-const plans = [
-	{ value: 'solo', label: 'solo' },
-	{ value: 'network', label: 'network' },
-]
+import { Loader } from '@/shared/ui/loader/Loader'
+import { useSignup } from './lib/api'
+import { schemaRegister } from './lib/validation'
+import { PLANS } from './lib/constants'
+import { cn } from '@/lib/utils'
 
 export const SingUpForm = () => {
+	const { fetchSignup, isLoading, error } = useSignup()
+
 	const {
 		control,
 		handleSubmit,
@@ -47,37 +42,10 @@ export const SingUpForm = () => {
 		resolver: yupResolver(schemaRegister),
 	})
 
-	const hasPersonErrors =
-		errors.user?.first_name ||
-		errors.user?.last_name ||
-		errors.user?.username ||
-		errors.user?.email ||
-		errors.user?.phone_number ||
-		errors.user?.password
+	const hasPersonErrors = errors.hasOwnProperty('user')
+	const hasOrgErrors = errors.hasOwnProperty('organization')
 
-	const hasOrgErrors =
-		errors.organization?.name ||
-		errors.organization?.plan_type ||
-		errors.organization?.description ||
-		errors.organization?.studio?.name
-
-	const navigate = useNavigate()
-	const { loading, post, reset: resetApi } = useApi()
-	const [error, setError] = useState('')
-
-	const onSubmit = data => {
-		post('auth/register', data)
-			.then(() => {
-				showAlert.successRegister().then(() => navigate('/login'))
-				reset()
-				setError('')
-			})
-			.catch(err => {
-				setError(err.response.data?.detail.detail)
-			})
-	}
-
-	if (loading) {
+	if (isLoading) {
 		return <Loader />
 	}
 	return (
@@ -97,7 +65,11 @@ export const SingUpForm = () => {
 				</TabsTrigger>
 			</TabsList>
 
-			<Form onSubmit={handleSubmit(onSubmit)}>
+			<Form
+				onSubmit={handleSubmit(data =>
+					fetchSignup({ data: data, reset: reset })
+				)}
+			>
 				{error && <p className='text-red-500 text-sm h-5 ml-2'>{error}</p>}
 				<TabsContent value='person'>
 					<FormInput
@@ -152,7 +124,7 @@ export const SingUpForm = () => {
 						error={errors.organization?.name?.message}
 					/>
 					<SelectForm
-						plans={plans}
+						plans={PLANS}
 						title='Choose plan'
 						name='organization.plan_type'
 						control={control}

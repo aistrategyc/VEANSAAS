@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { api } from '../api/api'
+import { api } from '@/shared/api/api'
 
 export const fetchStudios = createAsyncThunk(
 	'studios/fetchStudiosV2',

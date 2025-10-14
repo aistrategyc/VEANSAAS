@@ -1,8 +1,7 @@
 import axios from 'axios'
 import { deleteCookie, getCookie, setCookie } from '../helper/authHelper'
 
-// Конфигурация базового URL
-const BASE_URL = 'http://localhost:8000/api/v1/'
+const BASE_URL = 'http://localhost:8000/api/v1'
 
 export const parseJwt = token => {
 	try {
@@ -19,7 +18,7 @@ export const parseJwt = token => {
 		return null
 	}
 }
-// Создание экземпляра axios
+
 export const apiClient = axios.create({
 	baseURL: BASE_URL,
 	headers: {
@@ -28,7 +27,6 @@ export const apiClient = axios.create({
 	timeout: 10000,
 })
 
-// Утилиты для работы с токенами
 export const tokenManager = {
 	getAccessToken: () => getCookie('authToken'),
 	getRefreshToken: () => getCookie('refreshToken'),
@@ -47,22 +45,6 @@ export const tokenManager = {
 	},
 }
 
-// Флаг и очередь для обработки refresh token
-let isRefreshing = false
-let failedQueue = []
-
-const processQueue = (error, token = null) => {
-	failedQueue.forEach(prom => {
-		if (error) {
-			prom.reject(error)
-		} else {
-			prom.resolve(token)
-		}
-	})
-	failedQueue = []
-}
-
-// Создаем отдельный экземпляр axios для запросов без interceptor'ов
 const authClient = axios.create({
 	baseURL: BASE_URL,
 	headers: {
@@ -70,7 +52,6 @@ const authClient = axios.create({
 	},
 })
 
-// Функция обновления токена
 const refreshAuthToken = async () => {
 	try {
 		const refreshToken = tokenManager.getRefreshToken()
@@ -92,7 +73,6 @@ const refreshAuthToken = async () => {
 		tokenManager.setTokens(access_token)
 		return access_token
 	} catch (error) {
-		console.log('err')
 		// tokenManager.clearTokens()
 		// if (window.location.pathname !== '/login') {
 		// 	window.location.href = '/login'
@@ -101,10 +81,8 @@ const refreshAuthToken = async () => {
 	}
 }
 
-// Request interceptor
 apiClient.interceptors.request.use(
 	config => {
-		// Пропускаем добавление токена для запросов, которые не требуют аутентификации
 		if (config.skipAuth) {
 			return config
 		}
@@ -121,7 +99,6 @@ apiClient.interceptors.request.use(
 	}
 )
 
-// Response interceptor
 apiClient.interceptors.response.use(
 	response => response,
 	async error => {
@@ -145,7 +122,6 @@ apiClient.interceptors.response.use(
 			const newAccessToken = await refreshAuthToken()
 			originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
 
-			// Повторяем оригинальный запрос
 			return apiClient(originalRequest)
 		} catch (refreshError) {
 			tokenManager.clearTokens()
@@ -157,7 +133,6 @@ apiClient.interceptors.response.use(
 	}
 )
 
-// API методы
 export const api = {
 	get: (endpoint, config = {}) => apiClient.get(endpoint, config),
 	post: (endpoint, data, config = {}) => apiClient.post(endpoint, data, config),
@@ -167,7 +142,6 @@ export const api = {
 	delete: (endpoint, config = {}) => apiClient.delete(endpoint, config),
 }
 
-// Вспомогательные функции для аутентификации
 export const authAPI = {
 	login: credentials =>
 		apiClient.post('auth/login/', credentials, { skipAuth: true }),
