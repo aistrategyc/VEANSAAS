@@ -1,89 +1,52 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import {
 	Dialog,
 	DialogContent,
 	DialogHeader,
 	DialogTitle,
 } from '@/components/ui/dialog'
+import { Form } from '@/shared/ui/form/Form'
+import { FormInput } from '@/shared/ui/input/FormInput'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { AlertTriangle } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { schemaStudio } from './lib/validation'
 
 export const StudioModal = ({
 	isOpen,
 	onClose,
-	onSave,
-	onDelete,
+	handleCreate,
+	handleUpdate,
 	studio = null,
 }) => {
-	const [formData, setFormData] = useState({
-		name: '',
+	const {
+		control,
+		handleSubmit,
+		reset,
+		formState: { errors },
+	} = useForm({
+		mode: 'onChange',
+		resolver: yupResolver(schemaStudio),
 	})
-	const [errors, setErrors] = useState([])
 
 	useEffect(() => {
-		if (isOpen) {
-			if (studio) {
-				setFormData({
-					name: studio.name || '',
-				})
-			} else {
-				setFormData({
-					name: '',
-				})
-			}
-			setErrors([])
-		}
-	}, [isOpen, studio])
-
-	const validateForm = () => {
-		const newErrors = []
-
-		if (!formData.name.trim()) {
-			newErrors.push('Название студии обязательно для заполнения')
-		}
-
-		if (formData.name.trim().length < 2) {
-			newErrors.push('Название студии должно содержать минимум 2 символа')
-		}
-
-		if (formData.name.trim().length > 100) {
-			newErrors.push('Название студии не должно превышать 100 символов')
-		}
-
-		setErrors(newErrors)
-		return newErrors.length === 0
-	}
-
-	const handleSave = () => {
-		if (!validateForm()) return
-
-		const studioData = {
-			name: formData.name.trim(),
-		}
-
 		if (studio) {
-			studioData.id = studio.id
+			reset({
+				name: studio.name || '',
+				phone_number: studio.phone_number || null,
+				address: studio.address || null,
+			})
 		}
+	}, [studio, reset])
 
-		onSave(studioData)
+	const onSubmit = data => {
+		if (studio) {
+			handleUpdate(studio.uuid, data)
+		} else {
+			handleCreate(data)
+		}
+		reset()
 		onClose()
-	}
-
-	const handleDelete = () => {
-		if (studio) {
-			onDelete(studio.id)
-		}
-	}
-
-	const handleInputChange = e => {
-		const { name, value } = e.target
-		setFormData(prev => ({
-			...prev,
-			[name]: value,
-		}))
 	}
 
 	return (
@@ -96,48 +59,42 @@ export const StudioModal = ({
 				</DialogHeader>
 
 				<div className='space-y-6'>
-					{errors.length > 0 && (
-						<Alert variant='destructive'>
-							<AlertTriangle className='h-4 w-4' />
-							<AlertDescription>
-								<ul className='list-disc list-inside space-y-1'>
-									{errors.map((error, index) => (
-										<li key={index}>{error}</li>
-									))}
-								</ul>
-							</AlertDescription>
-						</Alert>
-					)}
+					<Form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
+						<div className='space-y-2'>
+							<FormInput
+								title='Название студии'
+								type='text'
+								name='name'
+								control={control}
+								error={errors.name?.message}
+							/>
+							<FormInput
+								title='Номер телефона'
+								type='tel'
+								name='phone_number'
+								control={control}
+								error={errors.phone_number?.message}
+							/>
+							<FormInput
+								title='Адрес'
+								type='text'
+								name='address'
+								control={control}
+								error={errors.address?.message}
+							/>
+						</div>
 
-					<div className='space-y-2'>
-						<Label htmlFor='name'>Название студии *</Label>
-						<Input
-							id='name'
-							name='name'
-							value={formData.name}
-							onChange={handleInputChange}
-							placeholder='Введите название студии'
-							className='w-full'
-						/>
-					</div>
-
-					<div className='flex items-center justify-between pt-4'>
-						<div className='flex items-center space-x-2'>
-							{studio && (
-								<Button variant='destructive' onClick={handleDelete}>
-									Удалить
+						<div className='flex items-center justify-between pt-4'>
+							<div className='flex items-center space-x-2 ml-auto'>
+								<Button type='button' variant='outline' onClick={onClose}>
+									Отмена
 								</Button>
-							)}
+								<Button type='submit'>
+									{studio ? 'Сохранить' : 'Создать'}
+								</Button>
+							</div>
 						</div>
-						<div className='flex items-center space-x-2'>
-							<Button variant='outline' onClick={onClose}>
-								Отмена
-							</Button>
-							<Button onClick={handleSave}>
-								{studio ? 'Сохранить' : 'Создать'}
-							</Button>
-						</div>
-					</div>
+					</Form>
 				</div>
 			</DialogContent>
 		</Dialog>

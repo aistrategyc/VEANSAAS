@@ -20,7 +20,6 @@ export const useLogin = () => {
 			.then(response => {
 				setAuth(response.data.access_token, response.data.refresh_token)
 				dispatch(fetchUserData()).unwrap()
-				dispatch(fetchStudios()).unwrap()
 				reset()
 			})
 			.catch(err => {

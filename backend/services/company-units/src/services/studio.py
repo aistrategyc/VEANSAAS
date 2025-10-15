@@ -8,15 +8,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.config.config import settings
 from shared.dependencies import AuthContext
+from shared.enums.company_units import OrganizationPlanType
 from shared.models.company_units.org import Organization
 from shared.models.company_units.studio import Studio, StudioInvite, StudioMember
 from shared.models.user import User
 from shared.rabbitmq import rabbitmq
-from shared.schemas.mixins import PaginationResponse
 from shared.schemas.company_units.invite import (
     BaseInviteResponse,
 )
-from shared.enums.company_units import OrganizationPlanType
 from shared.schemas.company_units.studio import (
     StudioCreateRequest,
     StudioFilter,
@@ -29,6 +28,7 @@ from shared.schemas.company_units.studio import (
     StudioUpdateRequest,
     StudioWithMembersResponse,
 )
+from shared.schemas.mixins import PaginationResponse
 from shared.utils import update_model_from_dict
 
 
@@ -84,7 +84,16 @@ async def update_studio(
     db: AsyncSession,
     auth: AuthContext,
 ):
-    studio_db = await db.get(Studio, uuid)
+    result = await db.execute(
+        select(Studio)
+        .where(
+            Studio.uuid == uuid,
+            Studio.organization_uuid == auth.organization_uuid,
+            StudioMember.user_uuid == auth.user.uuid,
+        )
+        .outerjoin(Studio.studio_memberships)
+    )
+    studio_db = result.scalar_one_or_none()
 
     if not studio_db:
         raise HTTPException(
@@ -117,14 +126,16 @@ async def get_list_studios(
             .filter(User.is_active.is_(True))
             .label('members_count'),
         )
-        .filter(Studio.uuid.in_(auth.studios_uuid), Studio.is_active.is_(True))
+        .where(Studio.is_active.is_(True), StudioMember.user_uuid == auth.user.uuid)
         .outerjoin(Studio.studio_memberships)
         .outerjoin(StudioMember.user)
         .group_by(Studio.uuid)
     )
     count_query = (
         select(func.count())
-        .where(Studio.uuid.in_(auth.studios_uuid))
+        .where(Studio.is_active.is_(True), StudioMember.user_uuid == auth.user.uuid)
+        .outerjoin(Studio.studio_memberships)
+        .outerjoin(StudioMember.user)
         .select_from(Studio)
     )
 

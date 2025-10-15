@@ -49,3 +49,4 @@ roles:
       - services-attribute-options:update
       - services-attribute-options:delete
       - services-attribute-options:create
+      - studio:update

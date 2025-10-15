@@ -71,8 +71,7 @@ async def get_studio_route(
 
 
 @router.patch('/{uuid}', response_model=StudioResponse, status_code=status.HTTP_200_OK)
-@requires_permission('studio:update')
-@requires_resource_access()
+@requires_permission('studio:update', scope='orgs')
 async def update_organization_route(
     request: Request,
     uuid: UUID,

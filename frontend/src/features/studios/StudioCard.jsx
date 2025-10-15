@@ -50,20 +50,14 @@ export const StudioCard = ({ studio, onEdit }) => {
 					<div className='space-y-2'>
 						<div className='text-center p-2 rounded-lg bg-muted/20'>
 							<p className='text-lg font-bold text-foreground'>
-								{studio.staff || 0}
+								{studio.members_count || 0}
 							</p>
 							<p className='text-xs text-muted-foreground'>Сотрудников</p>
-						</div>
-						<div className='text-center p-2 rounded-lg bg-muted/20'>
-							<p className='text-lg font-bold text-foreground'>
-								{studio.rooms || 0}
-							</p>
-							<p className='text-xs text-muted-foreground'>Кабинетов</p>
 						</div>
 					</div>
 				</div>
 
-				<div className='grid grid-cols-3 gap-4'>
+				<div className='grid grid-cols-2 gap-4'>
 					<div className='text-center'>
 						<p className='font-medium text-foreground'>
 							{studio.todayRevenue || '$0'}
@@ -76,31 +70,12 @@ export const StudioCard = ({ studio, onEdit }) => {
 						</p>
 						<p className='text-xs text-muted-foreground'>За месяц</p>
 					</div>
-					<div className='text-center'>
-						<p className='font-medium text-foreground'>
-							{studio.occupancy || 0}%
-						</p>
-						<p className='text-xs text-muted-foreground'>Загрузка</p>
-					</div>
-				</div>
-
-				<div className='space-y-2'>
-					<p className='text-sm font-medium text-foreground'>Услуги:</p>
-					<div className='flex flex-wrap gap-2'>
-						{(studio.services || ['Услуги не указаны']).map(
-							(service, index) => (
-								<Badge key={index} variant='outline' className='text-xs'>
-									{service}
-								</Badge>
-							)
-						)}
-					</div>
 				</div>
 
 				<div className='flex items-center gap-2 pt-2'>
-					<Button size='sm' variant='ghost' className='hover:bg-primary/10'>
+					{/* <Button size='sm' variant='ghost' className='hover:bg-primary/10'>
 						<Eye className='h-4 w-4' />
-					</Button>
+					</Button> */}
 					<Button
 						size='sm'
 						variant='ghost'
@@ -108,9 +83,6 @@ export const StudioCard = ({ studio, onEdit }) => {
 						onClick={onEdit}
 					>
 						<Edit className='h-4 w-4' />
-					</Button>
-					<Button size='sm' variant='ghost' className='hover:bg-destructive/10'>
-						<Trash2 className='h-4 w-4' />
 					</Button>
 				</div>
 			</CardContent>

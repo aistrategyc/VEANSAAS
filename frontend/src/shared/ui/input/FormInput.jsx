@@ -39,17 +39,16 @@ export const FormInput = ({
 	}
 
 	return (
-		<div className='space-y-2 mt-2 mb-1'>
-			<div className='flex items-center'>
+		<div className='space-y-2 mt-2 mb-4'>
+			<div className='flex items-center mb-2'>
 				<Label htmlFor={name}>{title}</Label>
-				<p className='text-red-500 text-sm h-5 ml-2'>{error}</p>
 			</div>
 
 			{isPhoneField ? (
 				<div>
 					<PhoneInput
 						international
-						defaultCountry='PL' // Установите страну по умолчанию
+						defaultCountry='PL'
 						placeholder={placeholder || 'Введите номер телефона'}
 						value={field.value}
 						onChange={field.onChange}
@@ -76,6 +75,7 @@ export const FormInput = ({
 					)}
 				</div>
 			)}
+			<p className='text-red-500 text-sm h-5 ml-2'>{error}</p>
 		</div>
 	)
 }
