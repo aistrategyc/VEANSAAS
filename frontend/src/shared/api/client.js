@@ -37,14 +37,13 @@ const refreshAuthToken = async () => {
 			throw new Error('No refresh token available')
 		}
 
-		const response = await apiClient.post(
-			'auth/refresh-access-token',
+		const response = await axios.post(
+			`${BASE_URL}/auth/refresh-access-token`,
 			{},
 			{
 				headers: {
 					Authorization: `Bearer ${refreshToken}`,
 				},
-				_skipAuthRefresh: true,
 			}
 		)
 
@@ -52,6 +51,7 @@ const refreshAuthToken = async () => {
 		tokenManager.setTokens(access_token)
 		return access_token
 	} catch (error) {
+		console.error('Token refresh failed:', error)
 		throw error
 	}
 }
