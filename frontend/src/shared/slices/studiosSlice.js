@@ -27,24 +27,24 @@ export const fetchStudiosSelection = createAsyncThunk(
 	}
 )
 
-export const setCurrentStudio = createAsyncThunk(
-	'studios/setCurrentStudio',
-	async (studioUuid, { getState, rejectWithValue }) => {
-		try {
-			const state = getState()
-			const studios = state.rootReducer.studios.studiosSelection
-			const studio = studios.find(s => s.uuid === studioUuid) || studios[0]
+// export const setCurrentStudio = createAsyncThunk(
+// 	'studios/setCurrentStudio',
+// 	async (studioUuid, { getState, rejectWithValue }) => {
+// 		try {
+// 			const state = getState()
+// 			const studios = state.rootReducer.studios.studiosSelection
+// 			const studio = studios.find(s => s.uuid === studioUuid) || studios[0]
 
-			if (studio) {
-				localStorage.setItem('currentStudioUuid', studio.uuid)
-				return studio
-			}
-			return null
-		} catch (error) {
-			return rejectWithValue('Ошибка установки текущей студии')
-		}
-	}
-)
+// 			if (studio) {
+// 				localStorage.setItem('currentStudioUuid', studio.uuid)
+// 				return studio
+// 			}
+// 			return null
+// 		} catch (error) {
+// 			return rejectWithValue('Ошибка установки текущей студии')
+// 		}
+// 	}
+// )
 
 export const saveStudio = createAsyncThunk(
 	'studios/saveStudio',
@@ -91,6 +91,7 @@ const studiosSlice = createSlice({
 		error: null,
 	},
 	reducers: {
+		setCurrentStudio: state => {},
 		clearError: state => {
 			state.error = null
 		},
@@ -113,8 +114,8 @@ const studiosSlice = createSlice({
 				if (!state.currentStudio && action.payload.length > 0) {
 					const savedStudioUuid = localStorage.getItem('currentStudioUuid')
 					const studioToSet = savedStudioUuid
-						? action.payload.find(studio => studio.uuid === savedStudioUuid)
-						: action.payload[0]
+						? savedStudioUuid
+						: action.payload?.[0]
 
 					if (studioToSet) {
 						state.currentStudio = studioToSet

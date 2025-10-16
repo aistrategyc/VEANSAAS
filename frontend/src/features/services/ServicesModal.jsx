@@ -127,6 +127,7 @@ export function ServiceModal({
 							<Label htmlFor='category_uuid' className='text-sm font-medium'>
 								Категория *
 							</Label>
+
 							<Select
 								value={category_uuid}
 								onValueChange={value => setValue('category_uuid', value)}
