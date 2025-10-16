@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Plus, Scissors, Tag, Folder } from 'lucide-react'
 import { ServiceModal } from '@/features/services/ServicesModal'
-import { CategoryModal } from '@/features/services/CategoryModal'
+import CategoryModal from '@/features/services/CategoryModal'
 import { ServicesTable } from '@/features/services/ServicesTable'
 
 // Импорты Redux
@@ -36,6 +36,10 @@ import { Loader } from '@/shared/ui/loader/Loader'
 
 export default function ServicesPage() {
 	const dispatch = useDispatch()
+
+	const [isOpen, setIsOpen] = useToggle(false)
+
+	setIsOpen()
 
 	// Селекторы для Redux состояния
 	const {
@@ -138,7 +142,6 @@ export default function ServicesPage() {
 		dispatch(clearFilters())
 	}
 
-	
 	const activeServices = services.filter(s => s.is_active)
 	const activeCategories = categories.filter(c => c.is_active)
 
@@ -172,14 +175,14 @@ export default function ServicesPage() {
 				</div>
 
 				<div className='flex items-center space-x-2'>
-					<Button variant='outline' onClick={handleCreateCategory}>
-						<Tag className='h-4 w-4 mr-2' />
-						Добавить категорию
-					</Button>
-					<Button onClick={handleCreateService}>
-						<Plus className='h-4 w-4 mr-2' />
-						Добавить услугу
-					</Button>
+					<CategoryModal data={data} onEdit={true} />
+
+					<CategoryModal>
+						<Button onClick={handleCreateService}>
+							<Plus className='h-4 w-4 mr-2' />
+							Добавить услугу
+						</Button>
+					</CategoryModal>
 				</div>
 			</div>
 			<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
@@ -325,10 +328,7 @@ export default function ServicesPage() {
 
 			<CategoryModal
 				isOpen={isCategoryModalOpen}
-				onClose={() => {
-					setIsCategoryModalOpen(false)
-					setSelectedCategory(null)
-				}}
+				setIsOpen={setIsOpen}
 				category={selectedCategory}
 				onSave={handleSaveCategory}
 				onEdit={handleSaveEditCategory}

@@ -9,6 +9,11 @@ const ATTRIBUTE_TYPES = [
 	{ value: 'number', label: 'Число' },
 	{ value: 'select', label: 'Список' },
 ]
+const ATTRIBUTE_TYPES1 = {
+	text: 'Текст',
+	number: 'Число',
+	select: 'Список',
+}
 
 export const AttributeList = memo(({ fields, onRemove }) => {
 	return (
@@ -28,6 +33,7 @@ export const AttributeList = memo(({ fields, onRemove }) => {
 									</span>
 									<Badge variant='outline' className='text-xs'>
 										{ATTRIBUTE_TYPES.find(t => t.value === field.type)?.label}
+										{ATTRIBUTE_TYPES1[field.type]}
 									</Badge>
 									{field.is_required && (
 										<Badge variant='destructive' className='text-xs'>

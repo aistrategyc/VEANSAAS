@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }) => {
 				setRoles({
 					roles: dataJwt?.roles || [],
 					permissions: dataJwt?.permissions || [],
-					org_uuid: dataJwt?.organization_uuid || null,
+					orgUuid: dataJwt?.organization_uuid || null,
 				})
 			)
 		} else {
