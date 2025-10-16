@@ -1,5 +1,3 @@
-'use client'
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -23,7 +21,7 @@ import { DashboardFinancesCard } from '@/features/dashboard/DashboardFinancesCar
 import { DashboardFinancesServiceCard } from '@/features/dashboard/DashboardFinancesServiceCard'
 import { DashboardCalendarCard } from '@/features/dashboard/DashboardCalendarCard'
 import { useSelector } from 'react-redux'
-import { mockUsers } from '@/role/mocks/rolesMock'
+
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/shared/hooks/useAuth'
 
@@ -101,17 +99,6 @@ export default function DashboardPage() {
 			master: 'Елена К.',
 		},
 	]
-	const [permissions, setPermissions] = useState([])
-	const { currentRole } = useAuth()
-	const roles = useSelector(state => state.rootReducer.roles.roles)
-	useEffect(() => {
-		setPermissions(roles.find(user => user.name === currentRole).permissions)
-	}, [roles])
-
-	const hasPermission = requiredPermission => {
-		if (!requiredPermission) return true
-		return permissions.includes(requiredPermission)
-	}
 
 	return (
 		<div className='flex h-screen bg-background'>
@@ -119,11 +106,11 @@ export default function DashboardPage() {
 			<div className='flex-1 flex flex-col overflow-hidden'>
 				<TopHeader />
 				<main className='flex-1 overflow-auto p-6'>
-					<DashboardStats stats={beautyStats} role={currentRole} />
+					<DashboardStats stats={beautyStats} />
 					<div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
 						<DashboardServicesCard services={popularServices} />
 						<DashboardAppointmentsCard appointments={upcomingAppointments} />
-						{hasPermission('dashboard:view') && <DashboardStaffCard />}
+						<DashboardStaffCard />
 					</div>
 					<div className='grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6'>
 						<DashboardFinancesCard />

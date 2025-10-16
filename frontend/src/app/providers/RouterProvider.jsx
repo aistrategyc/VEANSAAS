@@ -1,8 +1,8 @@
 import { useRoutes, Navigate, Outlet } from 'react-router-dom'
 import { ProtectedRoute } from './ProtectedRoute'
-import { Loader } from '../../shared/ui/loader/Loader'
-import { Layout } from '../../widgets/layout/Layout'
-import { useAuth } from '../../shared/hooks/useAuth'
+import { Loader } from '@/shared/ui/loader/Loader'
+import { Layout } from '@/widgets/layout/Layout'
+import { useAuth } from '@/shared/hooks/useAuth'
 import ClientsPage from '@/pages/clients/ClientsPage'
 import CalendarPage from '@/pages/calendar/CalendarPage'
 import AppointmentsPage from '@/pages/appointments/AppointmentsPage'
@@ -29,7 +29,7 @@ import ClientDetailPage from '@/features/clients/ClientDetailPage'
 import AppointmentDetailPage from '@/features/appointments/AppointmentDetailPage'
 
 export const RouterProvider = () => {
-	const { isAuthenticated, loading } = useAuth()
+	const { isAuthenticated, isLoading } = useAuth()
 
 	const routes = useRoutes([
 		{
@@ -81,7 +81,11 @@ export const RouterProvider = () => {
 		},
 		{
 			path: '/verify-email',
-			element: <VerificationEmailPage />,
+			element: isAuthenticated ? (
+				<Navigate to='/' replace />
+			) : (
+				<VerificationEmailPage />
+			),
 		},
 		{
 			path: '/register-invite',
@@ -97,7 +101,7 @@ export const RouterProvider = () => {
 		},
 	])
 
-	if (loading) {
+	if (isLoading) {
 		return <Loader />
 	}
 

@@ -1,27 +1,47 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { api } from '../api/api'
+import api from '@/shared/api/client'
 
 export const fetchStudios = createAsyncThunk(
 	'studios/fetchStudios',
 	async (_, { rejectWithValue }) => {
 		try {
 			const response = await api.get('/studios')
-			return response.data.items.map((studio, index) => ({
-				...studio,
-				id: index + 1,
-				manager: 'Менеджер не указан',
-				staff: studio.members_count || 0,
-				rooms: 0,
-				todayRevenue: '$0',
-				monthRevenue: '$0',
-				occupancy: 0,
-				status: 'active',
-				services: ['Услуги не указаны'],
-				address: studio.address || 'Адрес не указан',
-				phone: studio.phone_number || 'Телефон не указан',
-			}))
+			return response.data
 		} catch (error) {
 			return rejectWithValue(error.response?.data || 'Ошибка загрузки студий')
+		}
+	}
+)
+
+export const fetchStudiosSelection = createAsyncThunk(
+	'studios/fetchStudiosSelection',
+	async (_, { rejectWithValue }) => {
+		try {
+			const response = await api.get('/studios/selection')
+			return response.data
+		} catch (error) {
+			return rejectWithValue(
+				error.response?.data || 'Ошибка загрузки списка студий'
+			)
+		}
+	}
+)
+
+export const setCurrentStudio = createAsyncThunk(
+	'studios/setCurrentStudio',
+	async (studioUuid, { getState, rejectWithValue }) => {
+		try {
+			const state = getState()
+			const studios = state.rootReducer.studios.studiosSelection
+			const studio = studios.find(s => s.uuid === studioUuid) || studios[0]
+
+			if (studio) {
+				localStorage.setItem('currentStudioUuid', studio.uuid)
+				return studio
+			}
+			return null
+		} catch (error) {
+			return rejectWithValue('Ошибка установки текущей студии')
 		}
 	}
 )
@@ -31,7 +51,6 @@ export const saveStudio = createAsyncThunk(
 	async ({ studioData, editingStudio }, { rejectWithValue }) => {
 		try {
 			if (editingStudio) {
-				// Отправляем запрос на обновление
 				const response = await api.patch(
 					`/studios/${editingStudio.uuid}`,
 					{ name: studioData.name },
@@ -63,24 +82,21 @@ const studiosSlice = createSlice({
 	initialState: {
 		items: [],
 		filteredItems: [],
+		studiosSelection: [],
+		currentStudio: null,
 		searchTerm: '',
 		isLoading: false,
+		isSelectionLoading: false,
 		isLoaded: false,
 		error: null,
 	},
 	reducers: {
-		setSearchTerm: (state, action) => {
-			state.searchTerm = action.payload
-			if (action.payload.trim() === '') {
-				state.filteredItems = state.items
-			} else {
-				state.filteredItems = state.items.filter(studio =>
-					studio.name.toLowerCase().includes(action.payload.toLowerCase())
-				)
-			}
-		},
 		clearError: state => {
 			state.error = null
+		},
+		clearCurrentStudio: state => {
+			state.currentStudio = null
+			localStorage.removeItem('currentStudioUuid')
 		},
 	},
 	extraReducers: builder => {
@@ -99,6 +115,38 @@ const studiosSlice = createSlice({
 				state.isLoading = false
 				state.error = action.payload
 			})
+
+			.addCase(fetchStudiosSelection.pending, state => {
+				state.isSelectionLoading = true
+				state.error = null
+			})
+			.addCase(fetchStudiosSelection.fulfilled, (state, action) => {
+				state.isSelectionLoading = false
+				state.studiosSelection = action.payload
+
+				// Автоматически устанавливаем текущую студию при первой загрузке
+				if (!state.currentStudio && action.payload.length > 0) {
+					const savedStudioUuid = localStorage.getItem('currentStudioUuid')
+					const studioToSet = savedStudioUuid
+						? action.payload.find(studio => studio.uuid === savedStudioUuid)
+						: action.payload[0]
+
+					if (studioToSet) {
+						state.currentStudio = studioToSet
+						localStorage.setItem('currentStudioUuid', studioToSet.uuid)
+					}
+				}
+			})
+			.addCase(fetchStudiosSelection.rejected, (state, action) => {
+				state.isSelectionLoading = false
+				state.error = action.payload
+			})
+			.addCase(setCurrentStudio.fulfilled, (state, action) => {
+				state.currentStudio = action.payload
+			})
+			.addCase(setCurrentStudio.rejected, (state, action) => {
+				state.error = action.payload
+			})
 			.addCase(saveStudio.pending, state => {
 				state.isLoading = true
 				state.error = null
@@ -107,20 +155,17 @@ const studiosSlice = createSlice({
 				state.isLoading = false
 
 				if (action.payload.type === 'update') {
-					// Находим индекс студии в основном массиве
 					const index = state.items.findIndex(
 						s => s.uuid === action.payload.studio.uuid
 					)
 					if (index !== -1) {
-						// Сохраняем локальные поля (revenue, staff, etc.), которые не приходят с сервера
 						const existingStudio = state.items[index]
 						state.items[index] = {
-							...existingStudio, // Сохраняем существующие данные
-							...action.payload.studio, // Обновляем данными с сервера
-							name: action.payload.studio.name, // Гарантируем обновление имени
+							...existingStudio,
+							...action.payload.studio,
+							name: action.payload.studio.name,
 						}
 
-						// Обновляем в отфильтрованном списке
 						const filteredIndex = state.filteredItems.findIndex(
 							s => s.uuid === action.payload.studio.uuid
 						)
@@ -132,8 +177,26 @@ const studiosSlice = createSlice({
 							}
 						}
 					}
+
+					// Обновляем в списке выбора если нужно
+					const selectionIndex = state.studiosSelection.findIndex(
+						s => s.uuid === action.payload.studio.uuid
+					)
+					if (selectionIndex !== -1) {
+						state.studiosSelection[selectionIndex] = {
+							...state.studiosSelection[selectionIndex],
+							name: action.payload.studio.name,
+						}
+					}
+
+					// Обновляем текущую студию если она была изменена
+					if (state.currentStudio?.uuid === action.payload.studio.uuid) {
+						state.currentStudio = {
+							...state.currentStudio,
+							name: action.payload.studio.name,
+						}
+					}
 				} else if (action.payload.type === 'create') {
-					// Создаем новую студию с дополнительными полями
 					const newStudio = {
 						...action.payload.studio,
 						id: state.items.length + 1,
@@ -151,14 +214,40 @@ const studiosSlice = createSlice({
 
 					state.items.push(newStudio)
 					state.filteredItems.push(newStudio)
+
+					// Добавляем в список выбора
+					state.studiosSelection.push({
+						uuid: newStudio.uuid,
+						name: newStudio.name,
+					})
 				}
 			})
 			.addCase(saveStudio.rejected, (state, action) => {
 				state.isLoading = false
 				state.error = action.payload
 			})
+			.addCase(fetchStudios.pending, state => {
+				state.isLoading = true
+				state.error = null
+			})
+			.addCase(fetchStudios.fulfilled, (state, action) => {
+				state.isLoading = false
+				state.items = action.payload
+			})
+			.addCase(fetchStudios.rejected, (state, action) => {
+				state.isLoading = false
+				state.error = action.payload
+			})
 	},
 })
 
-export const { setSearchTerm, clearError } = studiosSlice.actions
+export const { setSearchTerm, clearError, clearCurrentStudio } =
+	studiosSlice.actions
 export default studiosSlice.reducer
+
+export const selectStudiosSelection = state =>
+	state.rootReducer.studios.studiosSelection
+export const selectCurrentStudio = state =>
+	state.rootReducer.studios.currentStudio
+export const selectIsSelectionLoading = state =>
+	state.rootReducer.studios.isSelectionLoading

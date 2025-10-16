@@ -17,17 +17,10 @@ import {
 	CardTitle,
 } from '@/components/ui/card'
 
-export function ServicesTable({
-	services,
-	categories,
-	onEdit,
-	onDelete,
-	currentUser,
-}) {
-	const canEdit =
-		currentUser?.role === 'Admin' || currentUser?.role === 'MasterOwner'
-	const canDelete =
-		currentUser?.role === 'Admin' || currentUser?.role === 'MasterOwner'
+export function ServicesTable({ services, categories, onEdit, onDelete }) {
+	const currentUser = 'Admin'
+	const canEdit = currentUser === 'Admin' || currentUser === 'MasterOwner'
+	const canDelete = currentUser === 'Admin' || currentUser === 'MasterOwner'
 
 	const getCategoryByUuid = categoryUuid => {
 		return categories.find(c => c.uuid === categoryUuid)
@@ -135,7 +128,7 @@ export function ServicesTable({
 										</TableCell>
 										{(canEdit || canDelete) && (
 											<TableCell>
-												<div className='flex items-center justify-end space-x-1 pr-2 opacity-0 group-hover:opacity-100 transition-opacity'>
+												<div className='flex items-center justify-end space-x-1 pr-2'>
 													{canEdit && (
 														<Button
 															variant='ghost'

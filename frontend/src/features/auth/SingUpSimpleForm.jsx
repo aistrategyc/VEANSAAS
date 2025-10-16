@@ -1,13 +1,19 @@
 import { Button } from '@/components/ui/button'
-import { useApi } from '@/shared/hooks/useApi'
-import { schemaRegisterSimple } from '@/shared/schema/schema'
+
+import { schemaRegisterSimple } from './lib/validation'
+import { useSignupByInvite } from './model/api'
 import { Form } from '@/shared/ui/form/Form'
 import { FormInput } from '@/shared/ui/input/FormInput'
+import { useSearchParams } from 'react-router-dom'
 import { Loader } from '@/shared/ui/loader/Loader'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm } from 'react-hook-form'
 
 export const SingUpSimpleForm = () => {
+	const [searchParams] = useSearchParams()
+	const inviteToken = searchParams.get('token')
+	const { fetchSignup, isLoading, error } = useSignupByInvite()
+
 	const {
 		control,
 		handleSubmit,
@@ -22,29 +28,23 @@ export const SingUpSimpleForm = () => {
 			phone_number: '',
 			password: '',
 			confirmPassword: '',
-			invite_token: '211e2f1dc63d32b1880e9b0f865c2d69',
+			invite_token: inviteToken,
 		},
 		resolver: yupResolver(schemaRegisterSimple),
 	})
 
-	const { loading, error, post, reset: resetApi } = useApi()
-
 	const onSubmit = data => {
 		const { confirmPassword, ...submitData } = data
-		post('auth/register-by-invite', submitData)
-			.then(() => {
-				showAlert.successRegister().then(() => navigate('/login'))
-				reset()
-			})
-			.catch()
+		fetchSignup({ data: submitData, reset: reset })
 	}
 
-	if (loading) {
+	if (isLoading) {
 		return <Loader />
 	}
 
 	return (
 		<Form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
+			{error && <p className='text-red-500 text-sm h-5 ml-2'>{error}</p>}
 			<FormInput
 				title='First name'
 				type='text'

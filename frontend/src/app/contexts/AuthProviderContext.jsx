@@ -3,49 +3,69 @@ import {
 	deleteCookie,
 	getCookie,
 	setCookie,
-} from '../../shared/helper/authHelper'
+} from '@/shared/helper/cookie-utils'
 import { AuthContext } from './AuthContext'
-import { useUser } from '../../shared/hooks/useUser'
+import { useUser } from '@/shared/hooks/useUser'
 import { useDispatch } from 'react-redux'
-import { fetchStudios } from '@/shared/slices/studiosSlice'
+import { parseJwt } from '@/shared/api/api'
+import { setRoles, clearRoles } from '@/role/slice/rolesSlice'
+import { clearCurrentStudio } from '@/shared/slices/studiosSlice'
 
 export const AuthProvider = ({ children }) => {
 	const [isAuthenticated, setIsAuthenticated] = useState(false)
-	const [loading, setLoading] = useState(true)
+	const [isLoading, setIsLoading] = useState(true)
+	const dispatch = useDispatch()
 
 	const { fetchUser, fetchStudios } = useUser()
 
-	const login = useCallback((accessToken, refreshToken, options = {}) => {
-		const { expires = 7 } = options
-		setCookie('authToken', accessToken, expires)
-		setCookie('refreshToken', refreshToken)
-
+	const setAuth = useCallback((accessToken, refreshToken) => {
+		setCookie('authToken', accessToken, 7)
+		setCookie('refreshToken', refreshToken, 30)
+		const dataJwt = parseJwt(accessToken)
+		dispatch(
+			setRoles({
+				roles: dataJwt?.roles || [],
+				permissions: dataJwt?.permissions || [],
+				org_uuid: dataJwt?.organization_uuid || null,
+			})
+		)
 		setIsAuthenticated(true)
 	}, [])
 
 	const logout = useCallback(() => {
 		deleteCookie('authToken')
 		deleteCookie('refreshToken')
+		dispatch(clearRoles())
+		dispatch(clearCurrentStudio())
 		setIsAuthenticated(false)
 	}, [])
 
 	useEffect(() => {
+		setIsLoading(true)
 		const token = getCookie('authToken')
 		if (token) {
 			setIsAuthenticated(true)
 			fetchUser()
 			fetchStudios()
+			const dataJwt = parseJwt(token)
+			dispatch(
+				setRoles({
+					roles: dataJwt?.roles || [],
+					permissions: dataJwt?.permissions || [],
+					org_uuid: dataJwt?.organization_uuid || null,
+				})
+			)
 		} else {
 			setIsAuthenticated(false)
 		}
 
-		setLoading(false)
+		setIsLoading(false)
 	}, [])
 
 	const value = {
 		isAuthenticated,
-		loading,
-		login,
+		isLoading,
+		setAuth,
 		logout,
 	}
 

@@ -4,10 +4,11 @@ import { RevenueChart } from '@/features/chart/RevenueChart'
 import { DistributionChart } from '@/features/chart/DistributionChart'
 import { TodayAppointments } from '../../features/appointments/TodayAppointments'
 import { MainActions } from '../../features/main/MainActions'
-import { ServicesTopList } from '@/features/services/ServicesTopList'
+
 import { StaffTopList } from '../../features/staff/StaffTopList'
 import { AppointmentModal } from '@/features/appointments/AppointmentModal'
 import { useState } from 'react'
+import { PermissionGuard } from '@/role/PermissionGuard'
 
 const revenueData = [
 	{ name: 'Пн', revenue: 2400, bookings: 12 },
@@ -173,7 +174,9 @@ export default function MainPage() {
 				type='main'
 				onClick={handleAppointmentIsOpenModal}
 			/>
-			<MainStats />
+			<PermissionGuard requiredAll={['main-stats:view']} scope='studio'>
+				<MainStats />
+			</PermissionGuard>
 
 			<div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
 				<RevenueChart revenueData={revenueData} />
@@ -184,7 +187,6 @@ export default function MainPage() {
 				<MainActions addAppointment={handleAppointmentIsOpenModal} />
 			</div>
 			<div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
-				<ServicesTopList topList={serviceTopList} />
 				<StaffTopList staffList={staffTopList} />
 			</div>
 			<AppointmentModal

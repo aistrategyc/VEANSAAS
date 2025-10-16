@@ -1,41 +1,44 @@
 roles:
   administrator:
     permissions:
-      - user.view
-      - user.create
-      - user.delete
-      - report.view
-      - report.download
-      - settings.edit
+      - user:view
+      - user:create
+      - user:delete
+      - report:view
+      - report:download
+      - settings:edit
+      - page:view
 
   master:
     permissions:
-      - user.view
-      - user.delete
-      - report.view
-      - report.download
-      - settings.edit
+      - user:view
+      - user:delete
+      - report:view
+      - report:download
+      - settings:edit
+      - page:view
 
   studio_manager:
     permissions:
-      - user.view
-      - report.view
-      - report.download
+      - user:view
+      - report:view
+      - report:download
+      - main-stats:view
 
   studio_owner:
     permissions:
-      - report.view
+      - report:view
       - org:update
       - studio:update
 
   owner:
     permissions:
-      - user.view
-      - user.create
-      - user.delete
-      - report.view
-      - report.download
-      - settings.edit
+      - user:view
+      - user:create
+      - user:delete
+      - report:view
+      - report:download
+      - settings:edit
       - org:update
       - services:create
       - services:update
@@ -49,3 +52,4 @@ roles:
       - services-attribute-options:update
       - services-attribute-options:delete
       - services-attribute-options:create
+      - studio:update

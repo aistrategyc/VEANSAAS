@@ -23,6 +23,7 @@ class ServiceUpdate(ServiceBase):
     name: str | None = Field(default=None, max_length=255)
     base_price: Decimal | None = Field(default=None, ge=Decimal('0.00'))
     is_active: bool | None = Field(default=None)
+    category_uuid: UUID
 
 
 class ServiceCategoryBase(BaseModel):
@@ -35,20 +36,12 @@ class ServiceCategoryUpdate(ServiceCategoryBase):
     name: str | None = Field(default=None, max_length=255)
 
 
-class ServiceCategoryResponse(ServiceCategoryBase, UUIDMixin, TimestampMixin):
-    organization_uuid: UUID
-
-
 class CategoryAttributeBase(BaseModel):
     name: str = Field(max_length=255)
     description: str | None = Field(default=None)
     type: AttributeType
     sort_order: int = Field(default=0, ge=0)
     is_required: bool = Field(default=True)
-
-
-class CategoryAttributeCreate(CategoryAttributeBase):
-    category_uuid: UUID
 
 
 class CategoryAttributeUpdate(CategoryAttributeBase):
@@ -67,6 +60,15 @@ class AttributeOptionBase(BaseModel):
     value: str = Field(max_length=255)
 
 
+class CategoryAttributeCreate(CategoryAttributeBase):
+    category_uuid: UUID
+    options: List[AttributeOptionBase] | None = Field(default=None)
+
+
+class CategoryAttributeWithoutCategoryCreate(CategoryAttributeBase):
+    options: List[AttributeOptionBase] | None = Field(default=None)
+
+
 class AttributeOptionCreate(AttributeOptionBase):
     attribute_uuid: UUID
 
@@ -80,7 +82,7 @@ class AttributeOptionUpdate(AttributeOptionBase):
 
 
 class ServiceCategoryCreate(ServiceCategoryBase):
-    attributes: List[CategoryAttributeBase] | None = Field(default=None)
+    attributes: List[CategoryAttributeWithoutCategoryCreate]
 
 
 class ServiceResponse(ServiceBase, UUIDMixin, TimestampMixin):
@@ -103,3 +105,7 @@ class ServiceDetailResponse(ServiceBase, UUIDMixin, TimestampMixin):
     organization_uuid: UUID
     category_uuid: UUID
     category: ServiceCategoryDetailResponse | None = Field(default=None)
+
+
+class ServiceCategoryResponse(ServiceCategoryBase, UUIDMixin, TimestampMixin):
+    organization_uuid: UUID

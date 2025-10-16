@@ -1,52 +1,25 @@
-// pages/StudiosPage.js
-import { Building2, Users, Clock, DollarSign } from 'lucide-react'
 import { HeaderPages } from '@/features/headerPages/HeaderPages'
 import { StatsList } from '@/features/stats/StatsList'
 import { FiltersPages } from '@/features/filtersPages/FiltersPages'
 import { StudiosGrid } from '@/features/studios/StudiosGrid'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { StudioModal } from '@/features/studios/StudioModal'
 import { useDispatch, useSelector } from 'react-redux'
 import { saveStudio, setSearchTerm } from '@/shared/slices/studiosSlice'
 import { Loader } from '@/shared/ui/loader/Loader'
-import { useUser } from '@/shared/hooks/useUser'
+import { useStudios } from '@/features/studios/model/api'
 
-export default function StudiosPage() {
-	const dispatch = useDispatch()
-
-	const { isLoading, isLoaded } = useSelector(
-		state => state.rootReducer.studios
-	)
-
-	const { studios, filteredStudios } = useUser()
+const StudiosPage = () => {
+	const { fetchStudios, createStudio, updateStudio, isLoading, studios } =
+		useStudios()
 
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
 	const [editingStudio, setEditingStudio] = useState(null)
 
-	const statsStudiosList = [
-		{
-			id: 1,
-			icon: Building2,
-			count: studios.length.toString(),
-			name: 'Всего студий',
-		},
-		{
-			id: 2,
-			icon: Users,
-			count: studios
-				.reduce((sum, studio) => sum + (studio.staff || 0), 0)
-				.toString(),
-			name: 'Всего сотрудников',
-		},
-		{ id: 3, icon: DollarSign, count: '$0', name: 'Выручка сегодня' },
-		{ id: 4, icon: Clock, count: '0%', name: 'Средняя загрузка' },
-	]
+	useEffect(() => {
+		fetchStudios()
+	}, [])
 
-	const onSaveData = async data => {
-		await dispatch(saveStudio({ studioData: data, editingStudio })).unwrap()
-		setIsCreateModalOpen(false)
-		setEditingStudio(null)
-	}
 	const handleStudioIsOpenModal = () => {
 		setEditingStudio(null)
 		setIsCreateModalOpen(true)
@@ -66,7 +39,7 @@ export default function StudiosPage() {
 		setEditingStudio(null)
 	}
 
-	if (!isLoaded && isLoading) {
+	if (isLoading) {
 		return <Loader />
 	}
 
@@ -78,21 +51,24 @@ export default function StudiosPage() {
 				title='Студии'
 				onClick={handleStudioIsOpenModal}
 			/>
-			<StatsList stats={statsStudiosList} />
+			<StatsList />
 			<FiltersPages
 				placeholder='Поиск по названию...'
 				type='studio'
 				onSearch={handleSearch}
 			/>
 
-			<StudiosGrid studios={filteredStudios} onEditStudio={handleEditStudio} />
+			<StudiosGrid studios={studios} onEditStudio={handleEditStudio} />
 
 			<StudioModal
 				isOpen={isCreateModalOpen}
 				onClose={handleCloseModal}
-				onSave={onSaveData}
+				handleCreate={createStudio}
+				handleUpdate={updateStudio}
 				studio={editingStudio}
 			/>
 		</div>
 	)
 }
+
+export default StudiosPage

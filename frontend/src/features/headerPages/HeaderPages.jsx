@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { useAuth } from '@/shared/hooks/useAuth'
-import { Eye, MessageSquare, Plus, User } from 'lucide-react'
+import { Eye, MessageSquare, Plus } from 'lucide-react'
 
 export const HeaderPages = ({
 	title,

@@ -2,19 +2,14 @@ import { useForm } from 'react-hook-form'
 import { FormInput } from 'shared/ui/input/FormInput'
 import { Form } from 'shared/ui/form/Form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { schemaLogin } from 'shared/schema/schema'
-import { useAuth } from '../../shared/hooks/useAuth'
-import { useApi } from '../../shared/hooks/useApi'
-import { Loader } from '../../shared/ui/loader/Loader'
-import { showAlert } from '../../shared/ui/alert/Alerts'
-import { useDispatch } from 'react-redux'
-import { fetchUserData } from '../../shared/slices/userSlice'
+import { schemaLogin } from './lib/validation'
+import { Loader } from '@/shared/ui/loader/Loader'
 import { Link } from 'react-router'
 import { Button } from '@/components/ui/button'
-import { useState } from 'react'
-import { fetchStudios } from '@/shared/slices/studiosSlice'
+import { useLogin } from './model/api'
 
 export const LoginForm = () => {
+	const { fetchLogin, isLoading, error } = useLogin()
 	const {
 		handleSubmit,
 		formState: { errors },
@@ -28,31 +23,15 @@ export const LoginForm = () => {
 		},
 		resolver: yupResolver(schemaLogin),
 	})
-	const [error, setError] = useState('')
-	const { login } = useAuth()
-	const { loading, post, reset: resetApi } = useApi()
-	const dispatch = useDispatch()
 
-	const onSubmit = data => {
-		post('auth/login', data)
-			.then(response => {
-				login(response.data.access_token, response.data.refresh_token, {
-					expires: 7,
-				})
-				dispatch(fetchUserData()).unwrap()
-				dispatch(fetchStudios()).unwrap()
-				reset()
-			})
-			.catch(err => {
-				setError(err.response.data.detail)
-			})
-	}
-
-	if (loading) {
+	if (isLoading) {
 		return <Loader />
 	}
 	return (
-		<Form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
+		<Form
+			onSubmit={handleSubmit(data => fetchLogin({ data: data, reset: reset }))}
+			className='space-y-4'
+		>
 			{error && <p className='text-red-500 text-sm h-5 ml-2'>{error}</p>}
 			<FormInput
 				title='Username'

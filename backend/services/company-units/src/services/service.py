@@ -4,7 +4,7 @@ from uuid import UUID
 from fastapi import HTTPException, Request, Response, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import joinedload, selectinload
 
 from shared.dependencies import AuthContext
 from shared.models.company_units.service import (
@@ -38,27 +38,52 @@ async def crete_category(
 
     if data.attributes:
         await db.flush()
-        attribute_data_list = [item.model_dump() for item in data.attributes]
 
-        db_attributes = []
-        for attribute_data in attribute_data_list:
+        db_attribute_options = []
+        for attribute_data in data.attributes:
             db_attribute = CategoryAttribute(
-                **attribute_data,
+                **attribute_data.model_dump(exclude={'options'}),
                 category_uuid=db_service_category.uuid,
                 organization_uuid=auth.organization_uuid,
             )
-            db_attributes.append(db_attribute)
+            db.add(db_attribute)
 
-        db.add_all(db_attributes)
+            if attribute_data.options:
+                await db.flush()
+                for data_options in attribute_data.options:
+                    db_attribute_option = AttributeOption(
+                        **data_options.model_dump(),
+                        attribute_uuid=db_attribute.uuid,
+                        organization_uuid=auth.organization_uuid,
+                    )
+                    db_attribute_options.append(db_attribute_option)
+
+        db.add_all(db_attribute_options)
 
     await db.commit()
-    return db_service_category
+
+    result = await db.execute(
+        select(ServiceCategory)
+        .where(ServiceCategory.uuid == db_service_category.uuid)
+        .options(
+            joinedload(ServiceCategory.attributes).joinedload(
+                CategoryAttribute.attribute_options
+            )
+        )
+    )
+    db_service_category_with_relations = result.unique().scalar_one()
+
+    return db_service_category_with_relations
 
 
 async def get_list_categories(request: Request, db: AsyncSession, auth: AuthContext):
     result = await db.execute(
-        select(ServiceCategory).where(
-            ServiceCategory.organization_uuid == auth.organization_uuid
+        select(ServiceCategory)
+        .where(ServiceCategory.organization_uuid == auth.organization_uuid)
+        .options(
+            selectinload(ServiceCategory.attributes).selectinload(
+                CategoryAttribute.attribute_options
+            )
         )
     )
     db_service_category = result.scalars().all()
