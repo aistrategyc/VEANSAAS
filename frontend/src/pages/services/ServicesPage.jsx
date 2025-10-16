@@ -138,7 +138,7 @@ export default function ServicesPage() {
 		dispatch(clearFilters())
 	}
 
-	// Статистика
+	
 	const activeServices = services.filter(s => s.is_active)
 	const activeCategories = categories.filter(c => c.is_active)
 

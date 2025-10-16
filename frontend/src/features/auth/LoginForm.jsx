@@ -41,6 +41,7 @@ export const LoginForm = () => {
 				})
 				dispatch(fetchUserData()).unwrap()
 				dispatch(fetchStudios()).unwrap()
+				
 				reset()
 			})
 			.catch(err => {
