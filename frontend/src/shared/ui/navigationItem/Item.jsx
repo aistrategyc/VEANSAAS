@@ -12,7 +12,7 @@ export const Item = ({
 	permission,
 }) => {
 	return (
-		<PermissionGuard requiredAll={permission}>
+		<PermissionGuard requiredAny={permission} scope='org'>
 			<li>
 				<Link
 					to={to}

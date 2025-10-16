@@ -56,7 +56,6 @@ const servicesSlice = createSlice({
 		filteredItems: [],
 		searchQuery: '',
 		categoryFilter: 'all',
-		statusFilter: 'active',
 		isLoading: false,
 		isLoaded: false,
 		error: null,
@@ -70,9 +69,9 @@ const servicesSlice = createSlice({
 			state.categoryFilter = action.payload
 			state.filteredItems = filterServices(state.items, state)
 		},
-		setStatusFilter: (state, action) => {
-			state.statusFilter = action.payload
-			state.filteredItems = filterServices(state.items, state)
+		clearFilters: state => {
+			state.searchQuery = ''
+			state.categoryFilter = 'all'
 		},
 		clearError: state => {
 			state.error = null
@@ -145,30 +144,25 @@ const servicesSlice = createSlice({
 	},
 })
 
-// Вспомогательная функция для фильтрации
+// Простая функция фильтрации
 const filterServices = (services, filters) => {
 	return services.filter(service => {
 		const matchesSearch =
 			filters.searchQuery === '' ||
-			service.name.toLowerCase().includes(filters.searchQuery.toLowerCase())
+			service.name.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
+			(service.description &&
+				service.description
+					.toLowerCase()
+					.includes(filters.searchQuery.toLowerCase()))
 
 		const matchesCategory =
 			filters.categoryFilter === 'all' ||
 			service.category_uuid === filters.categoryFilter
 
-		const matchesStatus =
-			filters.statusFilter === 'all' ||
-			(filters.statusFilter === 'active' && service.is_active) ||
-			(filters.statusFilter === 'inactive' && !service.is_active)
-
-		return matchesSearch && matchesCategory && matchesStatus
+		return matchesSearch && matchesCategory
 	})
 }
 
-export const {
-	setSearchQuery,
-	setCategoryFilter,
-	setStatusFilter,
-	clearError,
-} = servicesSlice.actions
+export const { setSearchQuery, setCategoryFilter, clearFilters, clearError } =
+	servicesSlice.actions
 export default servicesSlice.reducer

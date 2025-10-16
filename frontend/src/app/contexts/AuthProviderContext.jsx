@@ -6,22 +6,37 @@ import {
 } from '@/shared/helper/cookie-utils'
 import { AuthContext } from './AuthContext'
 import { useUser } from '@/shared/hooks/useUser'
+import { useDispatch } from 'react-redux'
+import { parseJwt } from '@/shared/api/api'
+import { setRoles, clearRoles } from '@/role/slice/rolesSlice'
+import { clearCurrentStudio } from '@/shared/slices/studiosSlice'
 
 export const AuthProvider = ({ children }) => {
 	const [isAuthenticated, setIsAuthenticated] = useState(false)
 	const [isLoading, setIsLoading] = useState(true)
+	const dispatch = useDispatch()
 
 	const { fetchUser, fetchStudios } = useUser()
 
 	const setAuth = useCallback((accessToken, refreshToken) => {
 		setCookie('authToken', accessToken, 7)
 		setCookie('refreshToken', refreshToken, 30)
+		const dataJwt = parseJwt(accessToken)
+		dispatch(
+			setRoles({
+				roles: dataJwt?.roles || [],
+				permissions: dataJwt?.permissions || [],
+				org_uuid: dataJwt?.organization_uuid || null,
+			})
+		)
 		setIsAuthenticated(true)
 	}, [])
 
 	const logout = useCallback(() => {
 		deleteCookie('authToken')
 		deleteCookie('refreshToken')
+		dispatch(clearRoles())
+		dispatch(clearCurrentStudio())
 		setIsAuthenticated(false)
 	}, [])
 
@@ -31,6 +46,15 @@ export const AuthProvider = ({ children }) => {
 		if (token) {
 			setIsAuthenticated(true)
 			fetchUser()
+			fetchStudios()
+			const dataJwt = parseJwt(token)
+			dispatch(
+				setRoles({
+					roles: dataJwt?.roles || [],
+					permissions: dataJwt?.permissions || [],
+					org_uuid: dataJwt?.organization_uuid || null,
+				})
+			)
 		} else {
 			setIsAuthenticated(false)
 		}

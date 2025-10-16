@@ -6,38 +6,57 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { ChevronDown } from 'lucide-react'
-import api from '@/shared/api/client'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+
+import { Loader } from '@/shared/ui/loader/Loader'
+import {
+	fetchStudiosSelection,
+	selectCurrentStudio,
+	selectIsSelectionLoading,
+	selectStudiosSelection,
+	setCurrentStudio,
+} from '@/shared/slices/studiosSlice'
 
 export const ChangeStudio = () => {
-	const [studios, setStudios] = useState([])
-	const fetchStudios = async () => {
-		await api.get('/studios/selection').then(response => {
-			setStudios(response.data)
-		})
-	}
-	const handleChange = studio => {
-		localStorage.setItem('currentStudioUuid', studio.uuid)
-	}
+	const dispatch = useDispatch()
+
+	const studiosSelection = useSelector(selectStudiosSelection)
+	const currentStudio = useSelector(selectCurrentStudio)
+	const isSelectionLoading = useSelector(selectIsSelectionLoading)
 
 	useEffect(() => {
-		fetchStudios()
+		dispatch(fetchStudiosSelection())
 	}, [])
+
+	const handleStudioChange = studio => {
+		dispatch(setCurrentStudio(studio.uuid))
+	}
+
+	if (isSelectionLoading) {
+		return <Loader />
+	}
 
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
 				<Button variant='outline' className='flex items-center gap-2'>
-					Выбрать студию
+					{currentStudio
+						? `Студия: ${currentStudio.name}`
+						: studiosSelection.length > 0
+						? `Студия: ${studiosSelection[0].name}`
+						: 'Нет доступных студий'}
 					<ChevronDown className='h-4 w-4 opacity-50' />
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className='w-56'>
-				{studios.map(studio => (
+				{studiosSelection.map(studio => (
 					<DropdownMenuItem
 						key={studio.uuid}
-						onClick={() => handleChange(studio)}
-						className='flex flex-col items-start py-2 cursor-pointer'
+						onClick={() => handleStudioChange(studio)}
+						className={`flex flex-col items-start py-2 cursor-pointer ${
+							currentStudio?.uuid === studio.uuid ? 'bg-accent' : ''
+						}`}
 					>
 						<span className='font-medium'>{studio.name}</span>
 					</DropdownMenuItem>

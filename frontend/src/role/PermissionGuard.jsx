@@ -5,31 +5,77 @@ export const PermissionGuard = ({
 	requiredPermission,
 	requiredAny = [],
 	requiredAll = [],
+	scope = 'studio',
 }) => {
-	const roleId = useSelector(state => state.rootReducer.rolesCurrent.roleId)
 	const roles = useSelector(state => state.rootReducer.roles?.roles)
-	const role = roles.find(r => r.name === roleId)
+	const orgUuid = useSelector(state => state.rootReducer.roles?.org_uuid)
+	const permissionsConfig = useSelector(
+		state => state.rootReducer.roles.permissions
+	)
+	const currentStudio = useSelector(
+		state => state.rootReducer.studios.currentStudio?.uuid
+	)
 
-	const permissions = role.permissions
+	const getUserRoles = () => {
+		if (scope === 'studio' && currentStudio) {
+			return roles?.studios?.[currentStudio] || []
+		} else if (scope === 'org' && orgUuid) {
+			return roles?.orgs?.[orgUuid] || []
+		}
+		return []
+	}
+
+	const getAllPermissions = () => {
+		const userRoles = getUserRoles()
+		const allPermissions = []
+
+		userRoles.forEach(role => {
+			const rolePermissions = permissionsConfig?.[role]?.permissions || []
+			allPermissions.push(...rolePermissions)
+		})
+
+		return [...new Set(allPermissions)]
+	}
 
 	const hasPermission = requiredPermission => {
 		if (!requiredPermission) return true
-		return permissions.includes(requiredPermission)
+
+		const userRoles = getUserRoles()
+		if (userRoles.length === 0) return false
+
+		return userRoles.some(role => {
+			const rolePermissions = permissionsConfig?.[role]?.permissions || []
+			return rolePermissions.includes(requiredPermission)
+		})
 	}
 
 	const hasAnyPermission = requiredPermissions => {
 		if (!requiredPermissions || requiredPermissions.length === 0) return true
-		return requiredPermissions.some(permission =>
-			permissions.includes(permission)
+
+		const userRoles = getUserRoles()
+		if (userRoles.length === 0) return false
+
+		return requiredPermissions.some(requiredPermission =>
+			userRoles.some(role => {
+				const rolePermissions = permissionsConfig?.[role]?.permissions || []
+				return rolePermissions.includes(requiredPermission)
+			})
 		)
 	}
 
 	const hasAllPermissions = requiredPermissions => {
 		if (!requiredPermissions || requiredPermissions.length === 0) return true
+
+		const userRoles = getUserRoles()
+		if (userRoles.length === 0) return false
+
+		const allPermissions = getAllPermissions()
+
 		return requiredPermissions.every(permission =>
-			permissions.includes(permission)
+			allPermissions.includes(permission)
 		)
 	}
+
 	let hasAccess = true
 
 	if (requiredPermission) {
