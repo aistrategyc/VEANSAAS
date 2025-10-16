@@ -53,3 +53,4 @@ roles:
       - services-attribute-options:delete
       - services-attribute-options:create
       - studio:update
+      - page:view

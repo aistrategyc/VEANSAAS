@@ -7,7 +7,7 @@ import {
 import { AuthContext } from './AuthContext'
 import { useUser } from '@/shared/hooks/useUser'
 import { useDispatch } from 'react-redux'
-import { parseJwt } from '@/shared/api/api'
+import { parseJwt } from '@/shared/helper/jwt-helpers'
 import { setRoles, clearRoles } from '@/role/slice/rolesSlice'
 import { clearCurrentStudio } from '@/shared/slices/studiosSlice'
 

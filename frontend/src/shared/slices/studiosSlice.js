@@ -101,21 +101,6 @@ const studiosSlice = createSlice({
 	},
 	extraReducers: builder => {
 		builder
-			.addCase(fetchStudios.pending, state => {
-				state.isLoading = true
-				state.error = null
-			})
-			.addCase(fetchStudios.fulfilled, (state, action) => {
-				state.isLoading = false
-				state.items = action.payload
-				state.filteredItems = action.payload
-				state.isLoaded = true
-			})
-			.addCase(fetchStudios.rejected, (state, action) => {
-				state.isLoading = false
-				state.error = action.payload
-			})
-
 			.addCase(fetchStudiosSelection.pending, state => {
 				state.isSelectionLoading = true
 				state.error = null
