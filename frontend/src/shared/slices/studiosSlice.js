@@ -1,25 +1,12 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { api } from '../api/api'
+import api from '@/shared/api/client'
 
 export const fetchStudios = createAsyncThunk(
 	'studios/fetchStudios',
 	async (_, { rejectWithValue }) => {
 		try {
 			const response = await api.get('/studios')
-			return response.data.items.map((studio, index) => ({
-				...studio,
-				id: index + 1,
-				manager: 'Менеджер не указан',
-				staff: studio.members_count || 0,
-				rooms: 0,
-				todayRevenue: '$0',
-				monthRevenue: '$0',
-				occupancy: 0,
-				status: 'active',
-				services: ['Услуги не указаны'],
-				address: studio.address || 'Адрес не указан',
-				phone: studio.phone_number || 'Телефон не указан',
-			}))
+			return response.data
 		} catch (error) {
 			return rejectWithValue(error.response?.data || 'Ошибка загрузки студий')
 		}
@@ -95,8 +82,8 @@ const studiosSlice = createSlice({
 	initialState: {
 		items: [],
 		filteredItems: [],
-		studiosSelection: [], // Для выпадающего списка
-		currentStudio: null, // Текущая выбранная студия
+		studiosSelection: [],
+		currentStudio: null,
 		searchTerm: '',
 		isLoading: false,
 		isSelectionLoading: false,
@@ -104,16 +91,6 @@ const studiosSlice = createSlice({
 		error: null,
 	},
 	reducers: {
-		setSearchTerm: (state, action) => {
-			state.searchTerm = action.payload
-			if (action.payload.trim() === '') {
-				state.filteredItems = state.items
-			} else {
-				state.filteredItems = state.items.filter(studio =>
-					studio.name.toLowerCase().includes(action.payload.toLowerCase())
-				)
-			}
-		},
 		clearError: state => {
 			state.error = null
 		},
@@ -124,7 +101,6 @@ const studiosSlice = createSlice({
 	},
 	extraReducers: builder => {
 		builder
-
 			.addCase(fetchStudios.pending, state => {
 				state.isLoading = true
 				state.error = null
@@ -165,14 +141,12 @@ const studiosSlice = createSlice({
 				state.isSelectionLoading = false
 				state.error = action.payload
 			})
-			// Установка текущей студии
 			.addCase(setCurrentStudio.fulfilled, (state, action) => {
 				state.currentStudio = action.payload
 			})
 			.addCase(setCurrentStudio.rejected, (state, action) => {
 				state.error = action.payload
 			})
-			// Сохранение студии
 			.addCase(saveStudio.pending, state => {
 				state.isLoading = true
 				state.error = null
@@ -249,6 +223,18 @@ const studiosSlice = createSlice({
 				}
 			})
 			.addCase(saveStudio.rejected, (state, action) => {
+				state.isLoading = false
+				state.error = action.payload
+			})
+			.addCase(fetchStudios.pending, state => {
+				state.isLoading = true
+				state.error = null
+			})
+			.addCase(fetchStudios.fulfilled, (state, action) => {
+				state.isLoading = false
+				state.items = action.payload
+			})
+			.addCase(fetchStudios.rejected, (state, action) => {
 				state.isLoading = false
 				state.error = action.payload
 			})

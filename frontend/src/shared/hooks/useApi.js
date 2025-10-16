@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { api } from '../api/api'
+import api from '@/shared/api/client'
 
 export const useApi = () => {
 	const [data, setData] = useState(null)

@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { api } from '@/shared/api/api'
+import api from '@/shared/api/client'
 
-// Асинхронные действия для категорий
 export const fetchCategories = createAsyncThunk(
 	'categories/fetchCategories',
 	async (_, { rejectWithValue }) => {
