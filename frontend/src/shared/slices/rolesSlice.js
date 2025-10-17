@@ -1,5 +1,3 @@
-import { parseJwt } from '@/shared/helper/jwt-helpers'
-import { getCookie } from '@/shared/helper/cookie-utils'
 import { createSlice } from '@reduxjs/toolkit'
 
 // Удалите начальную инициализацию из JWT, так как данные будут приходить после логина
@@ -8,7 +6,7 @@ const rolesSlice = createSlice({
 	initialState: {
 		roles: [],
 		permissions: [],
-		org_uuid: null,
+		orgUuid: null,
 		loading: false,
 		error: null,
 	},
@@ -16,7 +14,7 @@ const rolesSlice = createSlice({
 		setRoles: (state, action) => {
 			state.roles = action.payload.roles
 			state.permissions = action.payload.permissions
-			state.org_uuid = action.payload.org_uuid
+			state.orgUuid = action.payload.orgUuid
 			state.error = null
 		},
 
@@ -28,11 +26,10 @@ const rolesSlice = createSlice({
 			state.error = action.payload
 		},
 
-		// Добавьте экшен для очистки данных при логауте
 		clearRoles: state => {
 			state.roles = []
 			state.permissions = []
-			state.org_uuid = null
+			state.orgUuid = null
 			state.error = null
 		},
 	},

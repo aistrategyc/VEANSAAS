@@ -1,7 +1,6 @@
 import { HeaderPages } from '@/features/headerPages/HeaderPages'
 import { FinancesStats } from '@/features/finances/FinancesStats'
 import { FinancesMonthlyChart } from '@/features/finances/FinancesMonthlyChart'
-import { FiltersPages } from '@/features/filtersPages/FiltersPages'
 import { FinancesTransactions } from '@/features/finances/FinancesTransactions'
 
 export default function FinancesPage() {
@@ -16,7 +15,6 @@ export default function FinancesPage() {
 
 	return (
 		<div className='space-y-6 animate-in fade-in-0 duration-500'>
-
 			<HeaderPages
 				description='Управление доходами и расходами'
 				nameButton='Добавить операцию'
@@ -26,7 +24,6 @@ export default function FinancesPage() {
 			{/* Переписать  */}
 			<FinancesStats />
 			<FinancesMonthlyChart monthlyStats={monthlyStats} />
-			<FiltersPages placeholder='Поиск операций...' type='finances' />
 			<FinancesTransactions />
 		</div>
 	)

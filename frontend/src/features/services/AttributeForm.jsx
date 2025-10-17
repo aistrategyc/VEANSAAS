@@ -1,196 +1,116 @@
-import React, { useState, useCallback, memo } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select'
+
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Plus, Trash2 } from 'lucide-react'
+import { FormInput } from '@/shared/ui/input/FormInput'
+import { SelectForm } from '@/shared/ui/select/Select'
+import { ATTRIBUTE_TYPES_SELECT } from './lib/constants'
 
-const ATTRIBUTE_TYPES = [
-	{ value: 'text', label: 'Текст' },
-	{ value: 'number', label: 'Число' },
-	{ value: 'select', label: 'Список' },
-]
+export const AttributeForm = ({ onAppendAttribute }) => {
+	const [newAttributeValueInput, setNewAttributeValueInput] = useState('')
 
-export const AttributeForm = memo(({ onAppendAttribute }) => {
 	const {
-		register,
-		handleSubmit: handleNewAttributeSubmit,
-		formState: { errors: newAttributeErrors },
+		control,
+		handleSubmit,
+		formState: { errors },
 		setValue,
 		watch,
 		reset,
-		trigger,
 	} = useForm({
-		mode: 'onChange',
 		defaultValues: {
 			name: '',
 			description: '',
 			type: '',
 			is_required: false,
-			values: [],
+			attribute_options: [],
 		},
 	})
 
-	const newAttributeType = watch('type')
-	const newAttributeValues = watch('values')
-	const [newAttributeValueInput, setNewAttributeValueInput] = useState('')
+	const type = watch('type')
+	const values = watch('attribute_options')
 
-	const handleAddAttributeValue = useCallback(() => {
+	const handleAddAttributeValue = () => {
 		if (!newAttributeValueInput.trim()) return
 
-		const currentValues = watch('values') || []
-		setValue('values', [...currentValues, newAttributeValueInput.trim()])
+		const currentValues = values || []
+		setValue('attribute_options', [
+			...currentValues,
+			newAttributeValueInput.trim(),
+		])
 		setNewAttributeValueInput('')
-	}, [newAttributeValueInput, setValue, watch])
+	}
 
-	const handleRemoveAttributeValue = useCallback(
-		index => {
-			const currentValues = watch('values') || []
-			setValue(
-				'values',
-				currentValues.filter((_, i) => i !== index)
-			)
-		},
-		[setValue, watch]
-	)
+	const handleRemoveAttributeValue = index => {
+		const currentValues = values || []
+		setValue(
+			'attribute_options',
+			currentValues.filter((_, i) => i !== index)
+		)
+	}
 
-	const handleAddAttribute = useCallback(async () => {
-		// Проверяем валидность формы
-		const isValid = await trigger(['name', 'type'])
-
-		if (!isValid) {
-			return
-		}
-
-		const attributeData = watch()
-
-		// Дополнительная проверка для select типа
-		if (
-			attributeData.type === 'select' &&
-			(!attributeData.values || attributeData.values.length === 0)
-		) {
-			alert('Для типа "Список" необходимо добавить хотя бы одно значение')
-			return
-		}
-
+	const onSubmit = data => {
+		console.log(data)
 		const newAttribute = {
-			...attributeData,
+			...data,
 			id: Date.now().toString(),
-			values: attributeData.values || [],
+			attribute_options: data.values || [],
 		}
-
 
 		onAppendAttribute(newAttribute)
 
-		// Сбрасываем форму
-		reset({
-			name: '',
-			description: '',
-			type: '',
-			is_required: false,
-			values: [],
-		})
+		reset()
 		setNewAttributeValueInput('')
-	}, [watch, onAppendAttribute, reset, trigger])
-
-	const handleKeyPress = useCallback(
-		e => {
-			if (e.key === 'Enter') {
-				e.preventDefault()
-				if (newAttributeType === 'select') {
-					handleAddAttributeValue()
-				} else {
-					handleAddAttribute()
-				}
-			}
-		},
-		[newAttributeType, handleAddAttributeValue, handleAddAttribute]
-	)
+	}
 
 	return (
 		<div className='space-y-4 p-4 border rounded-lg'>
 			<div className='grid grid-cols-1 md:grid-cols-3 gap-3'>
-				<div className='space-y-2'>
-					<Label className='text-sm'>Название *</Label>
-					<Input
-						{...register('name', {
-							required: 'Обязательное поле',
-						})}
-						placeholder='Атрибут'
-						className='h-9'
-						onKeyPress={handleKeyPress}
-					/>
-					{newAttributeErrors.name && (
-						<p className='text-sm text-destructive'>
-							{newAttributeErrors.name.message}
-						</p>
-					)}
-				</div>
-
-				<div className='space-y-2'>
-					<Label className='text-sm'>Тип *</Label>
-					<Select
-						value={watch('type')}
-						onValueChange={value => setValue('type', value)}
-					>
-						<SelectTrigger className='h-9'>
-							<SelectValue placeholder='Выберите тип' />
-						</SelectTrigger>
-						<SelectContent>
-							{ATTRIBUTE_TYPES.map(type => (
-								<SelectItem key={type.value} value={type.value}>
-									{type.label}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-
-					{newAttributeErrors.type && (
-						<p className='text-sm text-destructive'>
-							{newAttributeErrors.type.message}
-						</p>
-					)}
-				</div>
-
-				<div className='space-y-2'>
-					<Label className='text-sm opacity-0'>Добавить</Label>
-					<Button
-						type='button'
-						onClick={handleAddAttribute}
-						className='h-9 w-full'
-						size='sm'
-					>
-						<Plus className='h-3 w-3 mr-1' />
-						Добавить
-					</Button>
-				</div>
-			</div>
-
-			<div className='space-y-2'>
-				<Label className='text-sm'>Описание атрибута</Label>
-				<Textarea
-					{...register('description')}
-					placeholder='Описание атрибута'
-					rows={2}
-					className='h-16'
-					onKeyPress={handleKeyPress}
+				<FormInput
+					title='Название *'
+					placeholder='Атрибут'
+					type='text'
+					name={'name'}
+					control={control}
+					className={errors.name ? 'border-destructive' : 'h-9'}
+					error={errors.name?.message}
 				/>
+				<SelectForm
+					items={ATTRIBUTE_TYPES_SELECT}
+					title='Тип *'
+					placeholder={'Выберите тип'}
+					name='type'
+					control={control}
+					error={errors.type?.message}
+				/>
+
+				<Button
+					type='button'
+					onClick={handleSubmit(onSubmit)}
+					className='h-9 w-full'
+					size='sm'
+				>
+					<Plus className='h-3 w-3 mr-1' />
+					Добавить
+				</Button>
 			</div>
 
-			{/* Используем display: none вместо условного рендеринга */}
-			<div
-				style={{ display: newAttributeType === 'select' ? 'block' : 'none' }}
-			>
+			<FormInput
+				title='Описание'
+				placeholder='Описание атрибута...'
+				type='textarea'
+				name={'description'}
+				control={control}
+				rows={2}
+				className='resize-none min-h-[80px]'
+				error={errors.description?.message}
+			/>
+
+			{type === 'select' && (
 				<div className='space-y-2'>
 					<Label className='text-sm'>Значения *</Label>
 					<div className='flex gap-2'>
@@ -198,7 +118,6 @@ export const AttributeForm = memo(({ onAppendAttribute }) => {
 							value={newAttributeValueInput}
 							onChange={e => setNewAttributeValueInput(e.target.value)}
 							placeholder='Новое значение'
-							onKeyPress={e => e.key === 'Enter' && handleAddAttributeValue()}
 							className='h-8 flex-1'
 						/>
 						<Button
@@ -212,9 +131,9 @@ export const AttributeForm = memo(({ onAppendAttribute }) => {
 						</Button>
 					</div>
 
-					{newAttributeValues && newAttributeValues.length > 0 && (
+					{values && values.length > 0 && (
 						<div className='flex flex-wrap gap-1'>
-							{newAttributeValues.map((value, index) => (
+							{values.map((value, index) => (
 								<Badge
 									key={index}
 									variant='secondary'
@@ -232,14 +151,13 @@ export const AttributeForm = memo(({ onAppendAttribute }) => {
 							))}
 						</div>
 					)}
-					{newAttributeType === 'select' &&
-						(!newAttributeValues || newAttributeValues.length === 0) && (
-							<p className='text-sm text-destructive'>
-								Добавьте хотя бы одно значение для списка
-							</p>
-						)}
+					{type === 'select' && (!values || values.length === 0) && (
+						<p className='text-sm text-destructive'>
+							Добавьте хотя бы одно значение для списка
+						</p>
+					)}
 				</div>
-			</div>
+			)}
 
 			<div className='flex items-center gap-2'>
 				<Switch
@@ -253,6 +171,4 @@ export const AttributeForm = memo(({ onAppendAttribute }) => {
 			</div>
 		</div>
 	)
-})
-
-AttributeForm.displayName = 'AttributeForm'
+}

@@ -8,7 +8,7 @@ import { AuthContext } from './AuthContext'
 import { useUser } from '@/shared/hooks/useUser'
 import { useDispatch } from 'react-redux'
 import { parseJwt } from '@/shared/helper/jwt-helpers'
-import { setRoles, clearRoles } from '@/role/slice/rolesSlice'
+import { setRoles, clearRoles } from '@/shared/slices/rolesSlice'
 import { clearCurrentStudio } from '@/shared/slices/studiosSlice'
 
 export const AuthProvider = ({ children }) => {
@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }) => {
 				setRoles({
 					roles: dataJwt?.roles || [],
 					permissions: dataJwt?.permissions || [],
-					org_uuid: dataJwt?.organization_uuid || null,
+					orgUuid: dataJwt?.organization_uuid || null,
 				})
 			)
 		} else {

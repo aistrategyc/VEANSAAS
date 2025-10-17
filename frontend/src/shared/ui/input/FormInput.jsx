@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
-import { Input } from './Input'
 import { useController } from 'react-hook-form'
 import { Label } from '@/components/ui/label'
 import { Eye, EyeOff } from 'lucide-react'
 import { PhoneInput } from '@/components/ui/phone-input'
+import { Textarea } from '@/components/ui/textarea'
+import { Input } from '@/components/ui/input'
 
 export const FormInput = ({
 	placeholder,
@@ -11,7 +12,9 @@ export const FormInput = ({
 	type,
 	name,
 	control,
+	rows,
 	rules = { require: true },
+	className,
 	error,
 }) => {
 	const [showPassword, setShowPassword] = useState(false)
@@ -27,6 +30,8 @@ export const FormInput = ({
 
 	const isPasswordField = type === 'password'
 	const isPhoneField = type === 'tel'
+	const isTextareaField = type === 'textarea'
+	const isPriceField = type === 'price'
 
 	const inputType = isPasswordField
 		? showPassword
@@ -55,6 +60,31 @@ export const FormInput = ({
 						className='w-full'
 					/>
 				</div>
+			) : isTextareaField ? (
+				<div>
+					<Textarea
+						id={name}
+						{...field}
+						placeholder={placeholder || 'Введите текст...'}
+						rows={rows}
+						className={className}
+					/>
+				</div>
+			) : isPriceField ? (
+				<div className='relative'>
+					<Input
+						id={name}
+						{...field}
+						type='number'
+						min='0'
+						step='10'
+						className={className}
+						error={error}
+					/>
+					<span className='absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm'>
+						$
+					</span>
+				</div>
 			) : (
 				<div className='relative'>
 					<Input
@@ -75,7 +105,7 @@ export const FormInput = ({
 					)}
 				</div>
 			)}
-			<p className='text-red-500 text-sm h-5 ml-2'>{error}</p>
+			{error && <p className='text-red-500 text-sm h-5 ml-2'>{error} </p>}
 		</div>
 	)
 }

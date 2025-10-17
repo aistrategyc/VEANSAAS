@@ -54,8 +54,6 @@ export function ImportModal({ isOpen, onClose, onImportComplete }) {
     const valid = []
     const invalid = []
     const duplicates = []
-
-    // Mock existing clients for duplicate detection
     const existingClients = [
       {
         id: "existing1",

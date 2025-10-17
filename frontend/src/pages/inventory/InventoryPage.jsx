@@ -1,7 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
 import {
 	Package,
 	Search,
@@ -16,8 +12,6 @@ import {
 } from 'lucide-react'
 import { HeaderPages } from '@/features/headerPages/HeaderPages'
 import { StatsList } from '@/features/stats/StatsList'
-import { CategoriesList } from '@/features/categories/CategoriesList'
-import { FiltersPages } from '@/features/filtersPages/FiltersPages'
 import { InventoryList } from '@/features/inventory/InventoryList'
 
 export default function InventoryPage() {
@@ -111,17 +105,14 @@ export default function InventoryPage() {
 
 	return (
 		<div className='space-y-6 animate-in fade-in-0 duration-500'>
-
 			<HeaderPages
 				description='Управление товарными запасами'
 				nameButton='Добавить товар'
 				title='Склад'
 			/>
 			<StatsList stats={statsInventoryList} />
-			<CategoriesList categories={categories} type='inventory' />
-			<FiltersPages placeholder='Поиск товаров...' type='inventory' />
-			<InventoryList inventories={inventory} />
 
+			<InventoryList inventories={inventory} />
 		</div>
 	)
 }

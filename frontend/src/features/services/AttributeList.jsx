@@ -3,12 +3,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Trash2 } from 'lucide-react'
 import { Label } from '@/components/ui/label'
-
-const ATTRIBUTE_TYPES = [
-	{ value: 'text', label: 'Текст' },
-	{ value: 'number', label: 'Число' },
-	{ value: 'select', label: 'Список' },
-]
+import { ATTRIBUTE_TYPES } from './lib/constants'
 
 export const AttributeList = memo(({ fields, onRemove }) => {
 	return (
@@ -27,7 +22,7 @@ export const AttributeList = memo(({ fields, onRemove }) => {
 										{field.name}
 									</span>
 									<Badge variant='outline' className='text-xs'>
-										{ATTRIBUTE_TYPES.find(t => t.value === field.type)?.label}
+										{ATTRIBUTE_TYPES[field.type]}
 									</Badge>
 									{field.is_required && (
 										<Badge variant='destructive' className='text-xs'>

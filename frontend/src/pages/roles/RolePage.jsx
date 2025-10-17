@@ -202,7 +202,7 @@ const permissionCategories = [
 	},
 ]
 
-const UserManager = () => {
+const RolePage = () => {
 	const dispatch = useDispatch()
 	const roles = useSelector(state => state.rootReducer.roles.roles)
 
@@ -595,4 +595,4 @@ const UserManager = () => {
 	)
 }
 
-export default UserManager
+export default RolePage

@@ -18,8 +18,7 @@ import MainPage from '@/pages/main/MainPage'
 import VerificationEmailPage from '@/pages/auth/VerificationEmailPage'
 import { RegisterSimple } from '@/pages/auth/RegisterSimple'
 import DashboardPage from '@/pages/dashboard/DashboardPage'
-import UserManager from '@/role/UserManager'
-import ProfileLayout from '@/features/clients/ClientCard'
+import UserManager from '@/pages/roles/RolePage'
 import CompatibilityPage from '@/pages/сompatibility/CompatibilityPage'
 import ReportsPage from '@/pages/reports/ReportsPage'
 import LocationsPage from '@/pages/locations/LocationsPage'
@@ -57,7 +56,6 @@ export const RouterProvider = () => {
 				{ path: 'inventory', element: <InventoryPage /> },
 				{ path: 'loyalty', element: <LoyaltyPage /> },
 				{ path: 'finance', element: <FinancesPage /> },
-				{ path: 'customer', element: <ProfileLayout /> },
 				{ path: 'analytics', element: <AnalyticsPage /> },
 				{ path: 'role', element: <UserManager /> },
 				{ path: 'report', element: <ReportsPage /> },

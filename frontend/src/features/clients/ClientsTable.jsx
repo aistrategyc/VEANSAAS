@@ -28,7 +28,7 @@ import {
 import { format } from 'date-fns'
 import { ru } from 'date-fns/locale'
 import { EmptyState } from '@/components/ui/empty-state'
-import { PermissionGuard } from '@/role/PermissionGuard'
+import { PermissionGuard } from '@/widgets/permissions/PermissionGuard'
 import { Link } from 'react-router'
 
 export function ClientsTable({ clients, onEdit, onDelete }) {
@@ -70,9 +70,7 @@ export function ClientsTable({ clients, onEdit, onDelete }) {
 				description='Начните добавлять клиентов в вашу базу данных'
 				action={{
 					label: 'Добавить первого клиента',
-					onClick: () => {
-						// This would trigger the parent's create function
-					},
+					onClick: () => {},
 				}}
 				icon={<Calendar className='h-12 w-12 text-muted-foreground' />}
 			/>
@@ -202,7 +200,7 @@ export function ClientsTable({ clients, onEdit, onDelete }) {
 										</Badge>
 									</TableCell>
 									<TableCell>
-										<PermissionGuard requiredPermission={'client:edit'}>
+										<PermissionGuard requiredAny={['client:edit']}>
 											<DropdownMenu>
 												<DropdownMenuTrigger asChild>
 													<Button variant='ghost' className='h-8 w-8 p-0'>

@@ -124,7 +124,7 @@ export const SingUpForm = () => {
 						error={errors.organization?.name?.message}
 					/>
 					<SelectForm
-						plans={PLANS}
+						item={PLANS}
 						title='Choose plan'
 						name='organization.plan_type'
 						control={control}

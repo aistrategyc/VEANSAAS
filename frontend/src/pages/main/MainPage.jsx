@@ -8,7 +8,7 @@ import { MainActions } from '../../features/main/MainActions'
 import { StaffTopList } from '../../features/staff/StaffTopList'
 import { AppointmentModal } from '@/features/appointments/AppointmentModal'
 import { useState } from 'react'
-import { PermissionGuard } from '@/role/PermissionGuard'
+import { PermissionGuard } from '@/widgets/permissions/PermissionGuard'
 
 const revenueData = [
 	{ name: 'Пн', revenue: 2400, bookings: 12 },

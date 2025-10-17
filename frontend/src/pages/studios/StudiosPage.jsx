@@ -1,13 +1,12 @@
-import { HeaderPages } from '@/features/headerPages/HeaderPages'
 import { StatsList } from '@/features/stats/StatsList'
-import { FiltersPages } from '@/features/filtersPages/FiltersPages'
 import { StudiosGrid } from '@/features/studios/StudiosGrid'
 import { useEffect, useState } from 'react'
 import { StudioModal } from '@/features/studios/StudioModal'
-import { useDispatch, useSelector } from 'react-redux'
-import { saveStudio, setSearchTerm } from '@/shared/slices/studiosSlice'
 import { Loader } from '@/shared/ui/loader/Loader'
 import { useStudios } from '@/features/studios/model/api'
+import { HeaderWrapper } from '@/widgets/wrapper/HeaderWrapper'
+import { Button } from '@/components/ui/button'
+import { Plus } from 'lucide-react'
 
 const StudiosPage = () => {
 	const { fetchStudios, createStudio, updateStudio, isLoading, studios } =
@@ -30,10 +29,6 @@ const StudiosPage = () => {
 		setIsCreateModalOpen(true)
 	}
 
-	const handleSearch = term => {
-		dispatch(setSearchTerm(term))
-	}
-
 	const handleCloseModal = () => {
 		setIsCreateModalOpen(false)
 		setEditingStudio(null)
@@ -45,21 +40,14 @@ const StudiosPage = () => {
 
 	return (
 		<div className='space-y-6 animate-in fade-in-0 duration-500'>
-			<HeaderPages
-				description='Управление филиалами и студиями'
-				nameButton='Добавить студию'
-				title='Студии'
-				onClick={handleStudioIsOpenModal}
-			/>
+			<HeaderWrapper title='Студии' desc='Управление филиалами и студиями'>
+				<Button onClick={handleStudioIsOpenModal}>
+					<Plus className='h-4 w-4 mr-2' />
+					Создать студию
+				</Button>
+			</HeaderWrapper>
 			<StatsList />
-			<FiltersPages
-				placeholder='Поиск по названию...'
-				type='studio'
-				onSearch={handleSearch}
-			/>
-
 			<StudiosGrid studios={studios} onEditStudio={handleEditStudio} />
-
 			<StudioModal
 				isOpen={isCreateModalOpen}
 				onClose={handleCloseModal}

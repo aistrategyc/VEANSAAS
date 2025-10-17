@@ -5,10 +5,10 @@ export const PermissionGuard = ({
 	requiredPermission,
 	requiredAny = [],
 	requiredAll = [],
-	scope = 'studio',
+	scope = 'orgs',
 }) => {
 	const roles = useSelector(state => state.rootReducer.roles?.roles)
-	const orgUuid = useSelector(state => state.rootReducer.roles?.org_uuid)
+	const orgUuid = useSelector(state => state.rootReducer.roles?.orgUuid)
 	const permissionsConfig = useSelector(
 		state => state.rootReducer.roles.permissions
 	)
@@ -19,7 +19,7 @@ export const PermissionGuard = ({
 	const getUserRoles = () => {
 		if (scope === 'studio' && currentStudio) {
 			return roles?.studios?.[currentStudio] || []
-		} else if (scope === 'org' && orgUuid) {
+		} else if (scope === 'orgs' && orgUuid) {
 			return roles?.orgs?.[orgUuid] || []
 		}
 		return []

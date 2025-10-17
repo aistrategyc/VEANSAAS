@@ -18,7 +18,7 @@ import {
 } from 'lucide-react'
 import { HeaderPages } from '@/features/headerPages/HeaderPages'
 import { StatsList } from '@/features/stats/StatsList'
-import { FiltersPages } from '@/features/filtersPages/FiltersPages'
+
 import { StaffList } from '@/features/staff/StaffList'
 
 export default function StaffPage() {
@@ -141,7 +141,7 @@ export default function StaffPage() {
 				nameButton='Добавить сотрудника'
 			/>
 			<StatsList stats={statsEmployeeList} />
-			<FiltersPages />
+
 			<StaffList staffs={staff} />
 		</div>
 	)

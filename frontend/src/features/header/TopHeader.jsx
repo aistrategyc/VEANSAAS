@@ -12,7 +12,7 @@ import { ThemeToggle } from '@/shared/ui/theme/ToggleTheme'
 import { Bell, Plus, Settings, Menu, User, X } from 'lucide-react'
 import { useState } from 'react'
 import NotificationDropdown from '../notification/NotificationDropdown'
-import { ChangeStudio } from './ChangeStudio'
+import ChangeStudio from './ChangeStudio'
 
 export const TopHeader = () => {
 	const user = {

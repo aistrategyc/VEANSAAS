@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button'
 import { ChevronDown } from 'lucide-react'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-
 import { Loader } from '@/shared/ui/loader/Loader'
 import {
 	fetchStudiosSelection,
@@ -18,7 +17,7 @@ import {
 	setCurrentStudio,
 } from '@/shared/slices/studiosSlice'
 
-export const ChangeStudio = () => {
+const ChangeStudio = () => {
 	const dispatch = useDispatch()
 
 	const studiosSelection = useSelector(selectStudiosSelection)
@@ -65,3 +64,5 @@ export const ChangeStudio = () => {
 		</DropdownMenu>
 	)
 }
+
+export default ChangeStudio
