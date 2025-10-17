@@ -19,6 +19,7 @@ import {
 	TimerReset,
 	LocationEditIcon,
 } from 'lucide-react'
+import { PermissionGuard } from '@/widgets/permissions/PermissionGuard'
 
 const menuItems = [
 	{
@@ -161,17 +162,19 @@ export const NavMenu = ({ isCollapsed }) => {
 		<nav className='flex-1 px-4 py-2 h-screen overflow-y-auto'>
 			<ul className='space-y-1'>
 				{menuItems.map(item => (
-					<Item
-						key={item.id}
-						text={item.text}
-						iconName={item.icon}
-						isActive={isActive(item.path)}
-						badge={item.badge}
-						onClick={() => handleItemClick(item.id)}
-						to={item.path}
-						isCollapsed={isCollapsed}
-						permission={item.permission}
-					/>
+					<PermissionGuard requiredAny={item.permission} scope='orgs'>
+						<Item
+							key={item.id}
+							text={item.text}
+							iconName={item.icon}
+							isActive={isActive(item.path)}
+							badge={item.badge}
+							onClick={() => handleItemClick(item.id)}
+							to={item.path}
+							isCollapsed={isCollapsed}
+							permission={item.permission}
+						/>
+					</PermissionGuard>
 				))}
 			</ul>
 		</nav>

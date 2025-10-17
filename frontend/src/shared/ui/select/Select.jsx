@@ -11,11 +11,12 @@ import {
 import { Label } from '@/components/ui/label'
 
 export const SelectForm = ({
-	plans,
+	items,
 	title,
 	name,
 	control,
-	rules = { required: 'Choose plan' },
+	placeholder = title,
+	rules = { required: 'Error' },
 	error,
 }) => {
 	const {
@@ -40,13 +41,13 @@ export const SelectForm = ({
 				className='w-full px-3 text-gray-500 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
 			>
 				<SelectTrigger className='w-full'>
-					<SelectValue placeholder={title} />
+					<SelectValue placeholder={placeholder} />
 				</SelectTrigger>
 				<SelectContent>
 					<SelectGroup>
-						{plans.map(plan => (
-							<SelectItem key={plan.value} value={plan.value}>
-								{plan.label}
+						{items.map(item => (
+							<SelectItem key={item.value} value={item.value}>
+								{item.label}
 							</SelectItem>
 						))}
 					</SelectGroup>
