@@ -1,6 +1,6 @@
 export const SEX_TYPES = [
-	{ value: 'FEMALE', label: 'Женский' },
-	{ value: 'MALE', label: 'Мужской' },
+	{ value: 'female', label: 'Женский' },
+	{ value: 'male', label: 'Мужской' },
 	{ value: 'OTHER', label: 'Другое' },
 ]
 
