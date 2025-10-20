@@ -76,6 +76,10 @@ apiClient.interceptors.request.use(
 		if (token) {
 			config.headers.Authorization = `Bearer ${token}`
 		}
+		const currentStudioUuid = localStorage.getItem('currentStudioUuid')
+		if (currentStudioUuid) {
+			config.headers['X-Studio-UUID'] = currentStudioUuid
+		}
 
 		return config
 	},

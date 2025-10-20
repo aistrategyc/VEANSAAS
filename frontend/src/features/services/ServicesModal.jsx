@@ -7,19 +7,14 @@ import {
 	DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { Form } from '@/shared/ui/form/Form'
 import { Trash2 } from 'lucide-react'
+import { FormInput } from '@/shared/ui/input/FormInput'
+import { SelectForm } from '@/shared/ui/select/Select'
+import { CATEGORY_TYPES } from './lib/constants'
+import { DialogWrapper } from '@/widgets/wrapper/DialogWrapper'
 
 export function ServiceModal({
 	isOpen,
@@ -31,7 +26,7 @@ export function ServiceModal({
 	onDelete,
 }) {
 	const {
-		register,
+		control,
 		handleSubmit,
 		formState: { errors },
 		reset,
@@ -44,14 +39,11 @@ export function ServiceModal({
 			description: '',
 			base_price: 0,
 			is_active: true,
-			category_uuid: '',
+			category_uuid: '0b12b41e-ee3b-4da3-82c9-f77851f2194b',
 		},
 	})
 
-	// Следим за состоянием формы
 	const is_active = watch('is_active')
-	const category_uuid = watch('category_uuid')
-
 	useEffect(() => {
 		if (isOpen) {
 			if (service) {
@@ -75,6 +67,7 @@ export function ServiceModal({
 	}, [service, isOpen, reset])
 
 	const onSubmit = data => {
+		console.log(data)
 		if (service) {
 			onEdit(service, data)
 		} else {
@@ -88,184 +81,96 @@ export function ServiceModal({
 		}
 	}
 
+	const title = service ? 'Редактировать услугу' : 'Новая услуга'
+
 	return (
-		<Dialog open={isOpen} onOpenChange={onClose}>
-			<DialogContent className='max-w-md max-h-[90vh] overflow-y-auto'>
-				<DialogHeader className='pb-2'>
-					<DialogTitle className='text-xl font-semibold'>
-						{service ? 'Редактировать услугу' : 'Новая услуга'}
-					</DialogTitle>
-				</DialogHeader>
+		<DialogWrapper title={title} isOpen={isOpen} onClose={onClose}>
+			<Form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+				<div className='space-y-4'>
+					<FormInput
+						title='Название услуги'
+						placeholder='Введите название услуги'
+						type='text'
+						name={'name'}
+						control={control}
+						className={errors.name ? 'border-destructive' : ''}
+						error={errors.name?.message}
+					/>
+					<SelectForm
+						items={CATEGORY_TYPES}
+						title='Категория *'
+						placeholder={'Выберите категорию'}
+						name='category_uuid'
+						control={control}
+						error={errors.category_uuid?.message}
+					/>
+					<FormInput
+						title='Описание'
+						placeholder='Описание услуги...'
+						type='textarea'
+						name={'description'}
+						control={control}
+						rows={3}
+						className='resize-none min-h-[80px]'
+						error={errors.description?.message}
+					/>
+					<FormInput
+						title='Цена *'
+						type='price'
+						name={'base_price'}
+						control={control}
+						className='h-11 pl-8'
+						error={errors.base_price?.message}
+					/>
 
-				<Form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
-					{/* Basic Information */}
-					<div className='space-y-4'>
-						<div className='space-y-3'>
-							<Label htmlFor='name' className='text-sm font-medium'>
-								Название услуги *
-							</Label>
-							<Input
-								id='name'
-								{...register('name', {
-									required: 'Название услуги обязательно',
-								})}
-								placeholder='Введите название услуги'
-								className={`h-11 ${
-									errors.name
-										? 'border-destructive focus-visible:ring-destructive'
-										: ''
-								}`}
-							/>
-							{errors.name && (
-								<p className='text-sm text-destructive mt-1'>
-									{errors.name.message}
-								</p>
-							)}
-						</div>
-
-						<div className='space-y-3'>
-							<Label htmlFor='category_uuid' className='text-sm font-medium'>
-								Категория *
-							</Label>
-							<Select
-								value={category_uuid}
-								onValueChange={value => setValue('category_uuid', value)}
+					<div className='flex items-center space-x-3 p-3 bg-muted/30 rounded-lg border'>
+						<Switch
+							id='is_active'
+							checked={is_active}
+							onCheckedChange={checked => setValue('is_active', checked)}
+						/>
+						<div className='space-y-0.5'>
+							<Label
+								htmlFor='is_active'
+								className='text-sm font-medium cursor-pointer'
 							>
-								<SelectTrigger
-									className={`h-11 ${
-										errors.category_uuid
-											? 'border-destructive focus:ring-destructive'
-											: ''
-									}`}
-								>
-									<SelectValue placeholder='Выберите категорию' />
-								</SelectTrigger>
-								<SelectContent>
-									{categories.map(category => (
-										<SelectItem
-											key={category.uuid}
-											value={category.uuid}
-											className='py-3'
-										>
-											<div className='flex items-center space-x-3'>
-												{category.color && (
-													<div
-														className='w-3 h-3 rounded-full flex-shrink-0'
-														style={{ backgroundColor: category.color }}
-													/>
-												)}
-												<span className='truncate'>{category.name}</span>
-											</div>
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-							{errors.category_uuid && (
-								<p className='text-sm text-destructive mt-1'>
-									{errors.category_uuid.message}
-								</p>
-							)}
-						</div>
-
-						<div className='space-y-3'>
-							<Label htmlFor='description' className='text-sm font-medium'>
-								Описание
+								Активная услуга
 							</Label>
-							<Textarea
-								id='description'
-								{...register('description')}
-								placeholder='Описание услуги...'
-								rows={3}
-								className='resize-none min-h-[80px]'
-							/>
-						</div>
-
-						<div className='space-y-3'>
-							<Label htmlFor='base_price' className='text-sm font-medium'>
-								Цена *
-							</Label>
-							<div className='relative'>
-								<Input
-									id='base_price'
-									type='number'
-									{...register('base_price', {
-										required: 'Цена обязательна',
-										min: {
-											value: 0,
-											message: 'Цена не может быть отрицательной',
-										},
-										valueAsNumber: true,
-									})}
-									min='0'
-									step='10'
-									className={`h-11 pl-8 ${
-										errors.base_price
-											? 'border-destructive focus-visible:ring-destructive'
-											: ''
-									}`}
-								/>
-								<span className='absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm'>
-									$
-								</span>
-							</div>
-							{errors.base_price && (
-								<p className='text-sm text-destructive mt-1'>
-									{errors.base_price.message}
-								</p>
-							)}
-						</div>
-
-						<div className='flex items-center space-x-3 p-3 bg-muted/30 rounded-lg border'>
-							<Switch
-								id='is_active'
-								checked={is_active}
-								onCheckedChange={checked => setValue('is_active', checked)}
-							/>
-							<div className='space-y-0.5'>
-								<Label
-									htmlFor='is_active'
-									className='text-sm font-medium cursor-pointer'
-								>
-									Активная услуга
-								</Label>
-								<p className='text-xs text-muted-foreground'>
-									{is_active
-										? 'Услуга доступна для записи'
-										: 'Услуга временно недоступна'}
-								</p>
-							</div>
+							<p className='text-xs text-muted-foreground'>
+								{is_active
+									? 'Услуга доступна для записи'
+									: 'Услуга временно недоступна'}
+							</p>
 						</div>
 					</div>
-
-					{/* Actions */}
-					<div className='flex items-center justify-end space-x-3 pt-6 border-t'>
-						{service && (
-							<Button
-								type='button'
-								variant='destructive'
-								onClick={handleDelete}
-								className='flex items-center gap-2 mr-auto'
-								size='sm'
-							>
-								<Trash2 className='h-4 w-4' />
-								Удалить
-							</Button>
-						)}
+				</div>
+				<div className='flex items-center justify-end space-x-3 pt-6'>
+					{service && (
 						<Button
 							type='button'
-							variant='outline'
-							onClick={onClose}
+							variant='destructive'
+							onClick={handleDelete}
+							className='flex items-center gap-2 mr-auto'
 							size='sm'
-							className='px-6'
 						>
-							Отмена
+							<Trash2 className='h-4 w-4' />
+							Удалить
 						</Button>
-						<Button type='submit' size='sm' className='px-6'>
-							{service ? 'Сохранить' : 'Создать'}
-						</Button>
-					</div>
-				</Form>
-			</DialogContent>
-		</Dialog>
+					)}
+					<Button
+						type='button'
+						variant='outline'
+						onClick={onClose}
+						size='sm'
+						className='px-6'
+					>
+						Отмена
+					</Button>
+					<Button type='submit' size='sm' className='px-6'>
+						{service ? 'Сохранить' : 'Создать'}
+					</Button>
+				</div>
+			</Form>
+		</DialogWrapper>
 	)
 }

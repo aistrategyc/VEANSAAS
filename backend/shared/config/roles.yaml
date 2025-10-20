@@ -54,3 +54,4 @@ roles:
       - services-attribute-options:create
       - studio:update
       - page:view
+      - client:edit

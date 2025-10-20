@@ -1,5 +1,5 @@
 import { HeaderPages } from '@/features/headerPages/HeaderPages'
-import { FiltersPages } from '@/features/filtersPages/FiltersPages'
+
 import { AppointmentsList } from '@/features/appointments/AppointmentsList'
 
 export default function AppointmentsPage() {
@@ -70,7 +70,7 @@ export default function AppointmentsPage() {
 				nameButton='Новая запись'
 				secondaryBtn='Чек-ин'
 			/>
-			<FiltersPages type='appointments' />
+
 			<AppointmentsList appointments={appointments} />
 		</div>
 	)

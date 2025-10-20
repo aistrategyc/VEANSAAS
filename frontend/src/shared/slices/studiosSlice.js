@@ -27,25 +27,6 @@ export const fetchStudiosSelection = createAsyncThunk(
 	}
 )
 
-export const setCurrentStudio = createAsyncThunk(
-	'studios/setCurrentStudio',
-	async (studioUuid, { getState, rejectWithValue }) => {
-		try {
-			const state = getState()
-			const studios = state.rootReducer.studios.studiosSelection
-			const studio = studios.find(s => s.uuid === studioUuid) || studios[0]
-
-			if (studio) {
-				localStorage.setItem('currentStudioUuid', studio.uuid)
-				return studio
-			}
-			return null
-		} catch (error) {
-			return rejectWithValue('Ошибка установки текущей студии')
-		}
-	}
-)
-
 export const saveStudio = createAsyncThunk(
 	'studios/saveStudio',
 	async ({ studioData, editingStudio }, { rejectWithValue }) => {
@@ -98,6 +79,16 @@ const studiosSlice = createSlice({
 			state.currentStudio = null
 			localStorage.removeItem('currentStudioUuid')
 		},
+		setCurrentStudio: (state, action) => {
+			const studioUuid = action.payload
+			const studios = state.studiosSelection
+			const studio = studios.find(s => s.uuid === studioUuid) || studios[0]
+
+			if (studio) {
+				state.currentStudio = studio
+				localStorage.setItem('currentStudioUuid', studio.uuid)
+			}
+		},
 	},
 	extraReducers: builder => {
 		builder
@@ -109,7 +100,6 @@ const studiosSlice = createSlice({
 				state.isSelectionLoading = false
 				state.studiosSelection = action.payload
 
-				// Автоматически устанавливаем текущую студию при первой загрузке
 				if (!state.currentStudio && action.payload.length > 0) {
 					const savedStudioUuid = localStorage.getItem('currentStudioUuid')
 					const studioToSet = savedStudioUuid
@@ -124,12 +114,6 @@ const studiosSlice = createSlice({
 			})
 			.addCase(fetchStudiosSelection.rejected, (state, action) => {
 				state.isSelectionLoading = false
-				state.error = action.payload
-			})
-			.addCase(setCurrentStudio.fulfilled, (state, action) => {
-				state.currentStudio = action.payload
-			})
-			.addCase(setCurrentStudio.rejected, (state, action) => {
 				state.error = action.payload
 			})
 			.addCase(saveStudio.pending, state => {
@@ -226,7 +210,7 @@ const studiosSlice = createSlice({
 	},
 })
 
-export const { setSearchTerm, clearError, clearCurrentStudio } =
+export const { setCurrentStudio, clearError, clearCurrentStudio } =
 	studiosSlice.actions
 export default studiosSlice.reducer
 
