@@ -74,4 +74,4 @@ class AppointmentAttributeValueCreate(AppointmentAttributeValueBase):
 
 
 class AppointmentCreate(AppointmentBase):
-    attributes: List[AppointmentAttributeValueCreate]
+    attributes: List[AppointmentAttributeValueCreate] | None = Field(default=None)
