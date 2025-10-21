@@ -2,14 +2,13 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
-
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Plus, Trash2 } from 'lucide-react'
 import { FormInput } from '@/shared/ui/input/FormInput'
-import { SelectForm } from '@/shared/ui/select/Select'
+import FormSelect from '@/shared/ui/select/Select'
 import { ATTRIBUTE_TYPES_SELECT } from './lib/constants'
+import FormSwitch from '@/shared/ui/switch/FormSwitch'
 
 export const AttributeForm = ({ onAppendAttribute }) => {
 	const [newAttributeValueInput, setNewAttributeValueInput] = useState('')
@@ -79,7 +78,7 @@ export const AttributeForm = ({ onAppendAttribute }) => {
 					className={errors.name ? 'border-destructive' : 'h-9'}
 					error={errors.name?.message}
 				/>
-				<SelectForm
+				<FormSelect
 					items={ATTRIBUTE_TYPES_SELECT}
 					title='Тип *'
 					placeholder={'Выберите тип'}
@@ -158,17 +157,7 @@ export const AttributeForm = ({ onAppendAttribute }) => {
 					)}
 				</div>
 			)}
-
-			<div className='flex items-center gap-2'>
-				<Switch
-					id='isRequired'
-					checked={watch('is_required')}
-					onCheckedChange={checked => setValue('is_required', checked)}
-				/>
-				<Label htmlFor='isRequired' className='text-sm'>
-					Обязательный
-				</Label>
-			</div>
+			<FormSwitch name='is_required' control={control} title='Обязательный' />
 		</div>
 	)
 }

@@ -18,6 +18,7 @@ import { AttributeList } from './AttributeList'
 import { AttributeForm } from './AttributeForm'
 import { FormInput } from '@/shared/ui/input/FormInput'
 import { DialogWrapper } from '@/widgets/wrapper/DialogWrapper'
+import FormSwitch from '@/shared/ui/switch/FormSwitch'
 
 export const CategoryModal = ({
 	isOpen,
@@ -129,16 +130,11 @@ export const CategoryModal = ({
 						error={errors.description?.message}
 					/>
 
-					<div className='flex items-center gap-3 p-3 border rounded-lg'>
-						<Switch
-							id='isActive'
-							checked={watch('is_active')}
-							onCheckedChange={checked => setValue('is_active', checked)}
-						/>
-						<Label htmlFor='isActive' className='text-sm'>
-							Активная категория
-						</Label>
-					</div>
+					<FormSwitch
+						name='is_active'
+						control={control}
+						title='Активная категории'
+					/>
 				</div>
 				<div className='space-y-4 mt-3'>
 					<div className='flex items-center gap-2'>

@@ -4,7 +4,7 @@ import { FormInput } from '@/shared/ui/input/FormInput'
 import { Form } from '@/shared/ui/form/Form'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { SelectForm } from '@/shared/ui/select/Select'
+import FormSelect from '@/shared/ui/select/Select'
 import { Loader } from '@/shared/ui/loader/Loader'
 import { useSignup } from './model/api'
 import { schemaRegister } from './lib/validation'
@@ -123,7 +123,7 @@ export const SingUpForm = () => {
 						control={control}
 						error={errors.organization?.name?.message}
 					/>
-					<SelectForm
+					<FormSelect
 						item={PLANS}
 						title='Choose plan'
 						name='organization.plan_type'

@@ -8,6 +8,7 @@ roles:
       - report:download
       - settings:edit
       - page:view
+      - client:edit
 
   master:
     permissions:

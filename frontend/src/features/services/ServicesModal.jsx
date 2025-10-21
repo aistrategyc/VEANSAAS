@@ -1,20 +1,13 @@
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import {
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogTitle,
-} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
 import { Form } from '@/shared/ui/form/Form'
 import { Trash2 } from 'lucide-react'
 import { FormInput } from '@/shared/ui/input/FormInput'
-import { SelectForm } from '@/shared/ui/select/Select'
+import FormSelect from '@/shared/ui/select/Select'
 import { CATEGORY_TYPES } from './lib/constants'
 import { DialogWrapper } from '@/widgets/wrapper/DialogWrapper'
+import FormSwitch from '@/shared/ui/switch/FormSwitch'
 
 export function ServiceModal({
 	isOpen,
@@ -96,7 +89,7 @@ export function ServiceModal({
 						className={errors.name ? 'border-destructive' : ''}
 						error={errors.name?.message}
 					/>
-					<SelectForm
+					<FormSelect
 						items={CATEGORY_TYPES}
 						title='Категория *'
 						placeholder={'Выберите категорию'}
@@ -122,27 +115,11 @@ export function ServiceModal({
 						className='h-11 pl-8'
 						error={errors.base_price?.message}
 					/>
-
-					<div className='flex items-center space-x-3 p-3 bg-muted/30 rounded-lg border'>
-						<Switch
-							id='is_active'
-							checked={is_active}
-							onCheckedChange={checked => setValue('is_active', checked)}
-						/>
-						<div className='space-y-0.5'>
-							<Label
-								htmlFor='is_active'
-								className='text-sm font-medium cursor-pointer'
-							>
-								Активная услуга
-							</Label>
-							<p className='text-xs text-muted-foreground'>
-								{is_active
-									? 'Услуга доступна для записи'
-									: 'Услуга временно недоступна'}
-							</p>
-						</div>
-					</div>
+					<FormSwitch
+						control={control}
+						title={'Активная услуга'}
+						name={'is_active'}
+					/>
 				</div>
 				<div className='flex items-center justify-end space-x-3 pt-6'>
 					{service && (

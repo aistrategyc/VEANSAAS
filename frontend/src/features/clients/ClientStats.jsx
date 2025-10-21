@@ -2,19 +2,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Users, Plus } from 'lucide-react'
 
-
 export const ClientStats = ({ clients }) => {
+	console.log(clients)
 	const total = clients.length
-	const active = clients.filter(c => c.isActive).length
-	const inactive = clients.filter(c => !c.isActive).length
-	const thisMonth = clients.filter(c => {
-		const created = new Date(c.createdAt)
-		const now = new Date()
-		return (
-			created.getMonth() === now.getMonth() &&
-			created.getFullYear() === now.getFullYear()
-		)
-	}).length
+	const active = 2
+	const inactive = 2
+	const thisMonth = 1
 
 	return (
 		<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>

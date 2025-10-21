@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import {
 	Table,
 	TableBody,
@@ -25,44 +24,11 @@ import {
 	Mail,
 	Calendar,
 } from 'lucide-react'
-import { format } from 'date-fns'
-import { ru } from 'date-fns/locale'
 import { EmptyState } from '@/components/ui/empty-state'
 import { PermissionGuard } from '@/widgets/permissions/PermissionGuard'
 import { Link } from 'react-router'
 
 export function ClientsTable({ clients, onEdit, onDelete }) {
-	const [sortField, setSortField] = useState('createdAt')
-	const [sortDirection, setSortDirection] = useState()
-
-	const handleSort = field => {
-		if (sortField === field) {
-			setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
-		} else {
-			setSortField(field)
-			setSortDirection('asc')
-		}
-	}
-
-	const sortedClients = [...clients].sort((a, b) => {
-		const aValue = a[sortField]
-		const bValue = b[sortField]
-
-		if (aValue === undefined || aValue === null) return 1
-		if (bValue === undefined || bValue === null) return -1
-
-		let comparison = 0
-		if (typeof aValue === 'string' && typeof bValue === 'string') {
-			comparison = aValue.localeCompare(bValue)
-		} else if (typeof aValue === 'number' && typeof bValue === 'number') {
-			comparison = aValue - bValue
-		} else {
-			comparison = String(aValue).localeCompare(String(bValue))
-		}
-
-		return sortDirection === 'asc' ? comparison : -comparison
-	})
-
 	if (clients.length === 0) {
 		return (
 			<EmptyState
@@ -88,60 +54,52 @@ export function ClientsTable({ clients, onEdit, onDelete }) {
 						<TableHeader>
 							<TableRow>
 								<TableHead>Клиент</TableHead>
-								<TableHead
-									className='cursor-pointer hover:bg-muted/50'
-									onClick={() => handleSort('firstName')}
-								>
-									Имя
-								</TableHead>
+								<TableHead>Имя</TableHead>
+								<TableHead>Пол</TableHead>
 								<TableHead>Контакты</TableHead>
-								<TableHead>Информация</TableHead>
-								<TableHead
-									className='cursor-pointer hover:bg-muted/50'
-									onClick={() => handleSort('createdAt')}
-								>
-									Дата создания
-								</TableHead>
 								<TableHead>Статус</TableHead>
 								<TableHead className='w-[50px]'></TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{sortedClients.map(client => (
-								<TableRow key={client.id}>
-									<TableCell>
-										<div className='flex items-center space-x-3'>
-											<Avatar>
-												<AvatarFallback>
-													{client.firstName[0]}
-													{client.lastName[0]}
-												</AvatarFallback>
-											</Avatar>
-											<div>
-												<div className='font-medium'>
-													<Link to='/clients/1'>
-														{client.firstName} {client.lastName}
-													</Link>
-												</div>
-												{client.preferences?.preferredMasters && (
-													<div className='text-sm text-muted-foreground'>
-														Предпочитаемые мастера:{' '}
-														{client.preferences.preferredMasters.length}
+							{clients.map(client => (
+								<TableRow key={client.uuid}>
+										<TableCell>
+											<Link to={`/clients/${client.uuid}`}>
+											<div className='flex items-center space-x-3'>
+												<Avatar>
+													<AvatarFallback>
+														{client.first_name[0]}
+														{client.last_name[0]}
+													</AvatarFallback>
+												</Avatar>
+												<div>
+													<div className='font-medium'>
+														{client.first_name} {client.last_name}
 													</div>
-												)}
+													{client.preferences?.preferredMasters && (
+														<div className='text-sm text-muted-foreground'>
+															Предпочитаемые мастера:{' '}
+															{client.preferences.preferredMasters.length}
+														</div>
+													)}
+												</div>
 											</div>
+											</Link>
+										</TableCell>
+									
+									<TableCell>
+										<div className='space-y-1'>
+											{client.first_name} {client.last_name}
 										</div>
 									</TableCell>
 									<TableCell>
 										<div className='space-y-1'>
-											<div className='font-medium'>
-												{client.firstName} {client.lastName}
-											</div>
 											{client.gender && (
 												<Badge variant='outline' className='text-xs'>
-													{client.gender === 'FEMALE'
+													{client.gender === 'female'
 														? 'Ж'
-														: client.gender === 'MALE'
+														: client.gender === 'male'
 														? 'М'
 														: 'Другое'}
 												</Badge>
@@ -150,10 +108,10 @@ export function ClientsTable({ clients, onEdit, onDelete }) {
 									</TableCell>
 									<TableCell>
 										<div className='space-y-1'>
-											{client.phone && (
+											{client.phone_number && (
 												<div className='flex items-center text-sm'>
 													<Phone className='h-3 w-3 mr-1 text-muted-foreground' />
-													{client.phone}
+													{client.phone_number}
 												</div>
 											)}
 											{client.email && (
@@ -165,38 +123,8 @@ export function ClientsTable({ clients, onEdit, onDelete }) {
 										</div>
 									</TableCell>
 									<TableCell>
-										<div className='space-y-1 text-sm'>
-											{client.dateOfBirth && (
-												<div>
-													Возраст:{' '}
-													{new Date().getFullYear() -
-														new Date(client.dateOfBirth).getFullYear()}{' '}
-													лет
-												</div>
-											)}
-											{client.preferences?.allergies &&
-												client.preferences.allergies.length > 0 && (
-													<Badge variant='destructive' className='text-xs'>
-														Аллергии
-													</Badge>
-												)}
-											{client.notes && (
-												<div className='text-muted-foreground truncate max-w-[200px]'>
-													{client.notes}
-												</div>
-											)}
-										</div>
-									</TableCell>
-									<TableCell>
-										<div className='text-sm text-muted-foreground'>
-											{format(new Date(client.createdAt), 'd MMM yyyy', {
-												locale: ru,
-											})}
-										</div>
-									</TableCell>
-									<TableCell>
-										<Badge variant={client.isActive ? 'default' : 'secondary'}>
-											{client.isActive ? 'Активен' : 'Неактивен'}
+										<Badge variant={client.is_active ? 'default' : 'secondary'}>
+											{client.is_active ? 'Активен' : 'Неактивен'}
 										</Badge>
 									</TableCell>
 									<TableCell>

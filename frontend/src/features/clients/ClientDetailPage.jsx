@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -29,8 +29,10 @@ import {
 	Users,
 	Wallet,
 } from 'lucide-react'
-import { Link, useParams, useRouteError } from 'react-router'
+import { Link, useParams, useRouteError, useSearchParams } from 'react-router'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import { useClient } from './hooks/useClients'
+import { Loader } from '@/shared/ui/loader/Loader'
 
 const clientDetails = {
 	id: 'c1',
@@ -305,8 +307,15 @@ const clientDetails = {
 	],
 }
 
-export default function ClientDetailPage() {
+const ClientDetailPage = () => {
+	const { uuid } = useParams()
 	const [client] = useState(clientDetails)
+
+	const { clientData, getClientInfo, isLoading } = useClient()
+
+	useEffect(() => {
+		getClientInfo(uuid)
+	}, [])
 
 	const getStatusColor = status => {
 		switch (status) {
@@ -333,6 +342,9 @@ export default function ClientDetailPage() {
 				return 'bg-blue-500/20 text-blue-600'
 		}
 	}
+	if (isLoading) {
+		return <Loader />
+	}
 
 	return (
 		<div className='min-h-screen bg-background'>
@@ -353,18 +365,12 @@ export default function ClientDetailPage() {
 										src={client.avatar || '/placeholder.svg'}
 										alt={client.name}
 									/>
-									<AvatarFallback className='text-lg'>
-										{client.name
-											.split(' ')
-											.map(n => n[0])
-											.join('')}
-									</AvatarFallback>
 								</Avatar>
 								<div className='absolute -bottom-1 -right-1 bg-green-500 w-5 h-5 rounded-full border-2 border-background' />
 							</div>
 							<div>
 								<h1 className='text-3xl font-bold text-foreground'>
-									{client.name}
+									{clientData.first_name} {clientData.last_name}
 								</h1>
 								<div className='flex items-center gap-3 mt-2'>
 									<Badge className={getTierColor(client.loyaltyTier)}>
@@ -538,11 +544,11 @@ export default function ClientDetailPage() {
 							<CardContent className='space-y-3'>
 								<div className='flex items-center gap-3 text-card-foreground'>
 									<Phone className='w-4 h-4 text-muted-foreground' />
-									<span className='text-sm'>{client.phone}</span>
+									<span className='text-sm'>{clientData.phone_number}</span>
 								</div>
 								<div className='flex items-center gap-3 text-card-foreground'>
 									<Mail className='w-4 h-4 text-muted-foreground' />
-									<span className='text-sm'>{client.email}</span>
+									<span className='text-sm'>{clientData.email}</span>
 								</div>
 								<div className='flex items-start gap-3 text-card-foreground'>
 									<MapPin className='w-4 h-4 text-muted-foreground mt-0.5' />
@@ -1241,3 +1247,4 @@ export default function ClientDetailPage() {
 		</div>
 	)
 }
+export default ClientDetailPage

@@ -9,6 +9,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from '@/components/ui/popover'
+import { useForm } from 'react-hook-form'
 
 function formatDate(date) {
 	if (!date) {
@@ -29,16 +30,26 @@ function isValidDate(date) {
 	return !isNaN(date.getTime())
 }
 
-export function DatePickerWithInput() {
+const DatePickerWithInput = ({ control, name, error }) => {
 	const [open, setOpen] = React.useState(false)
-	const [date, setDate] = React.useState(new Date('2025-06-01'))
+	const [date, setDate] = React.useState(new Date())
 	const [month, setMonth] = React.useState(date)
 	const [value, setValue] = React.useState(formatDate(date))
+
+	const { setValue: setFormValue } = useForm()
+
+	React.useEffect(() => {
+		if (date) {
+			// Преобразуем дату в формат ISO для формы
+			const isoDate = date.toISOString()
+			setFormValue(name, isoDate)
+		}
+	}, [date, name, setFormValue])
 
 	return (
 		<div className='flex flex-col gap-3'>
 			<Label htmlFor='date' className='px-1'>
-				Subscription Date
+				Дата и время *
 			</Label>
 			<div className='relative flex gap-2'>
 				<Input
@@ -47,11 +58,11 @@ export function DatePickerWithInput() {
 					placeholder='June 01, 2025'
 					className='bg-background pr-10'
 					onChange={e => {
-						const date = new Date(e.target.value)
+						const newDate = new Date(e.target.value)
 						setValue(e.target.value)
-						if (isValidDate(date)) {
-							setDate(date)
-							setMonth(date)
+						if (isValidDate(newDate)) {
+							setDate(newDate)
+							setMonth(newDate)
 						}
 					}}
 					onKeyDown={e => {
@@ -79,9 +90,9 @@ export function DatePickerWithInput() {
 							captionLayout='dropdown'
 							month={month}
 							onMonthChange={setMonth}
-							onSelect={date => {
-								setDate(date)
-								setValue(formatDate(date))
+							onSelect={selectedDate => {
+								setDate(selectedDate)
+								setValue(formatDate(selectedDate))
 								setOpen(false)
 							}}
 							className='rounded-md border shadow-sm'
@@ -93,6 +104,9 @@ export function DatePickerWithInput() {
 					</PopoverContent>
 				</Popover>
 			</div>
+			{error && <p className='text-sm text-destructive'>{error.message}</p>}
 		</div>
 	)
 }
+
+export default DatePickerWithInput

@@ -1,9 +1,16 @@
-import { HeaderPages } from '@/features/headerPages/HeaderPages'
-
 import { AppointmentsList } from '@/features/appointments/AppointmentsList'
+import { HeaderWrapper } from '@/widgets/wrapper/HeaderWrapper'
+import { Button } from '@/components/ui/button'
+import { Plus } from 'lucide-react'
+import { AppointmentModal } from '@/features/appointments/AppointmentModal'
+import { useEffect, useState } from 'react'
+import { useAppointment } from '@/features/appointments/hooks/useAppointment'
+import { Loader } from '@/shared/ui/loader/Loader'
+import { useDispatch } from 'react-redux'
+import { useClient } from '@/features/clients/hooks/useClients'
 
 export default function AppointmentsPage() {
-	const appointments = [
+	const appointments1 = [
 		{
 			id: 1,
 			time: '09:00',
@@ -18,60 +25,65 @@ export default function AppointmentsPage() {
 			prepaid: '€25',
 			notes: 'Клиент просит сохранить длину',
 		},
-		{
-			id: 2,
-			time: '10:30',
-			date: '2024-01-15',
-			client: 'Мария Сидорова',
-			phone: '+33 1 98 76 54 32',
-			service: 'Маникюр',
-			master: 'Ольга Морозова',
-			duration: '1ч 30мин',
-			price: '€35',
-			status: 'in-progress',
-			prepaid: '€0',
-			notes: '',
-		},
-		{
-			id: 3,
-			time: '12:00',
-			date: '2024-01-15',
-			client: 'Екатерина Иванова',
-			phone: '+33 1 11 22 33 44',
-			service: 'Татуировка',
-			master: 'Дмитрий Волков',
-			duration: '3ч',
-			price: '€150',
-			status: 'confirmed',
-			prepaid: '€50',
-			notes: 'Эскиз согласован',
-		},
-		{
-			id: 4,
-			time: '14:00',
-			date: '2024-01-15',
-			client: 'Светлана Козлова',
-			phone: '+33 1 56 78 90 12',
-			service: 'Пирсинг',
-			master: 'Анна Лебедева',
-			duration: '30мин',
-			price: '€25',
-			status: 'pending',
-			prepaid: '€0',
-			notes: '',
-		},
 	]
+
+	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+	const [editingAppointment, setEditingAppointment] = useState(null)
+
+	const {
+		fetchAppointments,
+		createAppointment,
+		isLoading,
+		appointments,
+		servicesSelectionList,
+		getServicesSelectionList,
+	} = useAppointment()
+	const { clientSelectionList, getClientSelectionList } = useClient()
+
+	const dispatch = useDispatch()
+
+	useEffect(() => {
+		fetchAppointments()
+		getClientSelectionList()
+		getServicesSelectionList()
+	}, [])
+
+	const handleStudioIsOpenModal = () => {
+		setEditingAppointment(null)
+		setIsCreateModalOpen(true)
+	}
+
+	const handleEditStudio = appointment => {
+		setEditingAppointment(appointment)
+		setIsCreateModalOpen(true)
+	}
+
+	const handleCloseModal = () => {
+		setIsCreateModalOpen(false)
+		setEditingAppointment(null)
+	}
+	if (isLoading) {
+		return <Loader />
+	}
 
 	return (
 		<div className='space-y-6'>
-			<HeaderPages
-				title='Записи'
-				description='Управление записями клиентов'
-				nameButton='Новая запись'
-				secondaryBtn='Чек-ин'
-			/>
+			<HeaderWrapper title='Записи' desc='Управление записями клиентов'>
+				<Button onClick={handleStudioIsOpenModal}>
+					<Plus className='h-4 w-4 mr-2' />
+					Новая запись
+				</Button>
+			</HeaderWrapper>
 
-			<AppointmentsList appointments={appointments} />
+			<AppointmentsList appointments={appointments1} />
+			<AppointmentModal
+				isOpen={isCreateModalOpen}
+				onClose={handleCloseModal}
+				services={servicesSelectionList}
+				customers={clientSelectionList}
+				handleCreate={createAppointment}
+				appointment={editingAppointment}
+			/>
 		</div>
 	)
 }

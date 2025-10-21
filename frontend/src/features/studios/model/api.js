@@ -1,7 +1,4 @@
-import { useState } from 'react'
-import api from '@/shared/api/client'
-
-export const useStudios = () => {
+const useStudios = () => {
 	const [isLoading, setIsLoading] = useState(false)
 	const [studios, setStudios] = useState([])
 
@@ -70,3 +67,4 @@ export const useStudios = () => {
 		updateStudio,
 	}
 }
+export default useStudios

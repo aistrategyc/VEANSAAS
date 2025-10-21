@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
 
-export const SelectForm = ({
+const FormSelect = ({
 	items,
 	title,
 	name,
@@ -46,8 +46,15 @@ export const SelectForm = ({
 				<SelectContent>
 					<SelectGroup>
 						{items.map(item => (
-							<SelectItem key={item.value} value={item.value}>
-								{item.label}
+							<SelectItem
+								key={item.value || item.uuid}
+								value={item.value || item.uuid}
+							>
+								{item.label ||
+									(item.first_name && item.last_name
+										? `${item.first_name} ${item.last_name}`
+										: null) ||
+									item.name}
 							</SelectItem>
 						))}
 					</SelectGroup>
@@ -56,3 +63,5 @@ export const SelectForm = ({
 		</div>
 	)
 }
+
+export default FormSelect
