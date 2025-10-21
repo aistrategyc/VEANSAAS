@@ -69,8 +69,8 @@ export function ClientsTable({ clients, onEdit, onDelete }) {
 											<div className='flex items-center space-x-3'>
 												<Avatar>
 													<AvatarFallback>
-														{client.first_name[0]}
-														{client.last_name[0]}
+														{client.first_name?.[0]}
+														{client.last_name?.[0]}
 													</AvatarFallback>
 												</Avatar>
 												<div>
