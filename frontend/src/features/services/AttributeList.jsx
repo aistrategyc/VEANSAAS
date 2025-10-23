@@ -1,11 +1,21 @@
-import React, { memo } from 'react'
-import { Badge } from '@/components/ui/badge'
+import { memo } from 'react'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { Trash2 } from 'lucide-react'
-import { Label } from '@/components/ui/label'
+import { EmptyState } from '@/components/ui/empty-state'
 import { ATTRIBUTE_TYPES } from './lib/constants'
-
+import { Label } from '@/components/ui/label'
 export const AttributeList = memo(({ fields, onRemove }) => {
+	if (fields.length === 0) {
+		return (
+			<EmptyState
+				title='Нет атрибутов'
+				description='Добавьте атрибуты для отображения в таблице'
+				icon={<Trash2 className='h-12 w-12 text-muted-foreground' />}
+			/>
+		)
+	}
+
 	return (
 		<div className='space-y-2'>
 			<Label className='text-sm'>Добавленные атрибуты:</Label>

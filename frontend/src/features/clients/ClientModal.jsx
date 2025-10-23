@@ -6,8 +6,9 @@ import { FormInput } from '@/shared/ui/input/FormInput'
 import FormSelect from '@/shared/ui/select/Select'
 import { DialogWrapper } from '@/widgets/wrapper/DialogWrapper'
 import { SEX_TYPES } from './lib/constants'
-import DatePickerWithInput  from '../../shared/ui/DatePickerWithInput'
+import DatePickerWithInput from '@/shared/ui/DatePickerWithInput'
 import FormSwitch from '@/shared/ui/switch/FormSwitch'
+import FormFileInput from '@/shared/ui/FormFileInput'
 
 export function ClientModal({
 	isOpen,
@@ -125,7 +126,6 @@ export function ClientModal({
 						error={errors.phone_number?.message}
 					/>
 				</div>
-
 				<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
 					<DatePickerWithInput name='dateOfBirth' control={control} />
 
@@ -148,7 +148,13 @@ export function ClientModal({
 					className='resize-none min-h-[80px]'
 					error={errors.notes?.message}
 				/>
-
+				<FormFileInput
+					title='Картинка профиля'
+					name='avatar'
+					control={control}
+					accept='image/*'
+					error={errors.avatar?.message}
+				/>
 				<FormSwitch
 					title={'Активный клиент'}
 					control={control}

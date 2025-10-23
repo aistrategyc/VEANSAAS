@@ -4,6 +4,7 @@ import {
 	getCookie,
 	setCookie,
 } from '@/shared/helper/cookie-utils'
+import { handleUserError } from '../helper/api-errors'
 
 const BASE_URL = 'http://localhost:8000/api/v1'
 
@@ -92,6 +93,10 @@ apiClient.interceptors.response.use(
 	response => response,
 	async error => {
 		const originalRequest = error.config
+
+		if (!originalRequest._skipUserError) {
+			handleUserError(error)
+		}
 
 		if (
 			error.response?.status !== 401 ||

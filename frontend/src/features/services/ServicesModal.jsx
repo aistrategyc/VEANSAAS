@@ -36,7 +36,6 @@ export function ServiceModal({
 		},
 	})
 
-	const is_active = watch('is_active')
 	useEffect(() => {
 		if (isOpen) {
 			if (service) {
@@ -90,7 +89,7 @@ export function ServiceModal({
 						error={errors.name?.message}
 					/>
 					<FormSelect
-						items={CATEGORY_TYPES}
+						items={categories}
 						title='Категория *'
 						placeholder={'Выберите категорию'}
 						name='category_uuid'

@@ -43,7 +43,6 @@ function isValidDate(date) {
 	return !isNaN(date.getTime())
 }
 
-// Функция для преобразования в формат ISO с Z
 function toUTCString(date) {
 	if (!date) return null
 
@@ -75,7 +74,6 @@ export function DateTimePicker({ name, control, error }) {
 	const [dateValue, setDateValue] = React.useState(formatDate(date))
 	const [timeValue, setTimeValue] = React.useState(formatTime(date))
 
-	// Обновляем внутреннее состояние при изменении value извне
 	React.useEffect(() => {
 		if (value) {
 			const newDate = new Date(value)
@@ -87,7 +85,6 @@ export function DateTimePicker({ name, control, error }) {
 
 	const handleDateSelect = selectedDate => {
 		if (selectedDate) {
-			// Сохраняем время из текущей даты
 			const newDate = new Date(selectedDate)
 			newDate.setHours(date.getHours())
 			newDate.setMinutes(date.getMinutes())
@@ -96,7 +93,7 @@ export function DateTimePicker({ name, control, error }) {
 			setDate(newDate)
 			setDateValue(formatDate(newDate))
 			setTimeValue(formatTime(newDate))
-			// Отправляем в формате UTC
+
 			onChange(toUTCString(newDate))
 			setOpen(false)
 		}
@@ -113,7 +110,7 @@ export function DateTimePicker({ name, control, error }) {
 
 			setDate(newDate)
 			setTimeValue(formatTime(newDate))
-			// Отправляем в формате UTC
+
 			onChange(toUTCString(newDate))
 		}
 	}
@@ -123,14 +120,13 @@ export function DateTimePicker({ name, control, error }) {
 		setDateValue(e.target.value)
 
 		if (isValidDate(newDate)) {
-			// Сохраняем время из текущей даты
 			newDate.setHours(date.getHours())
 			newDate.setMinutes(date.getMinutes())
 			newDate.setSeconds(date.getSeconds())
 
 			setDate(newDate)
 			setMonth(newDate)
-			// Отправляем в формате UTC
+
 			onChange(toUTCString(newDate))
 		}
 	}
@@ -143,7 +139,6 @@ export function DateTimePicker({ name, control, error }) {
 				Дата и время *
 			</Label>
 			<div className='flex gap-2'>
-				{/* Дата */}
 				<div className='relative flex-1'>
 					<Input
 						id='date'
@@ -186,8 +181,6 @@ export function DateTimePicker({ name, control, error }) {
 						</PopoverContent>
 					</Popover>
 				</div>
-
-				{/* Время */}
 				<div className='relative flex-1'>
 					<Input
 						type='time'

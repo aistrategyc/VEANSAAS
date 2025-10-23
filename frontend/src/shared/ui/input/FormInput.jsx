@@ -15,6 +15,7 @@ export const FormInput = ({
 	rows,
 	rules = { require: true },
 	className,
+	step = 10,
 	error,
 }) => {
 	const [showPassword, setShowPassword] = useState(false)

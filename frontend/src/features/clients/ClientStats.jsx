@@ -3,7 +3,6 @@ import { Badge } from '@/components/ui/badge'
 import { Users, Plus } from 'lucide-react'
 
 export const ClientStats = ({ clients }) => {
-	console.log(clients)
 	const total = clients.length
 	const active = 2
 	const inactive = 2

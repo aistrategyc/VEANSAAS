@@ -40,7 +40,7 @@ const DatePickerWithInput = ({ control, name, error }) => {
 
 	React.useEffect(() => {
 		if (date) {
-			// Преобразуем дату в формат ISO для формы
+			
 			const isoDate = date.toISOString()
 			setFormValue(name, isoDate)
 		}

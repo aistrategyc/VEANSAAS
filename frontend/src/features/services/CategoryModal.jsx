@@ -61,7 +61,7 @@ export const CategoryModal = ({
 				reset({
 					name: category.name,
 					description: category.description || '',
-					is_active: category.isActive,
+					is_active: category.isActive || true,
 					attributes: category.attributes || [],
 				})
 			} else {
