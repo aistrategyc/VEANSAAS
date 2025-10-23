@@ -24,9 +24,9 @@ export const AuthProvider = ({ children }) => {
 		const dataJwt = parseJwt(accessToken)
 		dispatch(
 			setRoles({
-				roles: dataJwt?.roles || [],
-				permissions: dataJwt?.permissions || [],
-				org_uuid: dataJwt?.organization_uuid || null,
+				roles: dataJwt?.roles || { orgs: {}, studios: {} },
+				permissions: dataJwt?.permissions || {},
+				orgUuid: dataJwt?.organization_uuid || null,
 			})
 		)
 		setIsAuthenticated(true)
@@ -50,8 +50,8 @@ export const AuthProvider = ({ children }) => {
 			const dataJwt = parseJwt(token)
 			dispatch(
 				setRoles({
-					roles: dataJwt?.roles || [],
-					permissions: dataJwt?.permissions || [],
+					roles: dataJwt?.roles || { orgs: {}, studios: {} },
+					permissions: dataJwt?.permissions || {},
 					orgUuid: dataJwt?.organization_uuid || null,
 				})
 			)

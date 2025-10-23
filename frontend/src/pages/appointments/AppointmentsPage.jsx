@@ -1,4 +1,4 @@
-import { AppointmentsList } from '@/features/appointments/AppointmentsList'
+
 import { HeaderWrapper } from '@/widgets/wrapper/HeaderWrapper'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
@@ -6,27 +6,10 @@ import { AppointmentModal } from '@/features/appointments/AppointmentModal'
 import { useEffect, useState } from 'react'
 import { useAppointment } from '@/features/appointments/hooks/useAppointment'
 import { Loader } from '@/shared/ui/loader/Loader'
-import { useDispatch } from 'react-redux'
 import { useClient } from '@/features/clients/hooks/useClients'
+import { AppointmentsTable } from '@/features/appointments/AppointmentsTable'
 
 export default function AppointmentsPage() {
-	const appointments1 = [
-		{
-			id: 1,
-			time: '09:00',
-			date: '2024-01-15',
-			client: 'Анна Петрова',
-			phone: '+33 1 23 45 67 89',
-			service: 'Стрижка + окрашивание',
-			master: 'Елена Кузнецова',
-			duration: '2ч 30мин',
-			price: '€85',
-			status: 'confirmed',
-			prepaid: '€25',
-			notes: 'Клиент просит сохранить длину',
-		},
-	]
-
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
 	const [editingAppointment, setEditingAppointment] = useState(null)
 
@@ -40,8 +23,6 @@ export default function AppointmentsPage() {
 	} = useAppointment()
 	const { clientSelectionList, getClientSelectionList } = useClient()
 
-	const dispatch = useDispatch()
-
 	useEffect(() => {
 		fetchAppointments()
 		getClientSelectionList()
@@ -53,7 +34,7 @@ export default function AppointmentsPage() {
 		setIsCreateModalOpen(true)
 	}
 
-	const handleEditStudio = appointment => {
+	const handleEditAppointments = appointment => {
 		setEditingAppointment(appointment)
 		setIsCreateModalOpen(true)
 	}
@@ -74,8 +55,12 @@ export default function AppointmentsPage() {
 					Новая запись
 				</Button>
 			</HeaderWrapper>
-
-			<AppointmentsList appointments={appointments1} />
+			<AppointmentsTable
+				appointments={appointments}
+				clients={clientSelectionList}
+				services={servicesSelectionList}
+				onEdit={handleEditAppointments}
+			/>
 			<AppointmentModal
 				isOpen={isCreateModalOpen}
 				onClose={handleCloseModal}

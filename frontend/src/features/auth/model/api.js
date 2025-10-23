@@ -6,6 +6,7 @@ import { useAuth } from '@/shared/hooks/useAuth'
 import { fetchStudios } from '@/shared/slices/studiosSlice'
 import { fetchUserData } from '@/shared/slices/userSlice'
 import { showAlert } from '@/shared/ui/alert/Alerts'
+import { toastError } from '@/lib/toast'
 
 export const useLogin = () => {
 	const [isLoading, setIsLoading] = useState(false)
@@ -23,7 +24,7 @@ export const useLogin = () => {
 				reset()
 			})
 			.catch(err => {
-				setError(err?.response?.data?.detail)
+				toastError(err?.response?.data?.detail)
 			})
 			.finally(() => {
 				setIsLoading(false)

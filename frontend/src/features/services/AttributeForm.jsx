@@ -24,45 +24,57 @@ export const AttributeForm = ({ onAppendAttribute }) => {
 		defaultValues: {
 			name: '',
 			description: '',
-			type: '',
-			is_required: false,
-			attribute_options: [],
+			type: 'text',
+			is_required: true,
+			options: [],
 		},
 	})
 
 	const type = watch('type')
-	const values = watch('attribute_options')
+	const options = watch('options')
 
 	const handleAddAttributeValue = () => {
 		if (!newAttributeValueInput.trim()) return
 
-		const currentValues = values || []
-		setValue('attribute_options', [
-			...currentValues,
-			newAttributeValueInput.trim(),
+		const currentOptions = options || []
+		setValue('options', [
+			...currentOptions,
+			{ value: newAttributeValueInput.trim() },
 		])
 		setNewAttributeValueInput('')
 	}
 
 	const handleRemoveAttributeValue = index => {
-		const currentValues = values || []
+		const currentOptions = options || []
 		setValue(
-			'attribute_options',
-			currentValues.filter((_, i) => i !== index)
+			'options',
+			currentOptions.filter((_, i) => i !== index)
 		)
 	}
 
 	const onSubmit = data => {
-		console.log(data)
+		console.log('Attribute data:', data)
+
 		const newAttribute = {
-			...data,
-			id: Date.now().toString(),
-			attribute_options: data.values || [],
+			name: data.name,
+			description: data.description,
+			type: data.type,
+			sort_order: data.sort_order || 0,
+			is_required: data.is_required,
+			options: data.options || [],
 		}
 
+		console.log('New attribute to append:', newAttribute)
 		onAppendAttribute(newAttribute)
 
-		reset()
+		reset({
+			name: '',
+			description: '',
+			type: 'text',
+			is_required: true,
+			sort_order: 0,
+			options: [],
+		})
 		setNewAttributeValueInput('')
 	}
 
@@ -130,15 +142,15 @@ export const AttributeForm = ({ onAppendAttribute }) => {
 						</Button>
 					</div>
 
-					{values && values.length > 0 && (
+					{options && options.length > 0 && (
 						<div className='flex flex-wrap gap-1'>
-							{values.map((value, index) => (
+							{options.map((option, index) => (
 								<Badge
 									key={index}
 									variant='secondary'
 									className='text-xs px-2 py-1 flex items-center gap-1'
 								>
-									{value}
+									{option.value}
 									<button
 										type='button'
 										onClick={() => handleRemoveAttributeValue(index)}
@@ -150,14 +162,17 @@ export const AttributeForm = ({ onAppendAttribute }) => {
 							))}
 						</div>
 					)}
-					{type === 'select' && (!values || values.length === 0) && (
+					{type === 'select' && (!options || options.length === 0) && (
 						<p className='text-sm text-destructive'>
 							Добавьте хотя бы одно значение для списка
 						</p>
 					)}
 				</div>
 			)}
-			<FormSwitch name='is_required' control={control} title='Обязательный' />
+
+			<div className='grid grid-cols-2 gap-4'>
+				<FormSwitch name='is_required' control={control} title='Обязательный' />
+			</div>
 		</div>
 	)
 }

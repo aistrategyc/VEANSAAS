@@ -1,3 +1,6 @@
+import api from '@/shared/api/client'
+import { useState } from 'react'
+
 const useStudios = () => {
 	const [isLoading, setIsLoading] = useState(false)
 	const [studios, setStudios] = useState([])
