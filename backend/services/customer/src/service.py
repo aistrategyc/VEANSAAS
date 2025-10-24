@@ -134,9 +134,14 @@ async def search_customer(
     if filters.phone_number:
         conditions.append(Customer.phone_number.ilike(f'%{filters.phone_number}%'))
 
-    query = select(
-        Customer,
-    ).where(*conditions)
+    query = (
+        select(
+            Customer,
+        )
+        .offset(offset)
+        .limit(limit)
+        .where(*conditions)
+    )
 
     count_query = select(func.count()).where(*conditions).select_from(Customer)
 
