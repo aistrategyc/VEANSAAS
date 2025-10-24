@@ -5,7 +5,7 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 
 from shared.enums.company_units import AttributeType
-from shared.schemas.mixins import TimestampMixin, UUIDMixin
+from shared.schemas.mixins import PaginationResponse, TimestampMixin, UUIDMixin
 
 
 class ServiceBase(BaseModel):
@@ -88,6 +88,19 @@ class ServiceCategoryCreate(ServiceCategoryBase):
 class ServiceResponse(ServiceBase, UUIDMixin, TimestampMixin):
     organization_uuid: UUID
     category_uuid: UUID
+
+
+class ServiceWithCategoryResponse(ServiceBase, UUIDMixin, TimestampMixin):
+    organization_uuid: UUID
+    category: ServiceResponse | None = Field(default=None)
+
+    class Config:
+        from_attributes = True
+
+
+class ServiceWithCategoryListResponse(BaseModel):
+    items: List[ServiceWithCategoryResponse]
+    pagination: PaginationResponse
 
 
 class CategoryAttributeDetailResponse(CategoryAttributeBase, UUIDMixin, TimestampMixin):

@@ -2,7 +2,7 @@ from typing import List
 from uuid import UUID
 
 from fastapi import HTTPException, Request, Response, status
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload, selectinload
 
@@ -22,7 +22,10 @@ from shared.schemas.company_units.service import (
     ServiceCategoryUpdate,
     ServiceCreate,
     ServiceUpdate,
+    ServiceWithCategoryListResponse,
+    ServiceWithCategoryResponse,
 )
+from shared.schemas.mixins import PaginationResponse
 from shared.utils import update_model_from_dict
 
 
@@ -136,12 +139,32 @@ async def create_service(
     return db_service
 
 
-async def get_list_services(request: Request, db: AsyncSession, auth: AuthContext):
-    result = await db.execute(
-        select(Service).where(Service.organization_uuid == auth.organization_uuid)
+async def get_list_services(
+    request: Request, offset: int, limit: int, db: AsyncSession, auth: AuthContext
+):
+    query = select(Service).where(Service.organization_uuid == auth.organization_uuid)
+
+    count_query = (
+        select(func.count())
+        .where(Service.organization_uuid == auth.organization_uuid)
+        .select_from(Service)
     )
-    db_service = result.scalars().all()
-    return db_service
+    query_result = await db.execute(query.offset(offset).limit(limit))
+    db_services = query_result.scalars().all()
+    total_count = await db.scalar(count_query) or 0
+
+    return ServiceWithCategoryListResponse(
+        items=[
+            ServiceWithCategoryResponse.model_validate(service)
+            for service in db_services
+        ],
+        pagination=PaginationResponse(
+            count=total_count,
+            offset=offset,
+            limit=limit,
+            has_more=(offset + limit) < total_count,
+        ),
+    )
 
 
 async def get_service(
