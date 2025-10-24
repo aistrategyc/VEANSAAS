@@ -23,7 +23,6 @@ import CompatibilityPage from '@/pages/сompatibility/CompatibilityPage'
 import ReportsPage from '@/pages/reports/ReportsPage'
 import LocationsPage from '@/pages/locations/LocationsPage'
 import SchedulePage from '@/pages/schedule/SchedulePage'
-import DashboardPageNew from '@/pages/dashboard/DashboardPageNew'
 
 import AppointmentDetailPage from '@/features/appointments/AppointmentDetailPage'
 import ClientDetailPage from '@/features/clients/ClientDetailPage'
@@ -67,7 +66,6 @@ export const RouterProvider = () => {
 				{ path: 'report', element: <ReportsPage /> },
 				{ path: 'locations', element: <LocationsPage /> },
 				{ path: 'schedule', element: <SchedulePage /> },
-				{ path: 'dashboard-test', element: <DashboardPageNew /> },
 				{ path: 'compatibility', element: <CompatibilityPage /> },
 				{ path: 'records/1', element: <AppointmentDetailPage /> },
 

@@ -25,7 +25,7 @@ import { useSelector } from 'react-redux'
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/shared/hooks/useAuth'
 
-export default function DashboardPage() {
+const DashboardPage = () => {
 	const beautyStats = [
 		{
 			name: 'Записи сегодня',
@@ -122,3 +122,5 @@ export default function DashboardPage() {
 		</div>
 	)
 }
+
+export default DashboardPage

@@ -11,7 +11,7 @@ export const toastError = (message, options = {}) => {
 export const toastSuccess = (message, options = {}) => {
 	return toast.success(message, {
 		duration: 4000,
-		position: 'top-right',
+		position: 'bottom-right',
 		...options,
 	})
 }

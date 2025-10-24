@@ -23,12 +23,26 @@ import {
 	Phone,
 	Mail,
 	Calendar,
+	ChevronLeft,
+	ChevronRight,
 } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
 import { PermissionGuard } from '@/widgets/permissions/PermissionGuard'
 import { Link } from 'react-router'
 
-export function ClientsTable({ clients, onEdit, onDelete }) {
+export function ClientsTable({
+	clients,
+	onEdit,
+	onDelete,
+	currentPage = 1,
+	pageSize = 10,
+	totalCount = 20,
+	onPageChange,
+}) {
+	const totalPages = Math.ceil(totalCount / pageSize)
+	const startItem = (currentPage - 1) * pageSize + 1
+	const endItem = Math.min(currentPage * pageSize, totalCount)
+
 	if (clients.length === 0) {
 		return (
 			<EmptyState
@@ -42,11 +56,17 @@ export function ClientsTable({ clients, onEdit, onDelete }) {
 			/>
 		)
 	}
-
 	return (
 		<Card>
-			<CardHeader>
-				<CardTitle>База клиентов ({clients.length})</CardTitle>
+			<CardHeader className='flex flex-row items-center justify-between space-y-0 pb-4'>
+				<CardTitle>База клиентов ({totalCount})</CardTitle>
+				{totalPages > 1 && (
+					<div className='flex items-center space-x-2 text-sm text-muted-foreground'>
+						<span>
+							{startItem}-{endItem} из {totalCount}
+						</span>
+					</div>
+				)}
 			</CardHeader>
 			<CardContent>
 				<div className='rounded-md border'>
@@ -64,8 +84,8 @@ export function ClientsTable({ clients, onEdit, onDelete }) {
 						<TableBody>
 							{clients.map(client => (
 								<TableRow key={client.uuid}>
-										<TableCell>
-											<Link to={`/clients/${client.uuid}`}>
+									<TableCell>
+										<Link to={`/clients/${client.uuid}`}>
 											<div className='flex items-center space-x-3'>
 												<Avatar>
 													<AvatarFallback>
@@ -85,9 +105,9 @@ export function ClientsTable({ clients, onEdit, onDelete }) {
 													)}
 												</div>
 											</div>
-											</Link>
-										</TableCell>
-									
+										</Link>
+									</TableCell>
+
 									<TableCell>
 										<div className='space-y-1'>
 											{client.first_name} {client.last_name}
@@ -157,6 +177,29 @@ export function ClientsTable({ clients, onEdit, onDelete }) {
 						</TableBody>
 					</Table>
 				</div>
+				{totalPages > 1 && (
+					<div className='flex items-center justify-center space-x-2 mt-4'>
+						<Button
+							variant='ghost'
+							size='sm'
+							onClick={() => onPageChange(currentPage - 1)}
+							disabled={currentPage <= 1}
+						>
+							<ChevronLeft className='h-4 w-4' />
+						</Button>
+						<div className='text-sm text-muted-foreground mx-2'>
+							{currentPage} / {totalPages}
+						</div>
+						<Button
+							variant='ghost'
+							size='sm'
+							onClick={() => onPageChange(currentPage + 1)}
+							disabled={currentPage >= totalPages}
+						>
+							<ChevronRight className='h-4 w-4' />
+						</Button>
+					</div>
+				)}
 			</CardContent>
 		</Card>
 	)

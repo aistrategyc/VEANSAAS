@@ -1,4 +1,3 @@
-
 import { HeaderWrapper } from '@/widgets/wrapper/HeaderWrapper'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
@@ -21,11 +20,11 @@ export default function AppointmentsPage() {
 		servicesSelectionList,
 		getServicesSelectionList,
 	} = useAppointment()
-	const { clientSelectionList, getClientSelectionList } = useClient()
+
+	const { clientSelectionList, clients, pagination } = useClient()
 
 	useEffect(() => {
 		fetchAppointments()
-		getClientSelectionList()
 		getServicesSelectionList()
 	}, [])
 
@@ -43,6 +42,7 @@ export default function AppointmentsPage() {
 		setIsCreateModalOpen(false)
 		setEditingAppointment(null)
 	}
+
 	if (isLoading) {
 		return <Loader />
 	}
@@ -55,17 +55,18 @@ export default function AppointmentsPage() {
 					Новая запись
 				</Button>
 			</HeaderWrapper>
+
 			<AppointmentsTable
 				appointments={appointments}
 				clients={clientSelectionList}
 				services={servicesSelectionList}
 				onEdit={handleEditAppointments}
 			/>
+
 			<AppointmentModal
 				isOpen={isCreateModalOpen}
 				onClose={handleCloseModal}
 				services={servicesSelectionList}
-				customers={clientSelectionList}
 				handleCreate={createAppointment}
 				appointment={editingAppointment}
 			/>

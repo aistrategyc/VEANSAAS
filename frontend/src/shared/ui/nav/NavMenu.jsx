@@ -38,7 +38,7 @@ const menuItems = [
 		id: 'dashboard',
 		text: 'Dashboard',
 		icon: LayoutDashboardIcon,
-		path: '/dashboard-test',
+		path: '/dashboard',
 		permission: ['page:view', 'view:dashboard'],
 	},
 	{
