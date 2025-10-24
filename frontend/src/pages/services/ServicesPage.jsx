@@ -21,18 +21,15 @@ import {
 } from '@/shared/slices/categoriesSlice'
 import { Loader } from '@/shared/ui/loader/Loader'
 import { ServiceStats } from '@/features/services/ServiceStats'
-
 import { CategoryList } from '@/features/services/CategoryList'
 import { Filters } from '@/widgets/filters/Filters'
 import { HeaderWrapper } from '@/widgets/wrapper/HeaderWrapper'
 
 const ServicesPage = () => {
 	const dispatch = useDispatch()
-	const {
-		items: services,
-		filteredItems: filteredServices,
-		isLoading: servicesLoading,
-	} = useSelector(state => state.rootReducer.services)
+	const { items: services, isLoading: servicesLoading } = useSelector(
+		state => state.rootReducer.services
+	)
 
 	const { items: categories, isLoading: categoriesLoading } = useSelector(
 		state => state.rootReducer.categories
@@ -42,20 +39,35 @@ const ServicesPage = () => {
 	const [selectedCategory, setSelectedCategory] = useState(null)
 	const [isServiceModalOpen, setIsServiceModalOpen] = useState(false)
 	const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false)
+	const [activeTab, setActiveTab] = useState('services')
+	const [categoriesLoaded, setCategoriesLoaded] = useState(false)
 
 	useEffect(() => {
 		dispatch(fetchServices())
-		dispatch(fetchCategories())
 	}, [dispatch])
+
+	useEffect(() => {
+		if (activeTab === 'categories') {
+			loadCategories()
+		}
+	}, [activeTab, dispatch])
+
+	const loadCategories = () => {
+		if (!categoriesLoaded && (!categories || categories.length === 0)) {
+			dispatch(fetchCategories()).then(() => setCategoriesLoaded(true))
+		}
+	}
 
 	const handleCreateService = () => {
 		setSelectedService(null)
 		setIsServiceModalOpen(true)
+		loadCategories()
 	}
 
 	const handleEditService = service => {
 		setSelectedService(service)
 		setIsServiceModalOpen(true)
+		loadCategories()
 	}
 
 	const handleSaveService = serviceData => {
@@ -112,7 +124,7 @@ const ServicesPage = () => {
 		setSelectedCategory(null)
 	}
 
-	if (servicesLoading || categoriesLoading) {
+	if (servicesLoading) {
 		return <Loader />
 	}
 
@@ -131,12 +143,19 @@ const ServicesPage = () => {
 					Добавить услугу
 				</Button>
 			</HeaderWrapper>
+
 			<ServiceStats services={services} categories={categories} />
-			<Tabs defaultValue='services' className='space-y-4'>
+
+			<Tabs
+				defaultValue='services'
+				className='space-y-4'
+				onValueChange={value => setActiveTab(value)}
+			>
 				<TabsList>
 					<TabsTrigger value='services'>Услуги</TabsTrigger>
 					<TabsTrigger value='categories'>Категории</TabsTrigger>
 				</TabsList>
+
 				<TabsContent value='services' className='space-y-4'>
 					<Filters
 						title='Поиск услуг'
@@ -144,14 +163,18 @@ const ServicesPage = () => {
 						searchPlaceholder='Поиск по названию или описанию...'
 					/>
 					<ServicesTable
-						services={filteredServices}
+						services={services}
 						categories={categories}
 						onEdit={handleEditService}
 						onDelete={handleDeleteService}
 					/>
 				</TabsContent>
 				<TabsContent value='categories' className='space-y-4'>
-					<CategoryList categories={categories} onEdit={handleEditCategory} />
+					{categoriesLoading ? (
+						<Loader size='sm' />
+					) : (
+						<CategoryList categories={categories} onEdit={handleEditCategory} />
+					)}
 				</TabsContent>
 			</Tabs>
 

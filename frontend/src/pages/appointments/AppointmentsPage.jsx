@@ -21,11 +21,10 @@ export default function AppointmentsPage() {
 		getServicesSelectionList,
 	} = useAppointment()
 
-	const { clientSelectionList, clients, pagination } = useClient()
+	const { clientSelectionList } = useClient()
 
 	useEffect(() => {
 		fetchAppointments()
-		getServicesSelectionList()
 	}, [])
 
 	const handleStudioIsOpenModal = () => {
@@ -59,14 +58,12 @@ export default function AppointmentsPage() {
 			<AppointmentsTable
 				appointments={appointments}
 				clients={clientSelectionList}
-				services={servicesSelectionList}
 				onEdit={handleEditAppointments}
 			/>
 
 			<AppointmentModal
 				isOpen={isCreateModalOpen}
 				onClose={handleCloseModal}
-				services={servicesSelectionList}
 				handleCreate={createAppointment}
 				appointment={editingAppointment}
 			/>

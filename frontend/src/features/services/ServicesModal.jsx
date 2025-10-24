@@ -5,9 +5,10 @@ import { Form } from '@/shared/ui/form/Form'
 import { Trash2 } from 'lucide-react'
 import { FormInput } from '@/shared/ui/input/FormInput'
 import FormSelect from '@/shared/ui/select/Select'
-import { CATEGORY_TYPES } from './lib/constants'
 import { DialogWrapper } from '@/widgets/wrapper/DialogWrapper'
 import FormSwitch from '@/shared/ui/switch/FormSwitch'
+import { useDispatch } from 'react-redux'
+import { fetchCategories } from '@/shared/slices/categoriesSlice'
 
 export function ServiceModal({
 	isOpen,
@@ -23,8 +24,6 @@ export function ServiceModal({
 		handleSubmit,
 		formState: { errors },
 		reset,
-		setValue,
-		watch,
 	} = useForm({
 		mode: 'onChange',
 		defaultValues: {
@@ -32,9 +31,15 @@ export function ServiceModal({
 			description: '',
 			base_price: 0,
 			is_active: true,
-			category_uuid: '0b12b41e-ee3b-4da3-82c9-f77851f2194b',
+			category_uuid: '',
 		},
 	})
+	const dispatch = useDispatch()
+	useEffect(() => {
+		if (isOpen && categories.length === 0) {
+			dispatch(fetchCategories())
+		}
+	}, [isOpen])
 
 	useEffect(() => {
 		if (isOpen) {

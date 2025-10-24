@@ -2,22 +2,22 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Folder, Scissors, Tag } from 'lucide-react'
 
 export const ServiceStats = ({ services, categories }) => {
-	const activeServices = services.filter(s => s.is_active)
-	const activeCategories = categories.filter(c => c.is_active)
+	const activeServices = services?.items?.filter(s => s.is_active)
+	const activeCategories = categories?.items?.filter(c => c.is_active)
 
 	const stats = {
-		totalServices: activeServices.length,
-		totalCategories: activeCategories.length,
+		totalServices: activeServices?.length,
+		totalCategories: activeCategories?.length,
 		averagePrice:
-			activeServices.length > 0
+			activeServices?.length > 0
 				? Math.round(
 						activeServices.reduce(
 							(sum, s) => sum + parseFloat(s.base_price || 0),
 							0
-						) / activeServices.length
+						) / activeServices?.length
 				  )
 				: 0,
-		categorizedServices: activeServices.filter(s => s.category_uuid).length,
+		categorizedServices: activeServices?.filter(s => s.category_uuid).length,
 	}
 
 	return (

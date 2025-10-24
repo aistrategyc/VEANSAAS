@@ -64,7 +64,7 @@ export function ServicesTable({ services, categories, onEdit, onDelete }) {
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{services.map(service => {
+							{services.items.map(service => {
 								const category = getCategoryByUuid(service.category_uuid)
 								return (
 									<TableRow
