@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
 export const CategoryList = ({ categories, onEdit }) => {
 	return (
 		<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-			{categories.map(category => {
+			{categories.items.map(category => {
 				return (
 					<Card
 						className='cursor-pointer hover:shadow-md transition-shadow'

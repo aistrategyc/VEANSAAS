@@ -63,19 +63,16 @@ export const deleteCategory = createAsyncThunk(
 const categoriesSlice = createSlice({
 	name: 'categories',
 	initialState: {
-		items: [],
-		isLoading: false,
-		isLoaded: false,
-		error: null,
-	},
-	reducers: {
-		clearError: state => {
-			state.error = null
+		items: {
+			items: [],
+			pagination: {},
 		},
+		isLoading: false,
+		error: null,
 	},
 	extraReducers: builder => {
 		builder
-			// Fetch Categories
+
 			.addCase(fetchCategories.pending, state => {
 				state.isLoading = true
 				state.error = null
@@ -89,7 +86,7 @@ const categoriesSlice = createSlice({
 				state.isLoading = false
 				state.error = action.payload
 			})
-			// Create Category
+
 			.addCase(createCategory.pending, state => {
 				state.isLoading = true
 				state.error = null
@@ -102,7 +99,7 @@ const categoriesSlice = createSlice({
 				state.isLoading = false
 				state.error = action.payload
 			})
-			// Update Category
+
 			.addCase(updateCategory.pending, state => {
 				state.isLoading = true
 				state.error = null
@@ -120,7 +117,7 @@ const categoriesSlice = createSlice({
 				state.isLoading = false
 				state.error = action.payload
 			})
-			// Delete Category
+
 			.addCase(deleteCategory.pending, state => {
 				state.isLoading = true
 				state.error = null
@@ -136,5 +133,5 @@ const categoriesSlice = createSlice({
 	},
 })
 
-export const { clearError } = categoriesSlice.actions
+export const {} = categoriesSlice.actions
 export default categoriesSlice.reducer
