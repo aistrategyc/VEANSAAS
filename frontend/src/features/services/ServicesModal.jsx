@@ -10,7 +10,6 @@ import FormSwitch from '@/shared/ui/switch/FormSwitch'
 import { useService } from '@/shared/hooks/useService'
 import { transformToValueLabel } from '@/shared/helper/transformToValueLabel'
 
-
 const ServiceModal = ({
 	isOpen,
 	onClose,
@@ -36,12 +35,6 @@ const ServiceModal = ({
 			category_uuid: '',
 		},
 	})
-	const dispatch = useDispatch()
-	useEffect(() => {
-		if (isOpen && categories.length === 0) {
-			dispatch(fetchCategories())
-		}
-	}, [isOpen])
 
 	useEffect(() => {
 		if (isOpen) {

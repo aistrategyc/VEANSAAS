@@ -34,7 +34,7 @@ const ServicesPage = () => {
 	const [selectedCategory, setSelectedCategory] = useState(null)
 	const [isServiceModalOpen, setIsServiceModalOpen] = useState(false)
 	const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false)
-	const [activeTab, setActiveTab] = useState('services')
+
 	const [categoriesLoaded, setCategoriesLoaded] = useState(false)
 
 	useEffect(() => {
