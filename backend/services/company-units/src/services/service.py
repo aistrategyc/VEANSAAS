@@ -19,6 +19,8 @@ from shared.schemas.company_units.service import (
     CategoryAttributeCreate,
     CategoryAttributeUpdate,
     ServiceCategoryCreate,
+    ServiceCategoryDetailListResponse,
+    ServiceCategoryDetailResponse,
     ServiceCategoryUpdate,
     ServiceCreate,
     ServiceUpdate,
@@ -79,8 +81,10 @@ async def crete_category(
     return db_service_category_with_relations
 
 
-async def get_list_categories(request: Request, db: AsyncSession, auth: AuthContext):
-    result = await db.execute(
+async def get_list_categories(
+    request: Request, offset: int, limit: int, db: AsyncSession, auth: AuthContext
+):
+    query = (
         select(ServiceCategory)
         .where(ServiceCategory.organization_uuid == auth.organization_uuid)
         .options(
@@ -89,8 +93,30 @@ async def get_list_categories(request: Request, db: AsyncSession, auth: AuthCont
             )
         )
     )
-    db_service_category = result.scalars().all()
-    return db_service_category
+
+    count_query = (
+        select(func.count())
+        .where(ServiceCategory.organization_uuid == auth.organization_uuid)
+        .select_from(ServiceCategory)
+    )
+
+    query_result = await db.execute(query.offset(offset).limit(limit))
+
+    db_service_category = query_result.scalars().all()
+    total_count = await db.scalar(count_query) or 0
+
+    return ServiceCategoryDetailListResponse(
+        items=[
+            ServiceCategoryDetailResponse.model_validate(category)
+            for category in db_service_category
+        ],
+        pagination=PaginationResponse(
+            count=total_count,
+            offset=offset,
+            limit=limit,
+            has_more=(offset + limit) < total_count,
+        ),
+    )
 
 
 async def update_category(
@@ -142,7 +168,11 @@ async def create_service(
 async def get_list_services(
     request: Request, offset: int, limit: int, db: AsyncSession, auth: AuthContext
 ):
-    query = select(Service).where(Service.organization_uuid == auth.organization_uuid)
+    query = (
+        select(Service)
+        .where(Service.organization_uuid == auth.organization_uuid)
+        .options(selectinload(Service.category))
+    )
 
     count_query = (
         select(func.count())
@@ -402,3 +432,15 @@ async def get_list_services_detail(
     )
     db_service = result.scalars().all()
     return db_service
+
+
+async def get_categories_selection(
+    request: Request, db: AsyncSession, auth: AuthContext
+):
+    result = await db.execute(
+        select(ServiceCategory).where(
+            ServiceCategory.organization_uuid == auth.organization_uuid
+        )
+    )
+    db_categories = result.scalars().all()
+    return db_categories

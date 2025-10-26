@@ -63,19 +63,16 @@ export const deleteCategory = createAsyncThunk(
 const categoriesSlice = createSlice({
 	name: 'categories',
 	initialState: {
-		items: [],
-		isLoading: false,
-		isLoaded: false,
-		error: null,
-	},
-	reducers: {
-		clearError: state => {
-			state.error = null
+		items: {
+			items: [],
+			pagination: {},
 		},
+		isLoading: false,
+		error: null,
 	},
 	extraReducers: builder => {
 		builder
-			// Fetch Categories
+
 			.addCase(fetchCategories.pending, state => {
 				state.isLoading = true
 				state.error = null
@@ -89,20 +86,24 @@ const categoriesSlice = createSlice({
 				state.isLoading = false
 				state.error = action.payload
 			})
-			// Create Category
+
 			.addCase(createCategory.pending, state => {
 				state.isLoading = true
 				state.error = null
 			})
 			.addCase(createCategory.fulfilled, (state, action) => {
 				state.isLoading = false
-				state.items.push(action.payload)
+				state.items.items.push(action.payload)
+				state.items.pagination = {
+					...state.items.pagination,
+					count: state.items.pagination.count + 1,
+				}
 			})
 			.addCase(createCategory.rejected, (state, action) => {
 				state.isLoading = false
 				state.error = action.payload
 			})
-			// Update Category
+
 			.addCase(updateCategory.pending, state => {
 				state.isLoading = true
 				state.error = null
@@ -120,14 +121,20 @@ const categoriesSlice = createSlice({
 				state.isLoading = false
 				state.error = action.payload
 			})
-			// Delete Category
+
 			.addCase(deleteCategory.pending, state => {
 				state.isLoading = true
 				state.error = null
 			})
 			.addCase(deleteCategory.fulfilled, (state, action) => {
 				state.isLoading = false
-				state.items = state.items.filter(item => item.uuid !== action.payload)
+				state.items.items = state.items.items.filter(
+					item => item.uuid !== action.payload
+				)
+				state.items.pagination = {
+					...state.items.pagination,
+					count: state.items.pagination.count - 1,
+				}
 			})
 			.addCase(deleteCategory.rejected, (state, action) => {
 				state.isLoading = false
@@ -136,5 +143,5 @@ const categoriesSlice = createSlice({
 	},
 })
 
-export const { clearError } = categoriesSlice.actions
+export const {} = categoriesSlice.actions
 export default categoriesSlice.reducer

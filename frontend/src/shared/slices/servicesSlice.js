@@ -52,12 +52,27 @@ export const deleteService = createAsyncThunk(
 const servicesSlice = createSlice({
 	name: 'services',
 	initialState: {
-		items: [],
+		items: {
+			items: [],
+			pagination: {},
+		},
+		searchQuery: '',
+		categoryFilter: 'all',
 		isLoading: false,
 		isLoaded: false,
 		error: null,
 	},
 	reducers: {
+		setSearchQuery: (state, action) => {
+			state.searchQuery = action.payload
+		},
+		setCategoryFilter: (state, action) => {
+			state.categoryFilter = action.payload
+		},
+		clearFilters: state => {
+			state.searchQuery = ''
+			state.categoryFilter = 'all'
+		},
 		clearError: state => {
 			state.error = null
 		},
@@ -83,13 +98,16 @@ const servicesSlice = createSlice({
 			})
 			.addCase(createService.fulfilled, (state, action) => {
 				state.isLoading = false
-				state.items.push(action.payload)
+				state.items.items.push(action.payload)
+				state.items.pagination = {
+					...state.items.pagination,
+					count: state.items.pagination.count + 1,
+				}
 			})
 			.addCase(createService.rejected, (state, action) => {
 				state.isLoading = false
 				state.error = action.payload
 			})
-	
 			.addCase(updateService.pending, state => {
 				state.isLoading = true
 				state.error = null
@@ -101,7 +119,6 @@ const servicesSlice = createSlice({
 				)
 				if (index !== -1) {
 					state.items[index] = action.payload
-					state.filteredItems = filterServices(state.items, state)
 				}
 			})
 			.addCase(updateService.rejected, (state, action) => {
@@ -115,8 +132,11 @@ const servicesSlice = createSlice({
 			})
 			.addCase(deleteService.fulfilled, (state, action) => {
 				state.isLoading = false
-				state.items = state.items.filter(item => item.uuid !== action.payload)
-				state.filteredItems = filterServices(state.items, state)
+				state.items = state.items.items.filter(item => item.uuid !== action.payload)
+				state.items.pagination = {
+					...state.items.pagination,
+					count: state.items.pagination.count - 1,
+				}
 			})
 			.addCase(deleteService.rejected, (state, action) => {
 				state.isLoading = false
@@ -125,5 +145,6 @@ const servicesSlice = createSlice({
 	},
 })
 
-export const { clearError } = servicesSlice.actions
+export const { setSearchQuery, setCategoryFilter, clearFilters, clearError } =
+	servicesSlice.actions
 export default servicesSlice.reducer
