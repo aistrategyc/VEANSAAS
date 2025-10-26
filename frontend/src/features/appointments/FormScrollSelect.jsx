@@ -9,6 +9,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select'
+import { Input } from '@/components/ui/input'
 import { Loader2 } from 'lucide-react'
 import api from '@/shared/api/client'
 
@@ -18,7 +19,7 @@ const FormScrollSelect = ({
 	title,
 	placeholder = title,
 	error,
-	endpoint = '/customers',
+	endpoint = '/customers/selection',
 	formatLabel = item =>
 		item.first_name && item.last_name
 			? `${item.first_name} ${item.last_name}`
@@ -34,19 +35,24 @@ const FormScrollSelect = ({
 	const [hasMore, setHasMore] = useState(true)
 	const [isLoading, setIsLoading] = useState(false)
 	const [isOpen, setIsOpen] = useState(false)
+	const [search, setSearch] = useState('')
 
 	const listRef = useRef(null)
+	const searchTimeout = useRef(null)
 
-	/** 🔹 Получение клиентов */
 	const fetchItems = useCallback(
-		async (reset = false) => {
+		async (reset = false, email = search) => {
 			if (isLoading || (!hasMore && !reset)) return
 			setIsLoading(true)
 
 			try {
-				const limit = 10
+				const limit = 11
 				const { data } = await api.get(endpoint, {
-					params: { limit, offset: reset ? 0 : offset },
+					params: {
+						limit,
+						offset: reset ? 0 : offset,
+						email: email || undefined,
+					},
 				})
 
 				const newItems = data.items || []
@@ -55,24 +61,33 @@ const FormScrollSelect = ({
 				setHasMore(data.pagination?.has_more ?? false)
 				setOffset(prev => (reset ? limit : prev + limit))
 			} catch (err) {
-				console.error('Ошибка загрузки клиентов:', err)
 			} finally {
 				setIsLoading(false)
 			}
 		},
-		[endpoint, offset, hasMore, isLoading]
+		[endpoint, offset, hasMore, isLoading, search]
 	)
 	useEffect(() => {
 		if (isOpen && items.length === 0) {
 			fetchItems(true)
 		}
 	}, [isOpen])
+
 	const handleScroll = e => {
 		const el = e.target
 		const scrollBottom = el.scrollHeight - el.scrollTop - el.clientHeight
 		if (scrollBottom < 20 && !isLoading && hasMore) {
 			fetchItems()
 		}
+	}
+	const handleSearchChange = e => {
+		const value = e.target.value
+		setSearch(value)
+
+		clearTimeout(searchTimeout.current)
+		searchTimeout.current = setTimeout(() => {
+			fetchItems(true, value)
+		}, 500)
 	}
 
 	return (
@@ -95,13 +110,21 @@ const FormScrollSelect = ({
 
 				<SelectContent
 					ref={listRef}
-					className='max-h-80 overflow-y-auto'
+					className='max-h-96 overflow-y-auto'
 					onScrollCapture={handleScroll}
 				>
+					<div className='p-2'>
+						<Input
+							placeholder='Поиск по email...'
+							value={search}
+							onChange={handleSearchChange}
+						/>
+					</div>
+
 					<SelectGroup>
 						{items.map(item => (
 							<SelectItem key={item.uuid} value={item.uuid}>
-								{formatLabel(item)}
+								{formatLabel(item)} — {item.email}
 							</SelectItem>
 						))}
 
@@ -114,6 +137,12 @@ const FormScrollSelect = ({
 						{!isLoading && !hasMore && items.length > 0 && (
 							<div className='text-center text-sm text-gray-400 py-2'>
 								Все клиенты загружены
+							</div>
+						)}
+
+						{!isLoading && items.length === 0 && (
+							<div className='text-center text-sm text-gray-400 py-2'>
+								Ничего не найдено
 							</div>
 						)}
 					</SelectGroup>

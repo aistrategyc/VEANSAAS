@@ -92,7 +92,6 @@ const servicesSlice = createSlice({
 				state.isLoading = false
 				state.error = action.payload
 			})
-
 			.addCase(createService.pending, state => {
 				state.isLoading = true
 				state.error = null
@@ -109,7 +108,6 @@ const servicesSlice = createSlice({
 				state.isLoading = false
 				state.error = action.payload
 			})
-
 			.addCase(updateService.pending, state => {
 				state.isLoading = true
 				state.error = null
@@ -127,7 +125,7 @@ const servicesSlice = createSlice({
 				state.isLoading = false
 				state.error = action.payload
 			})
-			// Delete Service
+
 			.addCase(deleteService.pending, state => {
 				state.isLoading = true
 				state.error = null

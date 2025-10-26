@@ -18,7 +18,9 @@ import {
 } from '@/shared/slices/categoriesSlice'
 import { Loader } from '@/shared/ui/loader/Loader'
 
+import { ServiceStats } from '@/features/services/ServiceStats'
 import { useService } from '@/shared/hooks/useService'
+
 import { CategoryList } from '@/features/services/CategoryList'
 import { Filters } from '@/widgets/filters/Filters'
 import { HeaderWrapper } from '@/widgets/wrapper/HeaderWrapper'
@@ -32,6 +34,8 @@ const ServicesPage = () => {
 	const [selectedCategory, setSelectedCategory] = useState(null)
 	const [isServiceModalOpen, setIsServiceModalOpen] = useState(false)
 	const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false)
+	const [activeTab, setActiveTab] = useState('services')
+	const [categoriesLoaded, setCategoriesLoaded] = useState(false)
 
 	useEffect(() => {
 		if (activeTab === 'services' && services.data.items.length === 0) {
@@ -46,11 +50,13 @@ const ServicesPage = () => {
 	const handleCreateService = () => {
 		setSelectedService(null)
 		setIsServiceModalOpen(true)
+		loadCategories()
 	}
 
 	const handleEditService = service => {
 		setSelectedService(service)
 		setIsServiceModalOpen(true)
+		loadCategories()
 	}
 
 	const handleSaveService = serviceData => {
@@ -138,6 +144,7 @@ const ServicesPage = () => {
 					<TabsTrigger value='services'>Услуги</TabsTrigger>
 					<TabsTrigger value='categories'>Категории</TabsTrigger>
 				</TabsList>
+
 				<TabsContent value='services' className='space-y-4'>
 					{activeTab === 'services' && (
 						<ServicesTable

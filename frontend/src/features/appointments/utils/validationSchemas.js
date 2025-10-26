@@ -5,7 +5,7 @@ export const createAppointmentSchema = (serviceAttributes = []) => {
 	return yup.object({
 		customer_uuid: yup.string().required('Выберите клиента'),
 		master_uuid: yup.string().required('Выберите мастера'),
-		service_uuid: yup.string().required('Выберите услугу'),
+		service: yup.object().required('Выберите услугу'),
 		date_time: yup.string().required('Выберите дату и время'),
 		duration: yup
 			.number()
@@ -45,15 +45,6 @@ export const createAppointmentSchema = (serviceAttributes = []) => {
 
 						if (attributeConfig.is_required) {
 							valueValidation = valueValidation.required('Это поле обязательно')
-						}
-
-						if (attributeConfig.type === 'number') {
-							valueValidation = yup.number().typeError('Должно быть числом')
-							if (attributeConfig.is_required) {
-								valueValidation = valueValidation.required(
-									'Это поле обязательно'
-								)
-							}
 						}
 
 						return yup.object({

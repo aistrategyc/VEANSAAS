@@ -12,12 +12,13 @@ import { DateTimePicker } from '@/shared/ui/DateTimePicker'
 import { FormServiceAttributes } from './FormServiceAttributes'
 import { createAppointmentSchema } from './utils/validationSchemas'
 import FormScrollSelect from './FormScrollSelect'
+import { formatAttributes } from './utils/formatAttributes'
+import { useAppointment } from './hooks/useAppointment'
 
 export function AppointmentModal({
 	isOpen,
 	onClose,
 	appointment,
-	customers,
 	masters,
 	services,
 	onEdit,
@@ -41,7 +42,7 @@ export function AppointmentModal({
 		defaultValues: {
 			customer_uuid: '',
 			master_uuid: '',
-			service_uuid: '',
+			service: '',
 			date_time: '',
 			duration: 0,
 			price: 0,
@@ -50,22 +51,29 @@ export function AppointmentModal({
 		},
 	})
 
-	const watchServiceUuid = watch('service_uuid')
+	const watchService = watch('service')
+
+	const { servicesSelectionList, getServicesSelectionList } = useAppointment()
 
 	useEffect(() => {
-		if (watchServiceUuid) {
-			const service = services?.find(s => s.uuid === watchServiceUuid)
-			setSelectedService(service)
-			setServiceAttributes(service?.category?.attributes || [])
+		if (isOpen) {
+			getServicesSelectionList()
+		}
+	}, [isOpen])
 
-			if (service?.base_price) {
-				setValue('price', parseFloat(service.base_price))
+	useEffect(() => {
+		if (watchService) {
+			setSelectedService(watchService)
+			setServiceAttributes(watchService.category?.attributes || [])
+			if (watchService.base_price) {
+				setValue('price', parseFloat(watchService.base_price))
 			}
 		} else {
 			setSelectedService(null)
 			setServiceAttributes([])
 		}
-	}, [watchServiceUuid, services, setValue])
+	}, [watchService])
+
 	useEffect(() => {
 		if (isOpen) {
 			if (appointment) {
@@ -76,7 +84,7 @@ export function AppointmentModal({
 				reset({
 					customer_uuid: appointment.customer_uuid,
 					master_uuid: appointment.master_uuid,
-					service_uuid: appointment.service_uuid,
+					service: appointment.service_uuid,
 					date_time: appointment.date_time,
 					duration: appointment.duration,
 					price: appointment.price,
@@ -89,7 +97,7 @@ export function AppointmentModal({
 				reset({
 					customer_uuid: '',
 					master_uuid: '',
-					service_uuid: '',
+					service: '',
 					date_time: '',
 					duration: 0,
 					price: 0,
@@ -103,8 +111,17 @@ export function AppointmentModal({
 	const onSubmit = data => {
 		console.log('Submitted data:', data)
 		trigger()
+
+		const formattedAttributes = formatAttributes(
+			data,
+			services,
+			selectedService,
+			data.service.uuid
+		)
 		const submitData = {
 			...data,
+			service_uuid: data.service?.uuid,
+			attributes: formattedAttributes,
 		}
 
 		if (appointment) {
@@ -129,14 +146,6 @@ export function AppointmentModal({
 		<DialogWrapper title={title} isOpen={isOpen} onClose={onClose}>
 			<Form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
 				<div className='space-y-4'>
-					<FormSelect
-						items={customers || []}
-						title='Клиент *'
-						placeholder='Выберите клиента'
-						name='customer_uuid'
-						control={control}
-						error={errors.customer_uuid?.message}
-					/>
 					<FormScrollSelect
 						name='customer_uuid'
 						control={control}
@@ -162,17 +171,18 @@ export function AppointmentModal({
 					/>
 
 					<FormSelect
-						items={services || []}
+						items={servicesSelectionList || []}
 						title='Услуга *'
 						placeholder='Выберите услугу'
-						name='service_uuid'
+						name='service'
 						control={control}
-						error={errors.service_uuid?.message}
+						returnObject
+						error={errors.service?.message}
 					/>
 
 					<FormServiceAttributes
 						service={selectedService}
-						services={services}
+						services={servicesSelectionList}
 						control={control}
 						errors={errors}
 						setValue={setValue}

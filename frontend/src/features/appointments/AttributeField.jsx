@@ -1,4 +1,4 @@
-// components/AttributeField.jsx
+
 import { FormInput } from '@/shared/ui/input/FormInput'
 import FormSelect from '@/shared/ui/select/Select'
 
@@ -54,7 +54,6 @@ export function AttributeField({ attribute, control, index, errors }) {
 		)
 	}
 
-	// Fallback для неизвестных типов
 	return (
 		<FormInput
 			{...commonProps}
@@ -66,7 +65,6 @@ export function AttributeField({ attribute, control, index, errors }) {
 	)
 }
 
-// Компонент для boolean атрибутов
 function BooleanAttributeField({ attribute, control, index }) {
 	const { setValue } = control
 
@@ -89,7 +87,6 @@ function BooleanAttributeField({ attribute, control, index }) {
 	)
 }
 
-// Компонент для select атрибутов
 function SelectAttributeField({
 	attribute,
 	control,

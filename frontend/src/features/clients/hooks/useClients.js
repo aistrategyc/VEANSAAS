@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import api from '@/shared/api/client'
 import { toastSuccess } from '@/lib/toast'
 
@@ -118,14 +118,10 @@ export const useClient = () => {
 		isLoading,
 		clientSelectionList,
 		pagination,
-		searchQuery,
 
 		fetchClients,
 		createClient,
 		updateClient,
-		handleSearch,
-		loadMore,
-		setSearchQuery,
 		getClientInfo,
 		getClientSelectionList,
 		handlePageChange,

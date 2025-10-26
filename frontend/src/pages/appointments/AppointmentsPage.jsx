@@ -17,15 +17,14 @@ export default function AppointmentsPage() {
 		createAppointment,
 		isLoading,
 		appointments,
-		servicesSelectionList,
-		getServicesSelectionList,
+		pagination,
+		handlePageChange,
 	} = useAppointment()
 
-	const { clientSelectionList, clients, pagination } = useClient()
+	const { clientSelectionList } = useClient()
 
 	useEffect(() => {
 		fetchAppointments()
-		getServicesSelectionList()
 	}, [])
 
 	const handleStudioIsOpenModal = () => {
@@ -41,6 +40,9 @@ export default function AppointmentsPage() {
 	const handleCloseModal = () => {
 		setIsCreateModalOpen(false)
 		setEditingAppointment(null)
+	}
+	const handlePageChangeWrapper = page => {
+		handlePageChange(page, pagination.pageSize)
 	}
 
 	if (isLoading) {
@@ -59,14 +61,16 @@ export default function AppointmentsPage() {
 			<AppointmentsTable
 				appointments={appointments}
 				clients={clientSelectionList}
-				services={servicesSelectionList}
 				onEdit={handleEditAppointments}
+				currentPage={pagination.currentPage}
+				pageSize={pagination.pageSize}
+				totalCount={pagination.totalCount}
+				onPageChange={handlePageChangeWrapper}
 			/>
 
 			<AppointmentModal
 				isOpen={isCreateModalOpen}
 				onClose={handleCloseModal}
-				services={servicesSelectionList}
 				handleCreate={createAppointment}
 				appointment={editingAppointment}
 			/>
