@@ -93,7 +93,11 @@ const categoriesSlice = createSlice({
 			})
 			.addCase(createCategory.fulfilled, (state, action) => {
 				state.isLoading = false
-				state.items.push(action.payload)
+				state.items.items.push(action.payload)
+				state.items.pagination = {
+					...state.items.pagination,
+					count: state.items.pagination.count + 1,
+				}
 			})
 			.addCase(createCategory.rejected, (state, action) => {
 				state.isLoading = false
@@ -124,7 +128,13 @@ const categoriesSlice = createSlice({
 			})
 			.addCase(deleteCategory.fulfilled, (state, action) => {
 				state.isLoading = false
-				state.items = state.items.filter(item => item.uuid !== action.payload)
+				state.items.items = state.items.items.filter(
+					item => item.uuid !== action.payload
+				)
+				state.items.pagination = {
+					...state.items.pagination,
+					count: state.items.pagination.count - 1,
+				}
 			})
 			.addCase(deleteCategory.rejected, (state, action) => {
 				state.isLoading = false

@@ -26,8 +26,6 @@ const ServiceModal = ({
 		handleSubmit,
 		formState: { errors },
 		reset,
-		setValue,
-		watch,
 	} = useForm({
 		mode: 'onChange',
 		defaultValues: {

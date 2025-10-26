@@ -100,12 +100,16 @@ const servicesSlice = createSlice({
 			.addCase(createService.fulfilled, (state, action) => {
 				state.isLoading = false
 				state.items.items.push(action.payload)
+				state.items.pagination = {
+					...state.items.pagination,
+					count: state.items.pagination.count + 1,
+				}
 			})
 			.addCase(createService.rejected, (state, action) => {
 				state.isLoading = false
 				state.error = action.payload
 			})
-			// Update Service
+
 			.addCase(updateService.pending, state => {
 				state.isLoading = true
 				state.error = null
@@ -130,7 +134,11 @@ const servicesSlice = createSlice({
 			})
 			.addCase(deleteService.fulfilled, (state, action) => {
 				state.isLoading = false
-				state.items = state.items.filter(item => item.uuid !== action.payload)
+				state.items = state.items.items.filter(item => item.uuid !== action.payload)
+				state.items.pagination = {
+					...state.items.pagination,
+					count: state.items.pagination.count - 1,
+				}
 			})
 			.addCase(deleteService.rejected, (state, action) => {
 				state.isLoading = false

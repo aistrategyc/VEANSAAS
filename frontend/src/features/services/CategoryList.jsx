@@ -8,6 +8,19 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 export const CategoryList = ({ categories, onEdit }) => {
+	if (categories.items.length === 0) {
+		return (
+			<Card>
+				<CardHeader>
+					<CardTitle>Категории не найдены</CardTitle>
+					<CardDescription>
+						Попробуйте изменить параметры поиска или добавьте новую категорию
+					</CardDescription>
+				</CardHeader>
+			</Card>
+		)
+	}
+
 	return (
 		<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
 			{categories.items.map(category => {
