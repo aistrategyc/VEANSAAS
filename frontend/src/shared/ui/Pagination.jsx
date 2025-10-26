@@ -1,16 +1,16 @@
 import { Button } from '@/components/ui/button'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
-export function Pagination({
+export const Pagination = ({
 	currentPage = 1,
 	totalCount = 0,
 	pageSize = 10,
 	onPageChange,
-}) {
+}) => {
 	const totalPages = Math.ceil(totalCount / pageSize)
 
 	return (
-		<div className='flex items-center justify-center space-x-2 mt-4'>
+		<div className='flex items-center justify-center space-x-2 m-3'>
 			<Button
 				variant='ghost'
 				size='sm'

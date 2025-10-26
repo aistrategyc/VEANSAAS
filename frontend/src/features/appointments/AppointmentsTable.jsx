@@ -27,6 +27,7 @@ import {
 } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Link } from 'react-router'
+import { Pagination } from '@/shared/ui/Pagination'
 
 // Вспомогательные функции для форматирования
 const formatDateTime = dateString => {
@@ -118,75 +119,18 @@ const safeString = (value, defaultValue = '') => {
 
 export function AppointmentsTable({
 	appointments,
-	clients = [],
-	services = [],
 	onEdit,
 	onDelete,
+	currentPage = 1,
+	pageSize = 10,
+	totalCount = 20,
+	onPageChange,
 }) {
-	// Преобразуем данные внутри компонента
-	const transformClients = clientsList => {
-		if (!Array.isArray(clientsList)) return []
-		return clientsList.map(client => {
-			// Если client - объект, извлекаем нужные поля
-			if (typeof client === 'object' && client !== null) {
-				return {
-					uuid: client.uuid || client.id || '',
-					name: safeString(client.name, 'Неизвестный клиент'),
-					phone: safeString(client.phone, ''),
-				}
-			}
-			return { uuid: '', name: 'Неизвестный клиент', phone: '' }
-		})
-	}
+	const totalPages = Math.ceil(totalCount / pageSize)
+	const startItem = (currentPage - 1) * pageSize + 1
+	const endItem = Math.min(currentPage * pageSize, totalCount)
 
-	const transformServices = servicesList => {
-		if (!Array.isArray(servicesList)) return []
-		return servicesList.map(service => {
-			// Если service - объект, извлекаем нужные поля
-			if (typeof service === 'object' && service !== null) {
-				return {
-					uuid: service.uuid || service.id || '',
-					name: safeString(service.name, 'Неизвестная услуга'),
-					price:
-						typeof service.price === 'object'
-							? service.price.value || service.price.amount || 0
-							: service.price || 0,
-					category: safeString(service.category, ''),
-					duration: service.duration || 0,
-				}
-			}
-			return { uuid: '', name: 'Неизвестная услуга', price: 0, duration: 0 }
-		})
-	}
-
-	const findClientById = clientId => {
-		const transformedClients = transformClients(clients)
-		if (!clientId) return null
-		return transformedClients.find(client => client.uuid === clientId)
-	}
-
-	const findServiceById = serviceId => {
-		const transformedServices = transformServices(services)
-		if (!serviceId) return null
-		return transformedServices.find(service => service.uuid === serviceId)
-	}
-
-	// Проверяем appointments на наличие объектов
-	const safeAppointments = Array.isArray(appointments)
-		? appointments.map(apt => ({
-				uuid: apt.uuid || apt.id || '',
-				customer_uuid: apt.customer_uuid || apt.client_id || '',
-				service_uuid: apt.service_uuid || apt.service_id || '',
-				date_time: apt.date_time || apt.datetime || '',
-				duration: apt.duration || 0,
-				price: apt.price || 0,
-				status: apt.status || 'pending',
-				note: safeString(apt.note),
-				created_at: apt.created_at || '',
-		  }))
-		: []
-
-	if (!safeAppointments || safeAppointments.length === 0) {
+	if (appointments.length === 0) {
 		return (
 			<EmptyState
 				title='Нет записей'
@@ -201,9 +145,13 @@ export function AppointmentsTable({
 			<CardHeader className='pb-3'>
 				<CardTitle className='flex items-center justify-between'>
 					<span>Список записей</span>
-					<Badge variant='secondary' className='ml-2'>
-						{safeAppointments.length}
-					</Badge>
+					{totalPages > 1 && (
+						<div className='flex items-center space-x-2 text-sm text-muted-foreground'>
+							<span>
+								{startItem}-{endItem} из {totalCount}
+							</span>
+						</div>
+					)}
 				</CardTitle>
 			</CardHeader>
 			<CardContent className='p-0'>
@@ -221,16 +169,7 @@ export function AppointmentsTable({
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{safeAppointments.map(appointment => {
-								const client = findClientById(appointment.customer_uuid)
-								const service = findServiceById(appointment.service_uuid)
-
-								const clientName = client?.name || 'Неизвестный клиент'
-								const serviceName = service?.name || 'Неизвестная услуга'
-								const servicePrice = service?.price || appointment.price
-								const serviceDuration =
-									service?.duration || appointment.duration
-
+							{appointments.map(appointment => {
 								return (
 									<TableRow
 										key={appointment.uuid}
@@ -257,55 +196,25 @@ export function AppointmentsTable({
 										</TableCell>
 
 										<TableCell>
-											{appointment.customer_uuid ? (
-												<Link
-													to={`/clients/${appointment.customer_uuid}`}
-													className='hover:no-underline'
-												>
-													<div className='flex items-center space-x-3'>
-														<Avatar className='h-8 w-8'>
-															<AvatarFallback className='text-xs bg-primary/10'>
-																{getInitials(clientName)}
-															</AvatarFallback>
-														</Avatar>
-														<div className='min-w-0 flex-1'>
-															<p className='font-medium text-sm truncate'>
-																{clientName}
-															</p>
-															{client?.phone && (
-																<p className='text-xs text-muted-foreground truncate'>
-																	{client.phone}
-																</p>
-															)}
-														</div>
-													</div>
-												</Link>
-											) : (
+											<Link
+												to={`/clients/${appointment.customer_uuid}`}
+												className='hover:no-underline'
+											>
 												<div className='flex items-center space-x-3'>
-													<Avatar className='h-8 w-8'>
-														<AvatarFallback className='text-xs bg-primary/10'>
-															?
-														</AvatarFallback>
-													</Avatar>
-													<div>
-														<p className='font-medium text-sm'>
-															Неизвестный клиент
+													<div className='min-w-0 flex-1'>
+														<p className='font-medium text-sm truncate'>
+															{appointment.customer_uuid}
 														</p>
 													</div>
 												</div>
-											)}
+											</Link>
 										</TableCell>
 
 										<TableCell>
 											<div className='space-y-1'>
 												<p className='font-medium text-sm leading-none'>
-													{serviceName}
+													{appointment.service_uuid}
 												</p>
-												{service?.category && (
-													<Badge variant='outline' className='text-xs'>
-														{service.category}
-													</Badge>
-												)}
 											</div>
 										</TableCell>
 
@@ -316,7 +225,7 @@ export function AppointmentsTable({
 													variant='outline'
 													className='text-xs font-normal'
 												>
-													{formatDuration(serviceDuration)}
+													{appointment.duration} min
 												</Badge>
 											</div>
 										</TableCell>
@@ -325,7 +234,7 @@ export function AppointmentsTable({
 											<div className='flex items-center space-x-2'>
 												<DollarSign className='h-4 w-4 text-muted-foreground flex-shrink-0' />
 												<span className='font-semibold text-sm'>
-													{formatPrice(servicePrice)}
+													{appointment.price}
 												</span>
 											</div>
 										</TableCell>
@@ -341,15 +250,6 @@ export function AppointmentsTable({
 
 										<TableCell>
 											<DropdownMenu>
-												<DropdownMenuTrigger asChild>
-													<Button
-														variant='ghost'
-														className='h-8 w-8 p-0 opacity-100 group-hover:opacity-100 transition-opacity'
-													>
-														<MoreHorizontal className='h-4 w-4' />
-														<span className='sr-only'>Открыть меню</span>
-													</Button>
-												</DropdownMenuTrigger>
 												<DropdownMenuContent align='end' className='w-48'>
 													<DropdownMenuItem
 														onClick={() => onEdit(appointment)}
@@ -380,6 +280,14 @@ export function AppointmentsTable({
 						</TableBody>
 					</Table>
 				</div>
+				{totalPages > 1 && (
+					<Pagination
+						currentPage={currentPage}
+						totalCount={totalCount}
+						pageSize={pageSize}
+						onPageChange={onPageChange}
+					/>
+				)}
 			</CardContent>
 		</Card>
 	)

@@ -9,8 +9,15 @@ import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 
 const StudiosPage = () => {
-	const { fetchStudios, createStudio, updateStudio, isLoading, studios } =
-		useStudios()
+	const {
+		fetchStudios,
+		createStudio,
+		updateStudio,
+		isLoading,
+		studios,
+		pagination,
+		handlePageChange,
+	} = useStudios()
 
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
 	const [editingStudio, setEditingStudio] = useState(null)
@@ -34,6 +41,10 @@ const StudiosPage = () => {
 		setEditingStudio(null)
 	}
 
+	const handlePageChangeWrapper = page => {
+		handlePageChange(page, pagination.pageSize)
+	}
+
 	if (isLoading) {
 		return <Loader />
 	}
@@ -47,7 +58,14 @@ const StudiosPage = () => {
 				</Button>
 			</HeaderWrapper>
 			<StatsList />
-			<StudiosGrid studios={studios} onEditStudio={handleEditStudio} />
+			<StudiosGrid
+				studios={studios}
+				onEditStudio={handleEditStudio}
+				currentPage={pagination.currentPage}
+				pageSize={pagination.pageSize}
+				totalCount={pagination.totalCount}
+				onPageChange={handlePageChangeWrapper}
+			/>
 			<StudioModal
 				isOpen={isCreateModalOpen}
 				onClose={handleCloseModal}

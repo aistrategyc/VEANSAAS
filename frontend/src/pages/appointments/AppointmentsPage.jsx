@@ -17,8 +17,8 @@ export default function AppointmentsPage() {
 		createAppointment,
 		isLoading,
 		appointments,
-		servicesSelectionList,
-		getServicesSelectionList,
+		pagination,
+		handlePageChange,
 	} = useAppointment()
 
 	const { clientSelectionList } = useClient()
@@ -41,6 +41,9 @@ export default function AppointmentsPage() {
 		setIsCreateModalOpen(false)
 		setEditingAppointment(null)
 	}
+	const handlePageChangeWrapper = page => {
+		handlePageChange(page, pagination.pageSize)
+	}
 
 	if (isLoading) {
 		return <Loader />
@@ -59,6 +62,10 @@ export default function AppointmentsPage() {
 				appointments={appointments}
 				clients={clientSelectionList}
 				onEdit={handleEditAppointments}
+				currentPage={pagination.currentPage}
+				pageSize={pagination.pageSize}
+				totalCount={pagination.totalCount}
+				onPageChange={handlePageChangeWrapper}
 			/>
 
 			<AppointmentModal
