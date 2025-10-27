@@ -3,7 +3,7 @@ from decimal import Decimal
 from uuid import UUID
 
 from sqlalchemy import DateTime, ForeignKey, Integer, Numeric, Text, Uuid
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from shared.database import Base
 from shared.enums.appointment import (
@@ -34,10 +34,19 @@ class Appointment(Base):
         ForeignKey('user_service.users.uuid', ondelete='SET NULL'),
         nullable=True,
     )
+
+    master: Mapped['User'] = relationship(
+        back_populates='appointments',
+        foreign_keys=[master_uuid],
+        lazy='noload',
+    )
     service_uuid: Mapped[UUID | None] = mapped_column(
         Uuid(as_uuid=True),
         ForeignKey('organization_service.services.uuid', ondelete='SET NULL'),
         nullable=True,
+    )
+    service: Mapped['Service'] = relationship(
+        back_populates='appointments', foreign_keys=[service_uuid], lazy='noload'
     )
     date_time: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True))
     duration: Mapped[int] = mapped_column(Integer, server_default='0')

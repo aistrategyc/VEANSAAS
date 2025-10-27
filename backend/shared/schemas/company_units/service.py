@@ -15,6 +15,14 @@ class ServiceBase(BaseModel):
     is_active: bool = Field(default=True)
 
 
+class ServiceSimpleResponse(BaseModel):
+    uuid: UUID
+    name: str
+
+    class Config:
+        from_attributes = True
+
+
 class ServiceCreate(ServiceBase):
     category_uuid: UUID
 

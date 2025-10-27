@@ -18,6 +18,15 @@ class UserBase(BaseModel):
     is_active: bool = Field(default=True)
 
 
+class UserSimpleResponse(BaseModel):
+    uuid: UUID
+    first_name: str | None = Field(max_length=255)
+    last_name: str | None = Field(max_length=255)
+
+    class Config:
+        from_attributes = True
+
+
 class UserResponse(UserBase):
     uuid: UUID
     created_at: datetime
