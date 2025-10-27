@@ -284,13 +284,23 @@ async def delete_category(
 async def crete_attribute(
     request: Request, data: CategoryAttributeCreate, db: AsyncSession, auth: AuthContext
 ):
-    attribute_data = data.model_dump()
     db_attribute = CategoryAttribute(
-        **attribute_data,
+        **data.model_dump(exclude={'options'}),
         organization_uuid=auth.organization_uuid,
     )
     db.add(db_attribute)
+    db_attribute_options = []
+    if data.options:
+        await db.flush()
+        for data_options in data.options:
+            db_attribute_option = AttributeOption(
+                **data_options.model_dump(),
+                attribute_uuid=db_attribute.uuid,
+                organization_uuid=auth.organization_uuid,
+            )
+            db_attribute_options.append(db_attribute_option)
 
+    db.add_all(db_attribute_options)
     await db.commit()
     return db_attribute
 
