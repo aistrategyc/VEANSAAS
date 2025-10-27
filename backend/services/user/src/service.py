@@ -1,19 +1,23 @@
 from uuid import UUID
 
 from fastapi import HTTPException, Request, Response, status
-from sqlalchemy import exists, select
+from sqlalchemy import exists, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import contains_eager, selectinload
 
 from shared.dependencies import AuthContext
+from shared.models.company_units.studio import StudioMember
 from shared.models.user import User
 from shared.schemas.auth import AuthUserResponse
 from shared.schemas.error import FieldError, ValidationError
+from shared.schemas.mixins import PaginationResponse
 from shared.schemas.user import (
     UserCreateInternal,
+    UserListResponse,
     UserUniquenessCheckRequest,
     UserUniquenessCheckResponse,
     UserVerificationEmail,
+    UserWitchMemberResponse,
 )
 
 
@@ -163,3 +167,44 @@ async def verification_email(
     await db.commit()
 
     return Response(status_code=status.HTTP_200_OK)
+
+
+async def get_user_list(
+    request: Request, offset: int, limit: int, db: AsyncSession, auth: AuthContext
+):
+    query = (
+        select(User)
+        .join(User.studio_memberships)
+        .where(StudioMember.studio_uuid == auth.studio_uuid)
+        .options(contains_eager(User.studio_memberships))
+    )
+
+    count_query = (
+        select(func.count())
+        .join(User.studio_memberships)
+        .where(StudioMember.studio_uuid == auth.studio_uuid)
+        .select_from(User)
+    )
+
+    query_result = await db.execute(query.offset(offset).limit(limit))
+    db_users = query_result.unique().scalars().all()
+
+    total_count = await db.scalar(count_query) or 0
+
+    items = []
+    for user in db_users:
+        data_user = UserWitchMemberResponse.model_validate(user)
+        data_user.studio_membership = (
+            user.studio_memberships[0] if user.studio_memberships else None
+        )
+        items.append(data_user)
+
+    return UserListResponse(
+        items=items,
+        pagination=PaginationResponse(
+            count=total_count,
+            offset=offset,
+            limit=limit,
+            has_more=(offset + limit) < total_count,
+        ),
+    )

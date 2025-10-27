@@ -1,12 +1,13 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Request, status
+from fastapi import APIRouter, Depends, Query, Request, status
 from service import (
     check_uniqueness_user,
     create_user,
     delete_user,
     get_my_user,
     get_user_for_auth,
+    get_user_list,
     verification_email,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -23,6 +24,7 @@ from shared.dependencies import (
 from shared.schemas.auth import AuthUserResponse
 from shared.schemas.user import (
     UserCreateInternal,
+    UserListResponse,
     UserResponse,
     UserUniquenessCheckRequest,
     UserUniquenessCheckResponse,
@@ -40,6 +42,19 @@ async def create_user_route(
     auth: AuthContext = Depends(get_auth_context),
 ):
     return await create_user(request=request, user=user, db=db)
+
+
+@router.get('', response_model=UserListResponse, status_code=status.HTTP_200_OK)
+async def get_user_list_route(
+    request: Request,
+    offset: int = Query(0, ge=0),
+    limit: int = Query(10, ge=1, le=1000),
+    db: AsyncSession = Depends(get_db),
+    auth: AuthContext = Depends(get_auth_context),
+):
+    return await get_user_list(
+        request=request, offset=offset, limit=limit, db=db, auth=auth
+    )
 
 
 @router.delete('/{user_uuid}', status_code=status.HTTP_204_NO_CONTENT)

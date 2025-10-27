@@ -1,8 +1,12 @@
 import re
 from datetime import datetime
+from typing import List
 from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, Field, field_validator
+
+from shared.schemas.company_units.studio import StudioMemberRoles
+from shared.schemas.mixins import PaginationResponse
 
 
 class UserBase(BaseModel):
@@ -99,3 +103,12 @@ class UserUniquenessCheckResponse(BaseModel):
 class UserVerificationEmail(BaseModel):
     user_uuid: UUID | str
     email: str
+
+
+class UserWitchMemberResponse(UserResponse):
+    studio_membership: StudioMemberRoles | None = Field(default=None)
+
+
+class UserListResponse(BaseModel):
+    items: List[UserWitchMemberResponse]
+    pagination: PaginationResponse
