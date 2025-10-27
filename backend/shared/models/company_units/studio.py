@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from sqlalchemy import JSON, Boolean, ForeignKey, String, Uuid, true
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -67,7 +68,7 @@ class StudioMember(Base):
         cascade='all, delete',
     )
 
-    roles: Mapped[list[StudioRole]] = mapped_column(JSON)
+    roles: Mapped[list[StudioRole]] = mapped_column(JSONB, default=list)
     created_by_uuid: Mapped[created_by_uuid]
     created_at: Mapped[created_at]
     updated_at: Mapped[updated_at]

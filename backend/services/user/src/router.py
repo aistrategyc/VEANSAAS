@@ -1,3 +1,4 @@
+from typing import List
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, Request, status
@@ -8,6 +9,7 @@ from service import (
     get_my_user,
     get_user_for_auth,
     get_user_list,
+    selection_master,
     verification_email,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -26,6 +28,7 @@ from shared.schemas.user import (
     UserCreateInternal,
     UserListResponse,
     UserResponse,
+    UserSelectionMasterResponse,
     UserUniquenessCheckRequest,
     UserUniquenessCheckResponse,
     UserVerificationEmail,
@@ -34,7 +37,7 @@ from shared.schemas.user import (
 router = APIRouter(prefix='/users', tags=['User'])
 
 
-@router.post('/', status_code=status.HTTP_201_CREATED)
+@router.post('', status_code=status.HTTP_201_CREATED)
 async def create_user_route(
     request: Request,
     user: UserCreateInternal,
@@ -55,6 +58,19 @@ async def get_user_list_route(
     return await get_user_list(
         request=request, offset=offset, limit=limit, db=db, auth=auth
     )
+
+
+@router.get(
+    '/selection-masters',
+    response_model=List[UserSelectionMasterResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def selection_master_route(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    auth: AuthContext = Depends(get_auth_context),
+):
+    return await selection_master(request=request, db=db, auth=auth)
 
 
 @router.delete('/{user_uuid}', status_code=status.HTTP_204_NO_CONTENT)

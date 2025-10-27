@@ -9,6 +9,7 @@ from shared.dependencies import AuthContext
 from shared.models.company_units.studio import StudioMember
 from shared.models.user import User
 from shared.schemas.auth import AuthUserResponse
+from shared.schemas.company_units.studio import StudioRole
 from shared.schemas.error import FieldError, ValidationError
 from shared.schemas.mixins import PaginationResponse
 from shared.schemas.user import (
@@ -208,3 +209,18 @@ async def get_user_list(
             has_more=(offset + limit) < total_count,
         ),
     )
+
+
+async def selection_master(request: Request, db: AsyncSession, auth: AuthContext):
+    query = (
+        select(User)
+        .join(User.studio_memberships)
+        .where(
+            StudioMember.studio_uuid == auth.studio_uuid,
+            StudioMember.roles.contains([StudioRole.MASTER]),
+        )
+    )
+
+    result = await db.execute(query)
+    db_users = result.scalars().all()
+    return db_users

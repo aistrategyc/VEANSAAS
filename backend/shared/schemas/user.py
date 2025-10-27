@@ -112,3 +112,12 @@ class UserWitchMemberResponse(UserResponse):
 class UserListResponse(BaseModel):
     items: List[UserWitchMemberResponse]
     pagination: PaginationResponse
+
+
+class UserSelectionMasterResponse(BaseModel):
+    uuid: UUID
+    first_name: str | None = Field(max_length=255)
+    last_name: str | None = Field(max_length=255)
+
+    class Config:
+        from_attributes = True
