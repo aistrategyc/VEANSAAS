@@ -6,6 +6,7 @@ export const useAppointment = () => {
 	const [appointments, setAppointments] = useState([])
 	const [clientData, setClientData] = useState({})
 	const [servicesSelectionList, setServicesSelectionList] = useState([])
+	const [masterSelectionList, setMasterSelectionList] = useState([])
 	const [pagination, setPagination] = useState({
 		currentPage: 1,
 		pageSize: 10,
@@ -85,6 +86,19 @@ export const useAppointment = () => {
 			})
 			.finally(() => setIsLoading(false))
 	}
+	const getMasterSelectionList = () => {
+		setIsLoading(true)
+
+		return api
+			.get('/users/selection-masters')
+			.then(response => {
+				setMasterSelectionList(response.data)
+			})
+			.catch(err => {
+				console.error('Error creating studio:', err)
+			})
+			.finally(() => setIsLoading(false))
+	}
 	const handlePageChange = (page, pageSize = pagination.pageSize) => {
 		fetchAppointments({ page, pageSize })
 	}
@@ -94,12 +108,14 @@ export const useAppointment = () => {
 		clientData,
 		isLoading,
 		servicesSelectionList,
+		masterSelectionList,
 		pagination,
 
 		fetchAppointments,
 		createAppointment,
 		getAppointmentInfo,
 		getServicesSelectionList,
+		getMasterSelectionList,
 		handlePageChange,
 	}
 }

@@ -28,7 +28,6 @@ import { HeaderWrapper } from '@/widgets/wrapper/HeaderWrapper'
 const ServicesPage = () => {
 	const dispatch = useDispatch()
 	const { services, categories } = useService()
-
 	const [activeTab, setActiveTab] = useState('services')
 	const [selectedService, setSelectedService] = useState(null)
 	const [selectedCategory, setSelectedCategory] = useState(null)
@@ -38,11 +37,11 @@ const ServicesPage = () => {
 	const [categoriesLoaded, setCategoriesLoaded] = useState(false)
 
 	useEffect(() => {
-		if (activeTab === 'services' && services.data.items.length === 0) {
-			services.fetch()
+		if (activeTab === 'services' && services.items.length === 0) {
+			services.fetch(services.currentPage)
 		}
 
-		if (activeTab === 'categories' && categories.data.items.length === 0) {
+		if (activeTab === 'categories' && categories.data.items?.length === 0) {
 			categories.fetch()
 		}
 	}, [activeTab])
@@ -50,13 +49,11 @@ const ServicesPage = () => {
 	const handleCreateService = () => {
 		setSelectedService(null)
 		setIsServiceModalOpen(true)
-		loadCategories()
 	}
 
 	const handleEditService = service => {
 		setSelectedService(service)
 		setIsServiceModalOpen(true)
-		loadCategories()
 	}
 
 	const handleSaveService = serviceData => {
@@ -113,7 +110,7 @@ const ServicesPage = () => {
 		setSelectedCategory(null)
 	}
 
-	if (services.isLoading || categories.isLoading) {
+	if (services.isLoading) {
 		return <Loader />
 	}
 
@@ -148,7 +145,10 @@ const ServicesPage = () => {
 				<TabsContent value='services' className='space-y-4'>
 					{activeTab === 'services' && (
 						<ServicesTable
-							services={services.data}
+							services={services}
+							currentPage={services.currentPage}
+							pageSize={services.pagination?.limit}
+							onPageChange={services.handlePageChange}
 							onEdit={handleEditService}
 							onDelete={handleDeleteService}
 						/>
@@ -186,6 +186,8 @@ const ServicesPage = () => {
 				onSave={handleSaveCategory}
 				onEdit={handleSaveEditCategory}
 				onDelete={handleDeleteCategory}
+				onCreateAttribute={categories.createAttribute}
+				onDeleteAttribute={categories.deleteAttribute}
 			/>
 		</div>
 	)

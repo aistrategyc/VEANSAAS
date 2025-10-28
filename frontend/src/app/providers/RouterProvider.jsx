@@ -89,11 +89,11 @@ export const RouterProvider = () => {
 			),
 		},
 		{
-			path: '/register-invite',
+			path: '/singup',
 			element: isAuthenticated ? (
-				<Navigate to='/' replace />
-			) : (
 				<RegisterSimple />
+			) : (
+				<Navigate to='/' replace />
 			),
 		},
 		{

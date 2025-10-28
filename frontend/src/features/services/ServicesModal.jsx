@@ -19,7 +19,6 @@ const ServiceModal = ({
 	onDelete,
 }) => {
 	const { categories } = useService()
-
 	const {
 		control,
 		handleSubmit,
@@ -50,6 +49,7 @@ const ServiceModal = ({
 					description: service.description || '',
 					base_price: service.base_price,
 					is_active: service.is_active,
+					category_uuid: service.category.uuid,
 				})
 			} else {
 				reset({
@@ -93,7 +93,7 @@ const ServiceModal = ({
 						error={errors.name?.message}
 					/>
 					<FormSelect
-						items={transformToValueLabel(categories.selections)}
+						items={transformToValueLabel(categories.data.selections)}
 						title='Категория *'
 						placeholder={'Выберите категорию'}
 						name='category_uuid'

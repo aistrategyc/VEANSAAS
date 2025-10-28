@@ -53,11 +53,17 @@ export function AppointmentModal({
 
 	const watchService = watch('service')
 
-	const { servicesSelectionList, getServicesSelectionList } = useAppointment()
+	const {
+		servicesSelectionList,
+		getServicesSelectionList,
+		getMasterSelectionList,
+		masterSelectionList,
+	} = useAppointment()
 
 	useEffect(() => {
 		if (isOpen) {
 			getServicesSelectionList()
+			getMasterSelectionList()
 		}
 	}, [isOpen])
 
@@ -109,7 +115,6 @@ export function AppointmentModal({
 	}, [appointment, isOpen, reset, services])
 
 	const onSubmit = data => {
-		console.log('Submitted data:', data)
 		trigger()
 
 		const formattedAttributes = formatAttributes(
@@ -156,7 +161,7 @@ export function AppointmentModal({
 
 					<FormSelect
 						items={
-							masters || [
+							masterSelectionList || [
 								{
 									value: '2d07e0ef-65d8-446a-b371-d97157712ec3',
 									label: 'Андрей',

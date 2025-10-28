@@ -17,9 +17,20 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card'
+import { Pagination } from '@/shared/ui/Pagination'
 
-const ServicesTable = ({ services, onEdit, onDelete }) => {
-	if (services.items.length === 0) {
+const ServicesTable = ({
+	services,
+	currentPage,
+	pageSize,
+	onPageChange,
+	onEdit,
+	onDelete,
+}) => {
+	const totalCount = services?.pagination.count
+	const totalPages = Math.ceil(totalCount / pageSize)
+
+	if (services?.items.length === 0) {
 		return (
 			<Card>
 				<CardHeader>
@@ -37,7 +48,7 @@ const ServicesTable = ({ services, onEdit, onDelete }) => {
 			<CardHeader className='pb-3'>
 				<CardTitle className='text-xl'>Услуги</CardTitle>
 				<CardDescription>
-					Список всех услуг салона ({services.pagination.count})
+					Список всех услуг салона ({services?.pagination.count})
 				</CardDescription>
 			</CardHeader>
 			<CardContent className='p-0'>
@@ -57,7 +68,7 @@ const ServicesTable = ({ services, onEdit, onDelete }) => {
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{services.items.map(service => {
+							{services?.items.map(service => {
 								return (
 									<TableRow
 										key={service.uuid}
@@ -145,6 +156,14 @@ const ServicesTable = ({ services, onEdit, onDelete }) => {
 						</TableBody>
 					</Table>
 				</div>
+				{totalPages > 1 && (
+					<Pagination
+						currentPage={currentPage}
+						totalCount={totalCount}
+						pageSize={pageSize}
+						onPageChange={onPageChange}
+					/>
+				)}
 			</CardContent>
 		</Card>
 	)

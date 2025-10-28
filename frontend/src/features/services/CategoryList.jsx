@@ -8,7 +8,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 export const CategoryList = ({ categories, onEdit }) => {
-	if (categories.items.length === 0) {
+	if (categories.items?.length === 0) {
 		return (
 			<Card>
 				<CardHeader>
@@ -23,16 +23,16 @@ export const CategoryList = ({ categories, onEdit }) => {
 
 	return (
 		<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-			{categories.items.map(category => {
+			{categories.items?.map(category => {
 				return (
 					<Card
 						className='cursor-pointer hover:shadow-md transition-shadow'
-						key={category.uuid}
+						key={category?.uuid}
 					>
 						<CardHeader className='pb-3'>
 							<div className='flex items-center justify-between'>
 								<div className='flex items-center space-x-2'>
-									<CardTitle className='text-lg'>{category.name}</CardTitle>
+									<CardTitle className='text-lg'>{category?.name}</CardTitle>
 								</div>
 								<Button
 									variant='ghost'
@@ -42,8 +42,8 @@ export const CategoryList = ({ categories, onEdit }) => {
 									Изменить
 								</Button>
 							</div>
-							{category.description && (
-								<CardDescription>{category.description}</CardDescription>
+							{category?.description && (
+								<CardDescription>{category?.description}</CardDescription>
 							)}
 						</CardHeader>
 						<CardContent>

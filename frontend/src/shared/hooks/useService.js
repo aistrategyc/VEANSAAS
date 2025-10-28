@@ -1,73 +1,101 @@
-import { useCallback, useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchServices } from '@/shared/slices/servicesSlice'
-import { fetchCategories } from '@/shared/slices/categoriesSlice'
+import {
+	fetchServices,
+	createService,
+	updateService,
+	deleteService,
+} from '@/shared/slices/servicesSlice'
+import {
+	createAttribute,
+	deleteAttribute,
+	fetchCategories,
+} from '../slices/categoriesSlice'
 import api from '@/shared/api/client'
 
-export const useServices = () => {
+export const useServices = (pageSize = 10) => {
 	const dispatch = useDispatch()
-	const { items, isLoading, error } = useSelector(
+	const { items, pagination, isLoading, error } = useSelector(
 		state => state.rootReducer.services
 	)
 
-	const fetchServicesCallback = useCallback(() => {
-		dispatch(fetchServices())
-	}, [dispatch])
+	const [currentPage, setCurrentPage] = useState(1)
+
+	const fetch = useCallback(
+		(page = 1) => {
+			const offset = (page - 1) * pageSize
+			dispatch(fetchServices({ offset, limit: pageSize }))
+		},
+		[dispatch]
+	)
+
+	const handlePageChange = page => {
+		if (page < 1) return
+		setCurrentPage(page)
+		fetch(page)
+	}
 
 	return {
-		data: items,
+		items,
+		pagination,
 		isLoading,
 		error,
-		fetch: fetchServicesCallback,
+		currentPage,
+		handlePageChange,
+		create: data => dispatch(createService(data)),
+		update: (uuid, data) =>
+			dispatch(updateService({ uuid, serviceData: data })),
+		remove: uuid => dispatch(deleteService(uuid)),
+		fetch,
 	}
 }
 
 export const useCategories = () => {
 	const dispatch = useDispatch()
-	const { items, isLoading, error } = useSelector(
+	const { items, pagination, isLoading, error } = useSelector(
 		state => state.rootReducer.categories
 	)
 	const [selections, setSelections] = useState([])
-	const [isLoadingSelections, setIsLoadingSelections] = useState(false)
-	const [selectionsError, setSelectionsError] = useState(null)
 
-	const fetchCategoriesCallback = useCallback(() => {
+	const fetch = useCallback(() => {
 		dispatch(fetchCategories())
 	}, [dispatch])
 
-	const fetchSelections = useCallback(async () => {
-		setIsLoadingSelections(true)
-		setSelectionsError(null)
+	const createAttributeAction = useCallback(
+		data => {
+			return dispatch(createAttribute(data))
+		},
+		[dispatch]
+	)
 
+	const deleteAttributeAction = useCallback(
+		(categoryUuid, uuid) => {
+			return dispatch(deleteAttribute({ categoryUuid, uuid }))
+		},
+		[dispatch]
+	)
+	const fetchSelections = useCallback(async () => {
 		try {
 			const response = await api.get('/services/categories/selection')
 			setSelections(response.data)
 		} catch (err) {
-			setSelectionsError(err.message)
-			console.error('Failed to fetch categories selection:', err)
-		} finally {
-			setIsLoadingSelections(false)
+			console.error('Ошибка при загрузке списка категорий:', err)
 		}
 	}, [])
 
 	return {
-		data: items,
-		selections,
+		data: { items, selections, pagination },
 		isLoading,
-		isLoadingSelections,
 		error,
-		selectionsError,
-		fetch: fetchCategoriesCallback,
+		fetch,
 		fetchSelections,
+		createAttribute: createAttributeAction,
+		deleteAttribute: deleteAttributeAction,
 	}
 }
 
 export const useService = () => {
 	const services = useServices()
 	const categories = useCategories()
-
-	return {
-		services,
-		categories,
-	}
+	return { services, categories }
 }
