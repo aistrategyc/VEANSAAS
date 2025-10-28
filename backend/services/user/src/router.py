@@ -37,7 +37,7 @@ from shared.schemas.user import (
 router = APIRouter(prefix='/users', tags=['User'])
 
 
-@router.post('', status_code=status.HTTP_201_CREATED)
+@router.post('/', status_code=status.HTTP_201_CREATED)
 async def create_user_route(
     request: Request,
     user: UserCreateInternal,
