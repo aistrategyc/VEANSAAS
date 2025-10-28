@@ -41,11 +41,11 @@ class User(Base, PhoneNumberMixin):
         foreign_keys='OrganizationMember.user_uuid',
         cascade='all, delete',
     )
-    appointments: Mapped[List['Appointment']] = relationship(
-        back_populates='master',
-        lazy='noload',
-        foreign_keys='Appointment.master_uuid',
-    )
+    # appointments: Mapped[List['Appointment']] = relationship(
+    #     back_populates='master',
+    #     lazy='noload',
+    #     foreign_keys='Appointment.master_uuid',
+    # )
     created_at: Mapped[created_at]
     updated_at: Mapped[updated_at]
 
