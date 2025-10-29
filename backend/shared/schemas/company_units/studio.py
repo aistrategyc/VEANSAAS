@@ -4,12 +4,12 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from shared.schemas.mixins import PaginationResponse
+from shared.enums.company_units import StudioRole
 from shared.schemas.company_units.invite import (
     BaseInviteCreateDB,
     BaseInviteCreateRequest,
 )
-from shared.enums.company_units import StudioRole
+from shared.schemas.mixins import PaginationResponse
 
 
 class StudioBase(BaseModel):
@@ -24,6 +24,14 @@ class StudioMemberBase(BaseModel):
     user_uuid: UUID | str
     roles: List[StudioRole]
     studio_uuid: UUID | str
+
+
+class StudioMemberRoles(BaseModel):
+    uuid: UUID
+    roles: List[StudioRole]
+
+    class Config:
+        from_attributes = True
 
 
 class StudioCreateRequest(StudioBase):

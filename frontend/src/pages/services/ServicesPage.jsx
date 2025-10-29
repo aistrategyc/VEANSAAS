@@ -1,26 +1,25 @@
 import { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Plus, Tag } from 'lucide-react'
-import { ServiceModal } from '@/features/services/ServicesModal'
+import ServiceModal from '@/features/services/ServicesModal'
 import { CategoryModal } from '@/features/services/CategoryModal'
-import { ServicesTable } from '@/features/services/ServicesTable'
-
+import ServicesTable from '@/features/services/ServicesTable'
 import {
-	fetchServices,
 	createService,
 	updateService,
 	deleteService,
 } from '@/shared/slices/servicesSlice'
 import {
-	fetchCategories,
 	createCategory,
 	updateCategory,
 	deleteCategory,
 } from '@/shared/slices/categoriesSlice'
 import { Loader } from '@/shared/ui/loader/Loader'
+
 import { ServiceStats } from '@/features/services/ServiceStats'
+import { useService } from '@/shared/hooks/useService'
 
 import { CategoryList } from '@/features/services/CategoryList'
 import { Filters } from '@/widgets/filters/Filters'
@@ -28,25 +27,24 @@ import { HeaderWrapper } from '@/widgets/wrapper/HeaderWrapper'
 
 const ServicesPage = () => {
 	const dispatch = useDispatch()
-	const {
-		items: services,
-		filteredItems: filteredServices,
-		isLoading: servicesLoading,
-	} = useSelector(state => state.rootReducer.services)
-
-	const { items: categories, isLoading: categoriesLoading } = useSelector(
-		state => state.rootReducer.categories
-	)
-
+	const { services, categories } = useService()
+	const [activeTab, setActiveTab] = useState('services')
 	const [selectedService, setSelectedService] = useState(null)
 	const [selectedCategory, setSelectedCategory] = useState(null)
 	const [isServiceModalOpen, setIsServiceModalOpen] = useState(false)
 	const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false)
 
+	const [categoriesLoaded, setCategoriesLoaded] = useState(false)
+
 	useEffect(() => {
-		dispatch(fetchServices())
-		dispatch(fetchCategories())
-	}, [dispatch])
+		if (activeTab === 'services' && services.items.length === 0) {
+			services.fetch(services.currentPage)
+		}
+
+		if (activeTab === 'categories' && categories.data.items?.length === 0) {
+			categories.fetch()
+		}
+	}, [activeTab])
 
 	const handleCreateService = () => {
 		setSelectedService(null)
@@ -112,7 +110,7 @@ const ServicesPage = () => {
 		setSelectedCategory(null)
 	}
 
-	if (servicesLoading || categoriesLoading) {
+	if (services.isLoading) {
 		return <Loader />
 	}
 
@@ -131,27 +129,38 @@ const ServicesPage = () => {
 					Добавить услугу
 				</Button>
 			</HeaderWrapper>
-			<ServiceStats services={services} categories={categories} />
-			<Tabs defaultValue='services' className='space-y-4'>
+
+			{/* <ServiceStats services={services.data} categories={categories} /> */}
+
+			<Tabs
+				value={activeTab}
+				onValueChange={setActiveTab}
+				className='space-y-4'
+			>
 				<TabsList>
 					<TabsTrigger value='services'>Услуги</TabsTrigger>
 					<TabsTrigger value='categories'>Категории</TabsTrigger>
 				</TabsList>
+
 				<TabsContent value='services' className='space-y-4'>
-					<Filters
-						title='Поиск услуг'
-						description='Найдите нужные услуги по различным критериям'
-						searchPlaceholder='Поиск по названию или описанию...'
-					/>
-					<ServicesTable
-						services={filteredServices}
-						categories={categories}
-						onEdit={handleEditService}
-						onDelete={handleDeleteService}
-					/>
+					{activeTab === 'services' && (
+						<ServicesTable
+							services={services}
+							currentPage={services.currentPage}
+							pageSize={services.pagination?.limit}
+							onPageChange={services.handlePageChange}
+							onEdit={handleEditService}
+							onDelete={handleDeleteService}
+						/>
+					)}
 				</TabsContent>
 				<TabsContent value='categories' className='space-y-4'>
-					<CategoryList categories={categories} onEdit={handleEditCategory} />
+					{activeTab === 'categories' && (
+						<CategoryList
+							categories={categories.data}
+							onEdit={handleEditCategory}
+						/>
+					)}
 				</TabsContent>
 			</Tabs>
 
@@ -162,7 +171,6 @@ const ServicesPage = () => {
 					setSelectedService(null)
 				}}
 				service={selectedService}
-				categories={categories}
 				onSave={handleSaveService}
 				onEdit={handleEditSaveService}
 				onDelete={handleDeleteService}
@@ -178,6 +186,8 @@ const ServicesPage = () => {
 				onSave={handleSaveCategory}
 				onEdit={handleSaveEditCategory}
 				onDelete={handleDeleteCategory}
+				onCreateAttribute={categories.createAttribute}
+				onDeleteAttribute={categories.deleteAttribute}
 			/>
 		</div>
 	)

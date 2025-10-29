@@ -5,14 +5,22 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 
 from shared.enums.company_units import AttributeType
-from shared.schemas.mixins import TimestampMixin, UUIDMixin
+from shared.schemas.mixins import PaginationResponse, TimestampMixin, UUIDMixin
 
 
 class ServiceBase(BaseModel):
     name: str = Field(max_length=255)
     description: str | None = Field(default=None)
-    base_price: Decimal = Field(ge=Decimal('0.00'))
+    base_price: float = Field(ge=0.00)
     is_active: bool = Field(default=True)
+
+
+class ServiceSimpleResponse(BaseModel):
+    uuid: UUID
+    name: str
+
+    class Config:
+        from_attributes = True
 
 
 class ServiceCreate(ServiceBase):
@@ -34,6 +42,11 @@ class ServiceCategoryBase(BaseModel):
 
 class ServiceCategoryUpdate(ServiceCategoryBase):
     name: str | None = Field(default=None, max_length=255)
+
+
+class ServiceCategorySelection(BaseModel):
+    uuid: UUID
+    name: str = Field(max_length=255)
 
 
 class CategoryAttributeBase(BaseModel):
@@ -76,6 +89,9 @@ class AttributeOptionCreate(AttributeOptionBase):
 class AttributeOptionResponse(AttributeOptionBase, UUIDMixin, TimestampMixin):
     attribute_uuid: UUID
 
+    class Config:
+        from_attributes = True
+
 
 class AttributeOptionUpdate(AttributeOptionBase):
     pass
@@ -89,16 +105,30 @@ class ServiceResponse(ServiceBase, UUIDMixin, TimestampMixin):
     organization_uuid: UUID
     category_uuid: UUID
 
+    class Config:
+        from_attributes = True
+
 
 class CategoryAttributeDetailResponse(CategoryAttributeBase, UUIDMixin, TimestampMixin):
     organization_uuid: UUID
     category_uuid: UUID
     attribute_options: List[AttributeOptionResponse] | None = Field(default=None)
 
+    class Config:
+        from_attributes = True
+
 
 class ServiceCategoryDetailResponse(ServiceCategoryBase, UUIDMixin, TimestampMixin):
     organization_uuid: UUID
     attributes: List[CategoryAttributeDetailResponse]
+
+    class Config:
+        from_attributes = True
+
+
+class ServiceCategoryDetailListResponse(BaseModel):
+    items: List[ServiceCategoryDetailResponse]
+    pagination: PaginationResponse
 
 
 class ServiceDetailResponse(ServiceBase, UUIDMixin, TimestampMixin):
@@ -109,3 +139,19 @@ class ServiceDetailResponse(ServiceBase, UUIDMixin, TimestampMixin):
 
 class ServiceCategoryResponse(ServiceCategoryBase, UUIDMixin, TimestampMixin):
     organization_uuid: UUID
+
+    class Config:
+        from_attributes = True
+
+
+class ServiceWithCategoryResponse(ServiceBase, UUIDMixin, TimestampMixin):
+    organization_uuid: UUID
+    category: ServiceCategoryResponse | None = Field(default=None)
+
+    class Config:
+        from_attributes = True
+
+
+class ServiceWithCategoryListResponse(BaseModel):
+    items: List[ServiceWithCategoryResponse]
+    pagination: PaginationResponse

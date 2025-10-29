@@ -19,6 +19,7 @@ import { AttributeForm } from './AttributeForm'
 import { FormInput } from '@/shared/ui/input/FormInput'
 import { DialogWrapper } from '@/widgets/wrapper/DialogWrapper'
 import FormSwitch from '@/shared/ui/switch/FormSwitch'
+import api from '@/shared/api/client'
 
 export const CategoryModal = ({
 	isOpen,
@@ -27,9 +28,10 @@ export const CategoryModal = ({
 	onSave,
 	onEdit,
 	onDelete,
+	onCreateAttribute,
+	onDeleteAttribute,
 }) => {
 	const {
-		register,
 		handleSubmit,
 		formState: { errors },
 		setValue,
@@ -55,6 +57,24 @@ export const CategoryModal = ({
 		name: 'attributes',
 	})
 
+	const createAttribute = async dataAttribute => {
+		if (category) {
+			const data = {
+				category_uuid: category.uuid,
+				...dataAttribute,
+			}
+			try {
+				appendAttribute(dataAttribute)
+				await onCreateAttribute(data)
+			} catch (error) {
+				console.error('Error creating attribute:', error)
+			}
+		} else {
+			// Для новой категории (еще не сохраненной) просто добавляем локально
+			appendAttribute(dataAttribute)
+		}
+	}
+
 	useEffect(() => {
 		if (isOpen) {
 			if (category) {
@@ -75,14 +95,23 @@ export const CategoryModal = ({
 		}
 	}, [category, isOpen, reset])
 
-	const handleRemoveAttribute = index => {
-		removeAttribute(index)
+	const handleRemoveAttribute = async (attribute, index) => {
+		if (attribute.uuid && category) {
+			try {
+				removeAttribute(index)
+				await onDeleteAttribute(category.uuid, attribute.uuid)
+			} catch (error) {
+				console.error('Error deleting attribute:', error)
+			}
+		} else {
+			removeAttribute(index)
+		}
 	}
 	const handleAppendAttribute = useCallback(
 		attribute => {
-			appendAttribute(attribute)
+			createAttribute(attribute)
 		},
-		[appendAttribute]
+		[category, onCreateAttribute]
 	)
 
 	const onSubmit = data => {

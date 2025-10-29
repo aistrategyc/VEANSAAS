@@ -1,8 +1,12 @@
 import re
 from datetime import datetime
+from typing import List
 from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, Field, field_validator
+
+from shared.schemas.company_units.studio import StudioMemberRoles
+from shared.schemas.mixins import PaginationResponse
 
 
 class UserBase(BaseModel):
@@ -12,6 +16,15 @@ class UserBase(BaseModel):
     last_name: str = Field(max_length=255)
     phone_number: str = Field(max_length=24)
     is_active: bool = Field(default=True)
+
+
+class UserSimpleResponse(BaseModel):
+    uuid: UUID
+    first_name: str | None = Field(max_length=255)
+    last_name: str | None = Field(max_length=255)
+
+    class Config:
+        from_attributes = True
 
 
 class UserResponse(UserBase):
@@ -99,3 +112,21 @@ class UserUniquenessCheckResponse(BaseModel):
 class UserVerificationEmail(BaseModel):
     user_uuid: UUID | str
     email: str
+
+
+class UserWitchMemberResponse(UserResponse):
+    studio_membership: StudioMemberRoles | None = Field(default=None)
+
+
+class UserListResponse(BaseModel):
+    items: List[UserWitchMemberResponse]
+    pagination: PaginationResponse
+
+
+class UserSelectionMasterResponse(BaseModel):
+    uuid: UUID
+    first_name: str | None = Field(max_length=255)
+    last_name: str | None = Field(max_length=255)
+
+    class Config:
+        from_attributes = True

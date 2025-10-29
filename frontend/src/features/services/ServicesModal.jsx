@@ -5,26 +5,25 @@ import { Form } from '@/shared/ui/form/Form'
 import { Trash2 } from 'lucide-react'
 import { FormInput } from '@/shared/ui/input/FormInput'
 import FormSelect from '@/shared/ui/select/Select'
-import { CATEGORY_TYPES } from './lib/constants'
 import { DialogWrapper } from '@/widgets/wrapper/DialogWrapper'
 import FormSwitch from '@/shared/ui/switch/FormSwitch'
+import { useService } from '@/shared/hooks/useService'
+import { transformToValueLabel } from '@/shared/helper/transformToValueLabel'
 
-export function ServiceModal({
+const ServiceModal = ({
 	isOpen,
 	onClose,
 	service,
-	categories,
 	onSave,
 	onEdit,
 	onDelete,
-}) {
+}) => {
+	const { categories } = useService()
 	const {
 		control,
 		handleSubmit,
 		formState: { errors },
 		reset,
-		setValue,
-		watch,
 	} = useForm({
 		mode: 'onChange',
 		defaultValues: {
@@ -32,9 +31,15 @@ export function ServiceModal({
 			description: '',
 			base_price: 0,
 			is_active: true,
-			category_uuid: '0b12b41e-ee3b-4da3-82c9-f77851f2194b',
+			category_uuid: '',
 		},
 	})
+
+	useEffect(() => {
+		if (isOpen) {
+			categories.fetchSelections()
+		}
+	}, [isOpen])
 
 	useEffect(() => {
 		if (isOpen) {
@@ -44,7 +49,7 @@ export function ServiceModal({
 					description: service.description || '',
 					base_price: service.base_price,
 					is_active: service.is_active,
-					category_uuid: service.category_uuid,
+					category_uuid: service.category.uuid,
 				})
 			} else {
 				reset({
@@ -59,7 +64,6 @@ export function ServiceModal({
 	}, [service, isOpen, reset])
 
 	const onSubmit = data => {
-		console.log(data)
 		if (service) {
 			onEdit(service, data)
 		} else {
@@ -89,7 +93,7 @@ export function ServiceModal({
 						error={errors.name?.message}
 					/>
 					<FormSelect
-						items={categories}
+						items={transformToValueLabel(categories.data.selections)}
 						title='Категория *'
 						placeholder={'Выберите категорию'}
 						name='category_uuid'
@@ -150,3 +154,5 @@ export function ServiceModal({
 		</DialogWrapper>
 	)
 }
+
+export default ServiceModal

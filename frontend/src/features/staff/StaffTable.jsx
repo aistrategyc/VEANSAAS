@@ -29,20 +29,19 @@ import { PermissionGuard } from '@/widgets/permissions/PermissionGuard'
 import { Link } from 'react-router'
 import { Pagination } from '@/shared/ui/Pagination'
 
-export function ClientsTable({
-	clients,
-	onEdit,
+export function StaffTable({
+	staffList,
 	onDelete,
 	currentPage = 1,
 	pageSize = 10,
-	totalCount = 20,
+	totalCount = 0,
 	onPageChange,
 }) {
 	const totalPages = Math.ceil(totalCount / pageSize)
 	const startItem = (currentPage - 1) * pageSize + 1
 	const endItem = Math.min(currentPage * pageSize, totalCount)
 
-	if (clients.length === 0) {
+	if (staffList?.length === 0) {
 		return (
 			<EmptyState
 				title='Нет клиентов'
@@ -72,36 +71,29 @@ export function ClientsTable({
 					<Table>
 						<TableHeader>
 							<TableRow>
-								<TableHead>Клиент</TableHead>
+								<TableHead>Сотрудник</TableHead>
 								<TableHead>Имя</TableHead>
-								<TableHead>Пол</TableHead>
+								<TableHead>Роль</TableHead>
 								<TableHead>Контакты</TableHead>
 								<TableHead>Статус</TableHead>
-								<TableHead className='w-[50px]'></TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{clients.map(client => (
-								<TableRow key={client.uuid}>
+							{staffList?.map(staff => (
+								<TableRow key={staff.uuid}>
 									<TableCell>
-										<Link to={`/clients/${client.uuid}`}>
+										<Link to={`/clients/${staff.uuid}`}>
 											<div className='flex items-center space-x-3'>
 												<Avatar>
 													<AvatarFallback>
-														{client.first_name?.[0]}
-														{client.last_name?.[0]}
+														{staff.first_name?.[0]}
+														{staff.last_name?.[0]}
 													</AvatarFallback>
 												</Avatar>
 												<div>
 													<div className='font-medium'>
-														{client.first_name} {client.last_name}
+														{staff.first_name} {staff.last_name}
 													</div>
-													{client.preferences?.preferredMasters && (
-														<div className='text-sm text-muted-foreground'>
-															Предпочитаемые мастера:{' '}
-															{client.preferences.preferredMasters.length}
-														</div>
-													)}
 												</div>
 											</div>
 										</Link>
@@ -109,67 +101,34 @@ export function ClientsTable({
 
 									<TableCell>
 										<div className='space-y-1'>
-											{client.first_name} {client.last_name}
+											{staff.first_name} {staff.last_name}
 										</div>
 									</TableCell>
 									<TableCell>
 										<div className='space-y-1'>
-											{client.gender && (
-												<Badge variant='outline' className='text-xs'>
-													{client.gender === 'female'
-														? 'Ж'
-														: client.gender === 'male'
-														? 'М'
-														: 'Другое'}
-												</Badge>
-											)}
+											{staff.studio_membership.roles.map(role => role)}
 										</div>
 									</TableCell>
 									<TableCell>
 										<div className='space-y-1'>
-											{client.phone_number && (
+											{staff.phone_number && (
 												<div className='flex items-center text-sm'>
 													<Phone className='h-3 w-3 mr-1 text-muted-foreground' />
-													{client.phone_number}
+													{staff.phone_number}
 												</div>
 											)}
-											{client.email && (
+											{staff.email && (
 												<div className='flex items-center text-sm'>
 													<Mail className='h-3 w-3 mr-1 text-muted-foreground' />
-													{client.email}
+													{staff.email}
 												</div>
 											)}
 										</div>
 									</TableCell>
 									<TableCell>
-										<Badge variant={client.is_active ? 'default' : 'secondary'}>
-											{client.is_active ? 'Активен' : 'Неактивен'}
+										<Badge variant={staff.is_active ? 'default' : 'secondary'}>
+											{staff.is_active ? 'Активен' : 'Неактивен'}
 										</Badge>
-									</TableCell>
-									<TableCell>
-										<PermissionGuard requiredAny={['client:edit']}>
-											<DropdownMenu>
-												<DropdownMenuTrigger asChild>
-													<Button variant='ghost' className='h-8 w-8 p-0'>
-														<MoreHorizontal className='h-4 w-4' />
-													</Button>
-												</DropdownMenuTrigger>
-												<DropdownMenuContent align='end'>
-													<DropdownMenuItem onClick={() => onEdit(client)}>
-														<Edit className='mr-2 h-4 w-4' />
-														Редактировать
-													</DropdownMenuItem>
-
-													<DropdownMenuItem
-														onClick={() => onDelete(client.id)}
-														className='text-destructive focus:text-destructive'
-													>
-														<Trash2 className='mr-2 h-4 w-4' />
-														Удалить
-													</DropdownMenuItem>
-												</DropdownMenuContent>
-											</DropdownMenu>
-										</PermissionGuard>
 									</TableCell>
 								</TableRow>
 							))}

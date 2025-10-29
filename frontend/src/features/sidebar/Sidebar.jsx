@@ -1,4 +1,4 @@
-import { Search, User } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { NavMenu } from '../../shared/ui/nav/NavMenu'
 import { ProfileCard } from '../profile/ProfileCard'
 import { LogoOrganization } from '../logoOrganization/LogoOrganization'

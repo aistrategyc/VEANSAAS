@@ -6,7 +6,9 @@ from uuid import UUID
 from pydantic import BaseModel, Field, model_validator
 
 from shared.enums.appointment import AppointmentStatusEnum
+from shared.schemas.company_units.service import ServiceSimpleResponse
 from shared.schemas.mixins import PaginationResponse, TimestampMixin, UUIDMixin
+from shared.schemas.user import UserSimpleResponse
 
 
 class AppointmentBase(BaseModel):
@@ -20,7 +22,7 @@ class AppointmentBase(BaseModel):
 
 
 class AppointmentResponse(AppointmentBase, UUIDMixin, TimestampMixin):
-    pass
+    service_uuid: UUID | None = Field(default=None)
 
     class Config:
         from_attributes = True
@@ -39,8 +41,17 @@ class AppointmentStatusResponse(AppointmentStatusBase, UUIDMixin, TimestampMixin
     created_by_uuid: UUID
 
 
+class AppointmentInfoResponse(AppointmentBase, UUIDMixin):
+    service_uuid: UUID | None = Field(default=None)
+    master: UserSimpleResponse | None = Field(default=None)
+    service: ServiceSimpleResponse | None = Field(default=None)
+
+    class Config:
+        from_attributes = True
+
+
 class AppointmentListResponse(BaseModel):
-    items: List[AppointmentResponse]
+    items: List[AppointmentInfoResponse]
     pagination: PaginationResponse
 
 

@@ -52,7 +52,7 @@ async def create_studio_invite(
     db.add(db_invite)
     await db.commit()
 
-    url = f'{settings.CLIENT_URL}/signup?token={db_invite.token}'
+    url = f'{settings.CLIENT_URL}/singnup?token={db_invite.token}'
 
     await rabbitmq.publish(
         routing_key='user.send_invite',
@@ -62,7 +62,7 @@ async def create_studio_invite(
     return BaseInviteResponse(
         email=db_invite.email,
         token=db_invite.token,
-        url=f'{settings.CLIENT_URL}/signup?token={db_invite.token}',
+        url=f'{settings.CLIENT_URL}/singnup?token={db_invite.token}',
     )
 
 

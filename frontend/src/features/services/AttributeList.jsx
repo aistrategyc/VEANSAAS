@@ -58,7 +58,7 @@ export const AttributeList = memo(({ fields, onRemove }) => {
 							type='button'
 							variant='ghost'
 							size='sm'
-							onClick={() => onRemove(index)}
+							onClick={() => onRemove(field,index)}
 							className='shrink-0 ml-2'
 						>
 							<Trash2 className='h-4 w-4' />

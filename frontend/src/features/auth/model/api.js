@@ -3,10 +3,8 @@ import { useNavigate } from 'react-router'
 import { useDispatch } from 'react-redux'
 import { useState } from 'react'
 import { useAuth } from '@/shared/hooks/useAuth'
-import { fetchStudios } from '@/shared/slices/studiosSlice'
 import { fetchUserData } from '@/shared/slices/userSlice'
 import { showAlert } from '@/shared/ui/alert/Alerts'
-import { toastError } from '@/lib/toast'
 
 export const useLogin = () => {
 	const [isLoading, setIsLoading] = useState(false)
@@ -23,9 +21,7 @@ export const useLogin = () => {
 				dispatch(fetchUserData()).unwrap()
 				reset()
 			})
-			.catch(err => {
-				toastError(err?.response?.data?.detail)
-			})
+			.catch(err => {})
 			.finally(() => {
 				setIsLoading(false)
 			})

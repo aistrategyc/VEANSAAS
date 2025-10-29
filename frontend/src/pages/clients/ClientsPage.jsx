@@ -13,8 +13,16 @@ export default function ClientsPag() {
 	const [selectedClient, setSelectedClient] = useState(null)
 	const [isClientModalOpen, setIsClientModalOpen] = useState(false)
 
-	const { clients, fetchClients, createClient, updateClient, isLoading } =
-		useClient()
+	const {
+		clients,
+		pagination,
+		fetchClients,
+
+		createClient,
+		updateClient,
+		isLoading,
+		handlePageChange,
+	} = useClient()
 
 	useEffect(() => {
 		fetchClients()
@@ -33,6 +41,9 @@ export default function ClientsPag() {
 	const handleCloseModal = () => {
 		setIsClientModalOpen(false)
 		setSelectedClient(null)
+	}
+	const handlePageChangeWrapper = page => {
+		handlePageChange(page, pagination.pageSize)
 	}
 	const handleDeleteClient = clientId => {}
 
@@ -59,6 +70,10 @@ export default function ClientsPag() {
 				clients={clients}
 				onEdit={handleEditClient}
 				onDelete={handleDeleteClient}
+				currentPage={pagination.currentPage}
+				pageSize={pagination.pageSize}
+				totalCount={pagination.totalCount}
+				onPageChange={handlePageChangeWrapper}
 			/>
 
 			<ClientModal
