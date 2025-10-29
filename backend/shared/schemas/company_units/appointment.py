@@ -41,7 +41,7 @@ class AppointmentStatusResponse(AppointmentStatusBase, UUIDMixin, TimestampMixin
     created_by_uuid: UUID
 
 
-class AppointmentInfoResponse(AppointmentBase):
+class AppointmentInfoResponse(AppointmentBase, UUIDMixin):
     service_uuid: UUID | None = Field(default=None)
     master: UserSimpleResponse | None = Field(default=None)
     service: ServiceSimpleResponse | None = Field(default=None)
