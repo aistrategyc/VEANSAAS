@@ -21,7 +21,6 @@ export default function AppointmentsPage() {
 		handlePageChange,
 	} = useAppointment()
 
-	const { clientSelectionList } = useClient()
 
 	useEffect(() => {
 		fetchAppointments()
@@ -60,7 +59,6 @@ export default function AppointmentsPage() {
 
 			<AppointmentsTable
 				appointments={appointments}
-				clients={clientSelectionList}
 				onEdit={handleEditAppointments}
 				currentPage={pagination.currentPage}
 				pageSize={pagination.pageSize}

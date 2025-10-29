@@ -29,7 +29,6 @@ const ServicesTable = ({
 }) => {
 	const totalCount = services?.pagination.count
 	const totalPages = Math.ceil(totalCount / pageSize)
-
 	if (services?.items.length === 0) {
 		return (
 			<Card>

@@ -46,40 +46,6 @@ const formatDateTime = dateString => {
 	}
 }
 
-const formatDuration = minutes => {
-	if (!minutes) return '—'
-	const hours = Math.floor(minutes / 60)
-	const mins = minutes % 60
-
-	if (hours > 0) {
-		return `${hours}ч ${mins}м`
-	}
-	return `${mins}мин`
-}
-
-const formatPrice = price => {
-	if (!price && price !== 0) return '—'
-
-	// Если price - объект, берем числовое значение
-	const numericPrice =
-		typeof price === 'object' ? price.value || price.amount || 0 : price
-
-	return new Intl.NumberFormat('ru-RU', {
-		style: 'currency',
-		currency: 'RUB',
-	}).format(numericPrice)
-}
-
-const getInitials = name => {
-	if (!name || typeof name !== 'string') return '?'
-	return name
-		.split(' ')
-		.map(part => part.charAt(0))
-		.join('')
-		.toUpperCase()
-		.slice(0, 2)
-}
-
 const getStatusVariant = status => {
 	switch (status) {
 		case 'confirmed':
@@ -108,15 +74,6 @@ const getStatusText = status => {
 	}
 }
 
-// Функция для безопасного извлечения строки из объекта
-const safeString = (value, defaultValue = '') => {
-	if (typeof value === 'string') return value
-	if (typeof value === 'object' && value !== null) {
-		return value.name || value.title || value.value || defaultValue
-	}
-	return defaultValue
-}
-
 export function AppointmentsTable({
 	appointments,
 	onEdit,
@@ -139,6 +96,7 @@ export function AppointmentsTable({
 			/>
 		)
 	}
+	console.log(appointments)
 
 	return (
 		<Card>
@@ -160,7 +118,8 @@ export function AppointmentsTable({
 						<TableHeader>
 							<TableRow>
 								<TableHead className='w-[180px]'>Дата и время</TableHead>
-								<TableHead className='w-[200px]'>Клиент</TableHead>
+								<TableHead className='w-[100px]'>Клиент</TableHead>
+								<TableHead className='w-[100px]'>Мастер</TableHead>
 								<TableHead className='w-[150px]'>Услуга</TableHead>
 								<TableHead className='w-[100px]'>Длительность</TableHead>
 								<TableHead className='w-[120px]'>Стоимость</TableHead>
@@ -176,23 +135,28 @@ export function AppointmentsTable({
 										className='group hover:bg-muted/50'
 									>
 										<TableCell>
-											<div className='flex items-center space-x-2 min-w-[140px]'>
-												<Calendar className='h-4 w-4 text-muted-foreground flex-shrink-0' />
-												<div className='flex flex-col'>
-													<span className='font-medium text-sm whitespace-nowrap'>
-														{formatDateTime(appointment.date_time)}
-													</span>
-													<span className='text-xs text-muted-foreground'>
-														{appointment.date_time
-															? new Date(
-																	appointment.date_time
-															  ).toLocaleDateString('ru-RU', {
-																	weekday: 'short',
-															  })
-															: ''}
-													</span>
+											<Link
+												to={`/clients/${appointment.uuid}`}
+												className='hover:no-underline'
+											>
+												<div className='flex items-center space-x-2 min-w-[140px]'>
+													<Calendar className='h-4 w-4 text-muted-foreground flex-shrink-0' />
+													<div className='flex flex-col'>
+														<span className='font-medium text-sm whitespace-nowrap'>
+															{formatDateTime(appointment.date_time)}
+														</span>
+														<span className='text-xs text-muted-foreground'>
+															{appointment.date_time
+																? new Date(
+																		appointment.date_time
+																  ).toLocaleDateString('ru-RU', {
+																		weekday: 'short',
+																  })
+																: ''}
+														</span>
+													</div>
 												</div>
-											</div>
+											</Link>
 										</TableCell>
 
 										<TableCell>
@@ -209,11 +173,26 @@ export function AppointmentsTable({
 												</div>
 											</Link>
 										</TableCell>
+										<TableCell>
+											<Link
+												to={`/master/${appointment.master.uuid}`}
+												className='hover:no-underline'
+											>
+												<div className='flex items-center space-x-3'>
+													<div className='min-w-0 flex-1'>
+														<p className='font-medium text-sm truncate'>
+															{appointment.master.first_name}{' '}
+															{appointment.master.last_name}
+														</p>
+													</div>
+												</div>
+											</Link>
+										</TableCell>
 
 										<TableCell>
 											<div className='space-y-1'>
 												<p className='font-medium text-sm leading-none'>
-													{appointment.service_uuid}
+													{appointment.service.name}
 												</p>
 											</div>
 										</TableCell>
@@ -249,30 +228,30 @@ export function AppointmentsTable({
 										</TableCell>
 
 										<TableCell>
-											<DropdownMenu>
-												<DropdownMenuContent align='end' className='w-48'>
-													<DropdownMenuItem
+											<div className='flex items-center justify-end space-x-1 pr-2'>
+												{true && (
+													<Button
+														variant='ghost'
+														size='sm'
 														onClick={() => onEdit(appointment)}
-														className='cursor-pointer'
+														className='h-8 w-8 p-0 hover:bg-primary/10'
 													>
-														<Edit className='mr-2 h-4 w-4' />
-														Редактировать
-													</DropdownMenuItem>
-													{appointment.note && (
-														<DropdownMenuItem className='cursor-pointer'>
-															<FileText className='mr-2 h-4 w-4' />
-															Примечание
-														</DropdownMenuItem>
-													)}
-													<DropdownMenuItem
-														onClick={() => onDelete(appointment.uuid)}
-														className='cursor-pointer text-destructive focus:text-destructive'
+														<Edit className='h-4 w-4' />
+														<span className='sr-only'>Редактировать</span>
+													</Button>
+												)}
+												{true && (
+													<Button
+														variant='ghost'
+														size='sm'
+														onClick={() => onDelete(appointment)}
+														className='h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10'
 													>
-														<Trash2 className='mr-2 h-4 w-4' />
-														Удалить
-													</DropdownMenuItem>
-												</DropdownMenuContent>
-											</DropdownMenu>
+														<Trash2 className='h-4 w-4' />
+														<span className='sr-only'>Удалить</span>
+													</Button>
+												)}
+											</div>
 										</TableCell>
 									</TableRow>
 								)

@@ -74,7 +74,7 @@ export const deleteCategory = createAsyncThunk(
 
 export const deleteAttribute = createAsyncThunk(
 	'categories/deleteAttribute',
-	async ({categoryUuid, uuid}, { rejectWithValue }) => {
+	async ({ categoryUuid, uuid }, { rejectWithValue }) => {
 		try {
 			await api.delete(`/services/attributes/${uuid}`)
 			return { uuid, categoryUuid }
@@ -125,7 +125,7 @@ const categoriesSlice = createSlice({
 			})
 			.addCase(createCategory.fulfilled, (state, action) => {
 				state.isLoading = false
-				state.items.push(action.payload.items)
+				state.items.push(action.payload)
 				state.pagination = {
 					...state.pagination,
 				}
@@ -163,7 +163,9 @@ const categoriesSlice = createSlice({
 					item => item.uuid === action.payload.uuid
 				)
 				if (index !== -1) {
-					state.items[index] = action.payload
+					state.items[index] = { ...state.items[index], 
+						...action.payload
+					}
 				}
 			})
 			.addCase(updateCategory.rejected, (state, action) => {
@@ -196,9 +198,9 @@ const categoriesSlice = createSlice({
 				const categoryIndex = state.items.findIndex(
 					item => item.uuid === action.payload.categoryUuid
 				)
-				state.items[categoryIndex].attributes =
-					state.items[categoryIndex].attributes.filter(item => item.uuid !== action.payload.uuid)
-
+				state.items[categoryIndex].attributes = state.items[
+					categoryIndex
+				].attributes.filter(item => item.uuid !== action.payload.uuid)
 			})
 			.addCase(deleteAttribute.rejected, (state, action) => {
 				state.isLoading = false
