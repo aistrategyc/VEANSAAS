@@ -171,8 +171,9 @@ async def get_studio_select_options(
     request: Request, db: AsyncSession, auth: AuthContext
 ):
     query_result = await db.execute(
-        select(Studio).filter(
-            Studio.uuid.in_(auth.studios_uuid), Studio.is_active.is_(True)
+        select(Studio).where(
+            Studio.studio_memberships.any(user_uuid=auth.user.uuid),
+            Studio.is_active.is_(True),
         )
     )
     studios = query_result.scalars().all()

@@ -70,6 +70,7 @@ class Config(BaseSettings):
     @property
     def roles(self) -> dict:
         with open(ROLES_FILE, 'r', encoding='utf-8') as f:
+            print('load')
             return yaml.load(f)
 
     class Config:

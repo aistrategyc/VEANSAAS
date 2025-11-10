@@ -83,6 +83,7 @@ async def update_organization_route(
 
 
 @router.get('', response_model=StudioListResponse, status_code=status.HTTP_200_OK)
+@requires_permission('studio:list', scope='orgs')
 async def get_list_studios_route(
     request: Request,
     offset: int = Query(0, ge=0),

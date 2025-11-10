@@ -15,6 +15,7 @@ from shared.schemas.mixins import PaginationResponse
 from shared.schemas.user import (
     UserCreateInternal,
     UserListResponse,
+    UserMeResponse,
     UserUniquenessCheckRequest,
     UserUniquenessCheckResponse,
     UserVerificationEmail,
@@ -24,15 +25,10 @@ from shared.schemas.user import (
 
 async def get_user_for_auth(request: Request, username: str, db: AsyncSession):
     result = await db.execute(
-        select(User)
-        .filter(
+        select(User).where(
             User.username == username,
             User.is_active.is_(True),
             User.is_verified.is_(True),
-        )
-        .options(
-            selectinload(User.studio_memberships),
-            selectinload(User.organization_memberships),
         )
     )
     db_user = result.scalar_one_or_none()
@@ -40,10 +36,6 @@ async def get_user_for_auth(request: Request, username: str, db: AsyncSession):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail='User not found'
         )
-    studios_role = {m.studio_uuid: m.roles for m in db_user.studio_memberships}
-    organizations_role = {
-        m.organization_uuid: m.roles for m in db_user.organization_memberships
-    }
 
     auth_user_response = AuthUserResponse(
         uuid=db_user.uuid,
@@ -52,7 +44,6 @@ async def get_user_for_auth(request: Request, username: str, db: AsyncSession):
         is_verified=db_user.is_verified,
         email=str(db_user.email),
         hashed_password=db_user.hashed_password,
-        roles={'studios': studios_role, 'orgs': organizations_role},
     )
 
     return auth_user_response
@@ -141,12 +132,31 @@ async def get_my_user(request: Request, auth: AuthContext, db: AsyncSession):
             status_code=status.HTTP_404_NOT_FOUND, detail='User not found'
         )
 
-    db_user = await db.get(User, auth.user.uuid)
+    result = await db.execute(
+        select(User)
+        .where(
+            User.uuid == auth.user.uuid,
+        )
+        .options(
+            selectinload(User.studio_memberships),
+            selectinload(User.organization_memberships),
+        )
+    )
+    db_user = result.scalar_one_or_none()
+    studios_role = {m.studio_uuid: m.roles for m in db_user.studio_memberships}
+    organizations_role = {
+        m.organization_uuid: m.roles for m in db_user.organization_memberships
+    }
+
     if not db_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail='User not found'
         )
-    return db_user
+
+    return UserMeResponse(
+        **db_user.__dict__,
+        roles={'studios': studios_role, 'orgs': organizations_role},
+    )
 
 
 async def verification_email(
