@@ -62,14 +62,10 @@ const ServicesPage = () => {
 	}
 
 	const handleEditSaveService = (editService, data) => {
-		const dataUpdate = {
-			category_uuid: data.category.uuid,
-			...data,
-		}
 		dispatch(
 			updateService({
 				uuid: editService.uuid,
-				serviceData: dataUpdate,
+				serviceData: data,
 			})
 		)
 		setIsServiceModalOpen(false)

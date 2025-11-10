@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -30,7 +30,8 @@ import {
 	ImageIcon,
 	Layers,
 } from 'lucide-react'
-import { Link } from 'react-router'
+import { Link, useParams } from 'react-router'
+import { useAppointment } from './hooks/useAppointment'
 
 const appointmentDetails = {
 	id: '1',
@@ -219,10 +220,15 @@ export default function AppointmentDetailPage() {
 	const [isEditing, setIsEditing] = useState(false)
 	const [selectedImage, setSelectedImage] = useState()
 	const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('card')
-	const [paymentAmount, setPaymentAmount] = useState(
-		appointment.pricing.remaining
-	)
 	const [bonusAmount, setBonusAmount] = useState(0)
+
+	const { uuid } = useParams()
+
+	const {appointmentData, getAppointmentInfo} =  useAppointment()
+
+	useEffect(() =>{
+		getAppointmentInfo(uuid)
+	},[])
 
 	const handleCheckIn = () => {
 		setAppointment({
@@ -278,10 +284,10 @@ export default function AppointmentDetailPage() {
 							variant='ghost'
 							className='mb-4 text-muted-foreground hover:text-foreground'
 						>
-							<Link to='/records'>Назад к записям</Link>
+							<Link to='/appointments'>Назад к записям</Link>
 						</Button>
 						<h1 className='text-3xl font-bold text-foreground'>
-							Запись #{appointment.id}
+							Запись #{appointmentData.uuid}
 						</h1>
 						<p className='text-muted-foreground mt-1'>
 							{appointment.date} в {appointment.time}

@@ -4,7 +4,7 @@ import api from '@/shared/api/client'
 export const useAppointment = () => {
 	const [isLoading, setIsLoading] = useState(false)
 	const [appointments, setAppointments] = useState([])
-	const [clientData, setClientData] = useState({})
+	const [appointmentData, setAppointmentData] = useState({})
 	const [servicesSelectionList, setServicesSelectionList] = useState([])
 	const [masterSelectionList, setMasterSelectionList] = useState([])
 	const [pagination, setPagination] = useState({
@@ -47,7 +47,7 @@ export const useAppointment = () => {
 		api
 			.get(`/appointments/${uuid}`)
 			.then(response => {
-				setClientData(response.data)
+				setAppointmentData(response.data)
 			})
 			.catch(err => {
 				console.error('Error fetching studios:', err)
@@ -72,6 +72,7 @@ export const useAppointment = () => {
 			.catch(err => {})
 			.finally(() => setIsLoading(false))
 	}
+	
 
 	const getServicesSelectionList = () => {
 		setIsLoading(true)
@@ -105,7 +106,7 @@ export const useAppointment = () => {
 
 	return {
 		appointments,
-		clientData,
+		appointmentData,
 		isLoading,
 		servicesSelectionList,
 		masterSelectionList,

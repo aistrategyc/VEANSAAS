@@ -67,7 +67,11 @@ const ServiceModal = ({
 		if (service) {
 			onEdit(service, data)
 		} else {
-			onSave(data)
+			const serviceData = {
+				...data,
+				category_uuid: data.category.uuid,
+			}
+			onSave(serviceData)
 		}
 	}
 

@@ -9,27 +9,18 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+
 import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import {
-	MoreHorizontal,
 	Edit,
 	Trash2,
 	Calendar,
 	Clock,
 	DollarSign,
-	FileText,
 } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Link } from 'react-router'
 import { Pagination } from '@/shared/ui/Pagination'
 
-// Вспомогательные функции для форматирования
 const formatDateTime = dateString => {
 	if (!dateString) return '—'
 	try {
@@ -96,7 +87,6 @@ export function AppointmentsTable({
 			/>
 		)
 	}
-	console.log(appointments)
 
 	return (
 		<Card>
@@ -136,7 +126,7 @@ export function AppointmentsTable({
 									>
 										<TableCell>
 											<Link
-												to={`/clients/${appointment.uuid}`}
+												to={`/appointments/${appointment.uuid}`}
 												className='hover:no-underline'
 											>
 												<div className='flex items-center space-x-2 min-w-[140px]'>
@@ -175,14 +165,14 @@ export function AppointmentsTable({
 										</TableCell>
 										<TableCell>
 											<Link
-												to={`/master/${appointment.master.uuid}`}
+												to={`/master/${appointment.master_uuid}`}
 												className='hover:no-underline'
 											>
 												<div className='flex items-center space-x-3'>
 													<div className='min-w-0 flex-1'>
 														<p className='font-medium text-sm truncate'>
-															{appointment.master.first_name}{' '}
-															{appointment.master.last_name}
+															{appointment.master?.first_name}{' '}
+															{appointment.master?.last_name}
 														</p>
 													</div>
 												</div>
@@ -192,7 +182,7 @@ export function AppointmentsTable({
 										<TableCell>
 											<div className='space-y-1'>
 												<p className='font-medium text-sm leading-none'>
-													{appointment.service.name}
+													{appointment.service?.name}
 												</p>
 											</div>
 										</TableCell>

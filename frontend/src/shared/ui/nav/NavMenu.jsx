@@ -17,8 +17,10 @@ import {
 	Paperclip,
 	TimerReset,
 	LocationEditIcon,
+	Search,
 } from 'lucide-react'
 import { PermissionGuard } from '@/widgets/permissions/PermissionGuard'
+import { useMemo, useState } from 'react'
 
 const menuItems = [
 	{
@@ -45,7 +47,7 @@ const menuItems = [
 		id: 'appointments',
 		text: 'Записи',
 		icon: NotepadText,
-		path: '/records',
+		path: '/appointments',
 		badge: '5',
 		permission: ['page:view', 'view:appointments'],
 	},
@@ -145,6 +147,15 @@ const menuItems = [
 
 export const NavMenu = ({ isCollapsed }) => {
 	const location = useLocation()
+	const [searchTerm, setSearchTerm] = useState('')
+
+	const filteredMenuItems = useMemo(() => {
+		if (!searchTerm.trim()) return menuItems
+
+		return menuItems.filter(item =>
+			item.text.toLowerCase().includes(searchTerm.toLowerCase())
+		)
+	}, [searchTerm])
 
 	const isActive = path => {
 		if (path === '/') {
@@ -154,31 +165,50 @@ export const NavMenu = ({ isCollapsed }) => {
 	}
 
 	const handleItemClick = itemId => {
-		//
+		// логика клика
 	}
 
 	return (
 		<nav className='flex-1 px-4 py-2 h-screen overflow-y-auto'>
+			<div className='mb-4'>
+				<div className='relative'>
+					<Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+					<input
+						type='text'
+						placeholder='Поиск в меню...'
+						value={searchTerm}
+						onChange={e => setSearchTerm(e.target.value)}
+						className='w-full pl-10 pr-4 py-2 bg-input border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring'
+					/>
+				</div>
+			</div>
+
+			{/* Результаты поиска */}
 			<ul className='space-y-1'>
-				{menuItems.map(item => (
-					<PermissionGuard
-						key={item.id}
-						requiredAny={item.permission}
-						scope='orgs'
-					>
-						<Item
+				{filteredMenuItems.length > 0 ? (
+					filteredMenuItems.map(item => (
+						<PermissionGuard
 							key={item.id}
-							text={item.text}
-							iconName={item.icon}
-							isActive={isActive(item.path)}
-							badge={item.badge}
-							onClick={() => handleItemClick(item.id)}
-							to={item.path}
-							isCollapsed={isCollapsed}
-							permission={item.permission}
-						/>
-					</PermissionGuard>
-				))}
+							requiredAny={item.permission}
+							scope='orgs'
+						>
+							<Item
+								text={item.text}
+								iconName={item.icon}
+								isActive={isActive(item.path)}
+								badge={item.badge}
+								onClick={() => handleItemClick(item.id)}
+								to={item.path}
+								isCollapsed={isCollapsed}
+								permission={item.permission}
+							/>
+						</PermissionGuard>
+					))
+				) : (
+					<div className='text-center text-muted-foreground py-4'>
+						Ничего не найдено
+					</div>
+				)}
 			</ul>
 		</nav>
 	)

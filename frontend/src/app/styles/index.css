@@ -5,7 +5,7 @@
 
 :root {
 	/* Light theme */
-	--background: #ffffff;
+	--background: #f9fafb;
 	--foreground: #0a0a0a;
 	--card: #f8fafc;
 	--card-foreground: #0a0a0a;
@@ -141,6 +141,9 @@
 		font-family: 'Work Sans', system-ui, sans-serif;
 		font-weight: 700;
 		color: #ffffff;
+	}
+	html {
+		transition: background-color 0.4s ease, color 0.4s ease;
 	}
 	input:-webkit-autofill,
 	input:-webkit-autofill:hover,

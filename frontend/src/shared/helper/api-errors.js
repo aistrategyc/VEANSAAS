@@ -12,9 +12,6 @@ export const handleUserError = error => {
 			case 400:
 				handleBadRequestError(data)
 				break
-			case 401:
-				handleBadRequestError(data)
-				break
 			case 422:
 				handleValidationError(data)
 				break
@@ -80,39 +77,39 @@ export const handleValidationError = data => {
 }
 
 export const handleBadRequestError = data => {
-	// Проверяем вложенную структуру: {detail: {detail: "...", errors: {...}}}
+	
 	if (data?.detail && typeof data.detail === 'object') {
-		// Если внутри detail есть еще detail и errors
+		
 		if (data.detail.errors && typeof data.detail.errors === 'object') {
 			handleNestedErrors(data.detail)
 			return
 		}
-		// Если внутри detail есть прямые поля ошибок
+		
 		if (data.detail.email?.message || data.detail.phone?.message) {
 			handleFieldErrors(data.detail)
 			return
 		}
 	}
 
-	// Проверяем, является ли это структурой валидации FastAPI
+	
 	if (data?.detail && Array.isArray(data.detail)) {
 		handleValidationError(data)
 		return
 	}
 
-	// Обработка структуры с прямыми errors
+	
 	if (data?.errors && typeof data.errors === 'object') {
 		handleNestedErrors(data)
 		return
 	}
 
-	// Обработка структуры с прямыми полями ошибок
+	
 	if (data?.email?.message || data?.phone?.message) {
 		handleFieldErrors(data)
 		return
 	}
 
-	// Обычное сообщение об ошибке
+	
 	const message = getErrorMessage(data)
 	toastError(message || 'Неверный запрос')
 }
@@ -136,7 +133,7 @@ export const handleRateLimitError = data => {
 }
 
 export const handleNestedErrors = data => {
-	// Пробуем извлечь все ошибки универсальным способом
+	
 	const allMessages = extractAllErrorMessages(data)
 
 	if (allMessages.length > 0) {
@@ -153,13 +150,13 @@ export const handleNestedErrors = data => {
 		return
 	}
 
-	// Fallback: пытаемся найти ошибки в известных структурах
+	
 	const errors = data.errors || data
 	const errorMessages = []
 
 	if (typeof errors === 'object') {
 		Object.keys(errors).forEach(field => {
-			if (field === 'detail' || field === 'message') return // Пропускаем системные поля
+			if (field === 'detail' || field === 'message') return 
 
 			const error = errors[field]
 			if (error && typeof error === 'object') {
@@ -239,7 +236,7 @@ export const formatFieldName = fieldName => {
 		path: 'Параметр пути',
 		header: 'Заголовок',
 		cookie: 'Cookie',
-		// добавьте другие поля по необходимости
+		
 	}
 
 	return (
@@ -253,11 +250,10 @@ export const formatFieldName = fieldName => {
 	)
 }
 
-
 export const handleFieldErrors = data => {
 	const errorMessages = []
 
-	// Ищем поля с ошибками (исключаем системные поля like detail, errors)
+	
 	const systemFields = ['detail', 'errors', 'message', 'code']
 
 	Object.keys(data).forEach(field => {
@@ -290,14 +286,14 @@ export const handleFieldErrors = data => {
 export const getErrorMessage = data => {
 	if (!data) return 'Неизвестная ошибка'
 
-	// Если это строка
+	
 	if (typeof data === 'string') return data
 
-	// Стандартная структура FastAPI с detail
+	
 	if (data.detail) {
 		if (typeof data.detail === 'string') return data.detail
 		if (Array.isArray(data.detail)) {
-			// Для массива ошибок возвращаем первую ошибку
+			
 			const firstError = data.detail[0]
 			if (firstError && firstError.msg) {
 				return firstError.msg
@@ -306,7 +302,7 @@ export const getErrorMessage = data => {
 		}
 	}
 
-	// Обработка новой структуры с errors
+	
 	if (data.errors && typeof data.errors === 'object') {
 		const firstField = Object.keys(data.errors)[0]
 		if (firstField && data.errors[firstField]?.message) {
@@ -314,12 +310,12 @@ export const getErrorMessage = data => {
 		}
 	}
 
-	// Обработка прямой структуры с полями ошибок
+	
 	if (data.email?.message) return data.email.message
 	if (data.phone?.message) return data.phone.message
 	if (data.username?.message) return data.username.message
 
-	// Другие возможные структуры
+	
 	if (data.message) return data.message
 	if (data.msg) return data.msg
 	if (data.error) return data.error
@@ -336,14 +332,14 @@ export const extractAllErrorMessages = data => {
 	const extractErrors = (obj, path = '') => {
 		if (!obj || typeof obj !== 'object') return
 
-		// Если это объект с message и code - добавляем его
+		
 		if (obj.message && obj.code) {
 			const fieldName = path ? formatFieldName(path.split('.').pop()) : 'Ошибка'
 			messages.push(`${fieldName}: ${obj.message}`)
 			return
 		}
 
-		// Рекурсивно обходим все поля
+		
 		Object.keys(obj).forEach(key => {
 			const value = obj[key]
 			const newPath = path ? `${path}.${key}` : key

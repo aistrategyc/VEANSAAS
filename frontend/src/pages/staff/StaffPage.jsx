@@ -1,17 +1,16 @@
 import { Badge } from '@/components/ui/badge'
 import { UserCheck, Star, Calendar, Plus } from 'lucide-react'
-import { HeaderPages } from '@/features/headerPages/HeaderPages'
-import { StatsList } from '@/features/stats/StatsList'
 
+import { StatsList } from '@/features/stats/StatsList'
 import { StaffTable } from '@/features/staff/StaffTable'
 import { useStaff } from '@/features/staff/hooks/useStaff'
 import { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
 import { HeaderWrapper } from '@/widgets/wrapper/HeaderWrapper'
 import { Button } from '@/components/ui/button'
 import { StaffModal } from '@/features/staff/StaffModal'
+import useStudios from '@/features/studios/model/api'
 
-export default function StaffPage() {
+const StaffPage = () => {
 	const statsEmployeeList = [
 		{ id: 1, icon: UserCheck, count: '24', name: 'Всего сотрудников' },
 		{ id: 2, icon: Badge, count: '21', name: 'Активные' },
@@ -21,8 +20,7 @@ export default function StaffPage() {
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
 
 	const { staff, fetchStaff, createInvite } = useStaff()
-	const { currentStudio } = useSelector(state => state.rootReducer.studios)
-
+	const { currentStudio } = useStudios()
 	useEffect(() => {
 		fetchStaff()
 	}, [currentStudio])
@@ -54,3 +52,4 @@ export default function StaffPage() {
 		</div>
 	)
 }
+export default StaffPage
