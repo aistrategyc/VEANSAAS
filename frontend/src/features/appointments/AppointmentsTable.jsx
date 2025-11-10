@@ -10,13 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-import {
-	Edit,
-	Trash2,
-	Calendar,
-	Clock,
-	DollarSign,
-} from 'lucide-react'
+import { Edit, Trash2, Calendar, Clock, DollarSign } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Link } from 'react-router'
 import { Pagination } from '@/shared/ui/Pagination'
@@ -65,15 +59,13 @@ const getStatusText = status => {
 	}
 }
 
-export function AppointmentsTable({
+export const AppointmentsTable = ({
 	appointments,
-	onEdit,
-	onDelete,
 	currentPage = 1,
 	pageSize = 10,
 	totalCount = 20,
 	onPageChange,
-}) {
+}) => {
 	const totalPages = Math.ceil(totalCount / pageSize)
 	const startItem = (currentPage - 1) * pageSize + 1
 	const endItem = Math.min(currentPage * pageSize, totalCount)
@@ -114,7 +106,6 @@ export function AppointmentsTable({
 								<TableHead className='w-[100px]'>Длительность</TableHead>
 								<TableHead className='w-[120px]'>Стоимость</TableHead>
 								<TableHead className='w-[120px]'>Статус</TableHead>
-								<TableHead className='w-[80px]'>Действия</TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>
@@ -215,33 +206,6 @@ export function AppointmentsTable({
 											>
 												{getStatusText(appointment.status)}
 											</Badge>
-										</TableCell>
-
-										<TableCell>
-											<div className='flex items-center justify-end space-x-1 pr-2'>
-												{true && (
-													<Button
-														variant='ghost'
-														size='sm'
-														onClick={() => onEdit(appointment)}
-														className='h-8 w-8 p-0 hover:bg-primary/10'
-													>
-														<Edit className='h-4 w-4' />
-														<span className='sr-only'>Редактировать</span>
-													</Button>
-												)}
-												{true && (
-													<Button
-														variant='ghost'
-														size='sm'
-														onClick={() => onDelete(appointment)}
-														className='h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10'
-													>
-														<Trash2 className='h-4 w-4' />
-														<span className='sr-only'>Удалить</span>
-													</Button>
-												)}
-											</div>
 										</TableCell>
 									</TableRow>
 								)

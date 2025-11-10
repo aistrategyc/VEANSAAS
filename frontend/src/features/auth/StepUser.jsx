@@ -72,11 +72,25 @@ export const StepUser = ({ onNext, initialData = {} }) => {
 				rules={{
 					required: 'Обязательное поле',
 					minLength: {
-						value: 6,
+						value: 8,
 						message: 'Пароль должен содержать минимум 6 символов',
 					},
 				}}
 				error={errors.password?.message}
+			/>
+			<FormInput
+				title='Повторить пароль'
+				type='password'
+				name='password_repeat'
+				control={control}
+				rules={{
+					required: 'Обязательное поле',
+					minLength: {
+						value: 8,
+						message: 'Пароль должен содержать минимум 6 символов',
+					},
+				}}
+				error={errors.password_repeat?.message}
 			/>
 
 			<Button type='submit' className='w-full mt-4'>

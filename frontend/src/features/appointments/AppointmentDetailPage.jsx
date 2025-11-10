@@ -32,6 +32,15 @@ import {
 } from 'lucide-react'
 import { Link, useParams } from 'react-router'
 import { useAppointment } from './hooks/useAppointment'
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select'
+import api from '@/shared/api/client'
+import toast from 'react-hot-toast'
 
 const appointmentDetails = {
 	id: '1',
@@ -215,69 +224,44 @@ const appointmentDetails = {
 
 export default function AppointmentDetailPage() {
 	const [appointment, setAppointment] = useState(appointmentDetails)
-	const [agreements, setAgreements] = useState(appointment.agreements)
 	const [notes, setNotes] = useState(appointment.notes)
 	const [isEditing, setIsEditing] = useState(false)
 	const [selectedImage, setSelectedImage] = useState()
 	const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('card')
-	const [bonusAmount, setBonusAmount] = useState(0)
-
 	const { uuid } = useParams()
+	const [status, setStatus] = useState(appointment.status)
+	const [loading, setLoading] = useState(false)
 
-	const {appointmentData, getAppointmentInfo} =  useAppointment()
+	const { appointmentData, getAppointmentInfo } = useAppointment()
 
-	useEffect(() =>{
+	useEffect(() => {
 		getAppointmentInfo(uuid)
-	},[])
+	}, [])
 
-	const handleCheckIn = () => {
-		setAppointment({
-			...appointment,
-			checkedIn: true,
-			checkedInAt: new Date().toISOString(),
-		})
-	}
+	const handleStatusChange = async newStatus => {
+		try {
+			setLoading(true)
+			setStatus(newStatus)
 
-	const handleAgreementChange = (key, value) => {
-		setAgreements({ ...agreements, [key]: value })
-	}
-
-	const allAgreementsSigned = Object.values(agreements).every(v => v === true)
-
-	const getStatusColor = status => {
-		switch (status) {
-			case 'confirmed':
-				return 'bg-green-500/20 text-green-600 border-green-500/30'
-			case 'pending':
-				return 'bg-amber-500/20 text-amber-600 border-amber-500/30'
-			case 'cancelled':
-				return 'bg-red-500/20 text-red-600 border-red-500/30'
-			case 'completed':
-				return 'bg-blue-500/20 text-blue-600 border-blue-500/30'
-			default:
-				return 'bg-gray-500/20 text-gray-600 border-gray-500/30'
+			api
+				.post(`/appointments/${uuid}/status`, { status: newStatus })
+				.then(toast.success('Статус успешно обновлён'))
+				.catch(err => {})
+		} finally {
+			setLoading(false)
 		}
 	}
-
-	const getStatusText = status => {
-		switch (status) {
-			case 'confirmed':
-				return 'Подтверждена'
-			case 'pending':
-				return 'Ожидает'
-			case 'cancelled':
-				return 'Отменена'
-			case 'completed':
-				return 'Завершена'
-			default:
-				return status
-		}
-	}
+	const statusOptions = [
+		{ value: 'scheduled', label: 'Запланирован' },
+		{ value: 'confirmed', label: 'Подтверждён' },
+		{ value: 'in_progress', label: 'В процессе' },
+		{ value: 'completed', label: 'Завершён' },
+		{ value: 'cancelled', label: 'Отменён' },
+	]
 
 	return (
 		<div className='min-h-screen bg-background p-6'>
 			<div className=' mx-auto space-y-6'>
-				{/* Заголовок и действия */}
 				<div className='flex items-center justify-between'>
 					<div>
 						<Button
@@ -294,29 +278,23 @@ export default function AppointmentDetailPage() {
 						</p>
 					</div>
 
-					<div className='flex gap-3'>
-						<Badge
-							className={`${getStatusColor(
-								appointment.status
-							)} border px-4 py-2`}
+					<div className='flex items-center gap-3'>
+						<Select
+							disabled={loading}
+							value={status}
+							onValueChange={handleStatusChange}
 						>
-							{getStatusText(appointment.status)}
-						</Badge>
-						{!appointment.checkedIn && (
-							<Button
-								onClick={handleCheckIn}
-								className='bg-primary hover:bg-primary/90'
-							>
-								<CheckCircle2 className='w-4 h-4 mr-2' />
-								Чекин
-							</Button>
-						)}
-						{appointment.checkedIn && (
-							<Badge className='bg-green-500/20 text-green-600 border-green-500/30 border px-4 py-2'>
-								<CheckCircle2 className='w-4 h-4 mr-2' />
-								Клиент прибыл
-							</Badge>
-						)}
+							<SelectTrigger className='w-[200px]'>
+								<SelectValue placeholder='Выберите статус' />
+							</SelectTrigger>
+							<SelectContent>
+								{statusOptions.map(opt => (
+									<SelectItem key={opt.value} value={opt.value}>
+										{opt.label}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
 					</div>
 				</div>
 
@@ -324,7 +302,7 @@ export default function AppointmentDetailPage() {
 					{/* Левая колонка - Основная информация */}
 					<div className='lg:col-span-2 space-y-6'>
 						{/* Маркетинг и акции */}
-						{appointment.marketing && (
+						{/* {appointment.marketing && (
 							<Card className='crypto-card'>
 								<CardHeader>
 									<div className='flex items-center justify-between'>
@@ -345,9 +323,9 @@ export default function AppointmentDetailPage() {
 									</div>
 								</CardHeader>
 								<CardContent>
-									<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-										{/* Активная акция */}
-										{appointment.marketing.promotion && (
+									<div className='grid grid-cols-1 md:grid-cols-2 gap-4'> */}
+						{/* Активная акция */}
+						{/* {appointment.marketing.promotion && (
 											<div className='bg-muted/50 border rounded-lg p-4'>
 												<div className='flex items-start justify-between mb-2'>
 													<Badge className='bg-amber-500 text-white'>
@@ -372,10 +350,10 @@ export default function AppointmentDetailPage() {
 													</code>
 												</div>
 											</div>
-										)}
+										)} */}
 
-										{/* Программа лояльности */}
-										{appointment.marketing.loyaltyProgram && (
+						{/* Программа лояльности */}
+						{/* {appointment.marketing.loyaltyProgram && (
 											<div className='bg-muted/50 border rounded-lg p-4'>
 												<div className='flex items-center justify-between mb-2'>
 													<Badge className='bg-purple-500 text-white'>
@@ -433,9 +411,9 @@ export default function AppointmentDetailPage() {
 														))}
 												</div>
 											</div>
-										)}
+										)} */}
 
-										{/* Реферальная программа */}
+						{/* Реферальная программа
 										{appointment.marketing.referralBonus &&
 											appointment.marketing.referralBonus.active && (
 												<div className='bg-muted/50 border rounded-lg p-4'>
@@ -462,10 +440,10 @@ export default function AppointmentDetailPage() {
 														</span>
 													</div>
 												</div>
-											)}
+											)} */}
 
-										{/* Специальное предложение */}
-										{appointment.marketing.specialOffer && (
+						{/* Специальное предложение */}
+						{/* {appointment.marketing.specialOffer && (
 											<div className='bg-muted/50 border rounded-lg p-4'>
 												<Badge className='bg-blue-500 text-white mb-2'>
 													{appointment.marketing.specialOffer.type}
@@ -485,11 +463,11 @@ export default function AppointmentDetailPage() {
 													</span>
 												</div>
 											</div>
-										)}
-									</div>
+										)} */}
+						{/* </div>
 
 									{/* Заметки для мастера */}
-									<div className='mt-4 p-3 bg-muted/50 rounded-lg border'>
+						{/* <div className='mt-4 p-3 bg-muted/50 rounded-lg border'>
 										<p className='text-xs text-muted-foreground mb-1'>
 											💡 Заметка для мастера:
 										</p>
@@ -500,7 +478,7 @@ export default function AppointmentDetailPage() {
 									</div>
 								</CardContent>
 							</Card>
-						)}
+						)}   */}
 
 						{/* Информация о сеансе */}
 						{appointment.sessionInfo && (
@@ -904,7 +882,7 @@ export default function AppointmentDetailPage() {
 						</Card>
 
 						{/* Соглашения и согласия */}
-						<Card className='crypto-card'>
+						{/* <Card className='crypto-card'>
 							<CardHeader>
 								<div className='flex items-center justify-between'>
 									<CardTitle>Соглашения и согласия</CardTitle>
@@ -1031,7 +1009,7 @@ export default function AppointmentDetailPage() {
 									</div>
 								)}
 							</CardContent>
-						</Card>
+						</Card> */}
 
 						{/* Заметки к записи */}
 						<Card className='crypto-card'>
@@ -1064,7 +1042,7 @@ export default function AppointmentDetailPage() {
 						</Card>
 
 						{/* Документы */}
-						<Card className='crypto-card'>
+						{/* <Card className='crypto-card'>
 							<CardHeader>
 								<CardTitle>Документы</CardTitle>
 							</CardHeader>
@@ -1107,7 +1085,7 @@ export default function AppointmentDetailPage() {
 									</Button>
 								</div>
 							</CardContent>
-						</Card>
+						</Card> */}
 					</div>
 
 					{/* Правая колонка - Дополнительная информация */}
@@ -1444,6 +1422,7 @@ export default function AppointmentDetailPage() {
 									<Button
 										variant='outline'
 										className='w-full border-red-200 text-red-600 hover:bg-red-50'
+										onClick={() => handleStatusChange('cancelled')}
 									>
 										<XCircle className='w-4 h-4 mr-2' />
 										Отменить запись

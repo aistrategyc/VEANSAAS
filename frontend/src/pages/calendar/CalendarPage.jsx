@@ -5,6 +5,7 @@ import { CalendarToolbar } from '@/features/calendar/CalendarToolbar'
 import { MasterTimelineView } from '@/features/calendar/MasterTimelineView'
 import useStudios from '@/features/studios/model/api'
 import { Loader } from '@/shared/ui/loader/Loader'
+import { addDays } from 'date-fns'
 
 const generateMasterColors = masters => {
 	const palette = [
@@ -25,12 +26,18 @@ const generateMasterColors = masters => {
 }
 
 const CalendarPage = () => {
-	const [selectedDate, setSelectedDate] = useState(new Date())
+	
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const [selectedAppointment, setSelectedAppointment] = useState(null)
 	const [selectedSlot, setSelectedSlot] = useState(null)
-	const [viewType, setViewType] = useState('day')
+	
 	const [selectedResource, setSelectedResource] = useState('all')
+	const [viewType, setViewType] = useState('day')
+	const [selectedDate, setSelectedDate] = useState(new Date())
+	const [dateRange, setDateRange] = useState({
+		from: new Date(),
+		to: addDays(new Date(), 6),
+	})
 
 	const {
 		appointments,
@@ -113,17 +120,21 @@ const CalendarPage = () => {
 			<h1 className='text-3xl font-bold tracking-tight'>Календарь записей</h1>
 
 			<CalendarToolbar
-				selectedDate={selectedDate}
-				onDateChange={setSelectedDate}
 				viewType={viewType}
 				onViewTypeChange={setViewType}
+				selectedDate={selectedDate}
+				onDateChange={setSelectedDate}
+				dateRange={dateRange}
+				onDateRangeChange={setDateRange}
 				selectedResource={selectedResource}
 				onResourceChange={setSelectedResource}
 				resources={resources}
 			/>
 
 			<MasterTimelineView
+				viewType={viewType}
 				selectedDate={selectedDate}
+				dateRange={dateRange}
 				events={filteredEvents}
 				resources={filteredResources}
 				onEventClick={handleEventClick}
