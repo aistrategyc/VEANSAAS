@@ -7,6 +7,13 @@ export const useUser = () => {
 	const isLoading = useSelector(state => state.rootReducer.user.isLoading)
 	const error = useSelector(state => state.rootReducer.user.error)
 
+	const setRoles = () => {
+		if(user){
+			dispatch(setRoles({
+				roles:user.roles
+			}))
+		}
+	}
 	return {
 		user,
 		isLoading,

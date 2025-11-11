@@ -27,7 +27,7 @@ from shared.schemas.auth import AuthUserResponse
 from shared.schemas.user import (
     UserCreateInternal,
     UserListResponse,
-    UserResponse,
+    UserMeResponse,
     UserSelectionMasterResponse,
     UserUniquenessCheckRequest,
     UserUniquenessCheckResponse,
@@ -83,7 +83,7 @@ async def delete_user_route(
     return await delete_user(request=request, user_uuid=user_uuid, db=db)
 
 
-@router.get('/me', response_model=UserResponse, status_code=status.HTTP_200_OK)
+@router.get('/me', response_model=UserMeResponse, status_code=status.HTTP_200_OK)
 @redis_cache(expire=180, key_builder=user_me_key_builder)
 async def get_my_user_router(
     request: Request,

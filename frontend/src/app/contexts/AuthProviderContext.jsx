@@ -8,24 +8,22 @@ import { AuthContext } from './AuthContext'
 import { useUser } from '@/shared/hooks/useUser'
 import { useDispatch } from 'react-redux'
 import { parseJwt } from '@/shared/helper/jwt-helpers'
-import { setRoles, clearRoles } from '@/shared/slices/rolesSlice'
+import { setRoles, clearRoles, setPermissions } from '@/shared/slices/rolesSlice'
 
 export const AuthProvider = ({ children }) => {
 	const [isAuthenticated, setIsAuthenticated] = useState(false)
 	const [isLoading, setIsLoading] = useState(true)
 	const dispatch = useDispatch()
 
-	const { fetchUser} = useUser()
+	const { fetchUser } = useUser()
 
 	const setAuth = useCallback((accessToken, refreshToken) => {
 		setCookie('authToken', accessToken, 7)
 		setCookie('refreshToken', refreshToken, 30)
 		const dataJwt = parseJwt(accessToken)
 		dispatch(
-			setRoles({
-				roles: dataJwt?.roles || { orgs: {}, studios: {} },
+			setPermissions({
 				permissions: dataJwt?.permissions || {},
-				orgUuid: dataJwt?.organization_uuid || null,
 			})
 		)
 		setIsAuthenticated(true)
@@ -47,10 +45,8 @@ export const AuthProvider = ({ children }) => {
 			fetchUser()
 			const dataJwt = parseJwt(token)
 			dispatch(
-				setRoles({
-					roles: dataJwt?.roles || { orgs: {}, studios: {} },
+				setPermissions({
 					permissions: dataJwt?.permissions || {},
-					orgUuid: dataJwt?.organization_uuid || null,
 				})
 			)
 		} else {

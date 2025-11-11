@@ -14,7 +14,6 @@ class AuthUserResponse(BaseModel):
     is_active: bool
     is_verified: bool
     email: EmailStr | str
-    roles: dict
     hashed_password: str
 
     class Config:

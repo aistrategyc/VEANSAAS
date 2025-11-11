@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import api from '@/shared/api/client'
-import { getCookie } from '@/shared/helper/cookie-utils'
 
 export const fetchUserData = createAsyncThunk(
 	'user/fetchUserData',

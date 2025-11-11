@@ -140,10 +140,9 @@ async def login(
         'is_active': user.is_active,
         'is_verified': user.is_verified,
         'user_uuid': user.uuid,
-        'organization_uuid': list(user.roles['orgs'].keys())[0],
+        # 'organization_uuid': list(user.roles['orgs'].keys())[0],
         'username': user.username,
         'email': user.email,
-        'roles': user.roles,
         'permissions': settings.roles['roles'],
     }
 

@@ -7,7 +7,7 @@ export const PermissionGuard = ({
 	requiredAll = [],
 	scope = 'orgs',
 }) => {
-	const roles = useSelector(state => state.rootReducer.roles?.roles)
+	const roles = useSelector(state => state.rootReducer.user?.data?.roles)
 	const orgUuid = useSelector(state => state.rootReducer.roles?.orgUuid)
 	const permissionsConfig = useSelector(
 		state => state.rootReducer.roles.permissions

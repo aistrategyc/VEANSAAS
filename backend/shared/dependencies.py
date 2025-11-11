@@ -1,12 +1,13 @@
-from typing import List
 from uuid import UUID
 
 from fastapi import Depends, Header, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from pydantic import BaseModel
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.config.config import settings
+from shared.database import get_db
 from shared.service_clients.company_units import (
     CompanyUnitsInviteServiceClient,
     CompanyUnitsOrganizationServiceClient,
@@ -57,11 +58,6 @@ class AuthContext:
         return self._payload.get('studio_uuid', None)
 
     @property
-    def studios_uuid(self) -> List[str | UUID]:
-        roles_data = self._payload.get('roles', {}).get('studios', {})
-        return list(roles_data.keys())
-
-    @property
     def roles(self) -> set:
         roles_data = self._payload.get('roles', {})
         unique_roles = set()
@@ -69,7 +65,6 @@ class AuthContext:
             if isinstance(category, dict):
                 for roles_list in category.values():
                     unique_roles.update(roles_list)
-
         return self._payload.get('roles', {})
 
 
@@ -116,7 +111,7 @@ async def get_current_user(
             payload={
                 **payload,
                 'studio_uuid': studio_uuid,
-            }
+            },
         )
     except JWTError:
         raise HTTPException(

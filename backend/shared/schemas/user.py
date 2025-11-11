@@ -6,7 +6,7 @@ from uuid import UUID
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
 from shared.schemas.company_units.studio import StudioMemberRoles
-from shared.schemas.mixins import PaginationResponse
+from shared.schemas.mixins import PaginationResponse, TimestampMixin, UUIDMixin
 
 
 class UserBase(BaseModel):
@@ -127,6 +127,13 @@ class UserSelectionMasterResponse(BaseModel):
     uuid: UUID
     first_name: str | None = Field(max_length=255)
     last_name: str | None = Field(max_length=255)
+
+    class Config:
+        from_attributes = True
+
+
+class UserMeResponse(UserBase, UUIDMixin, TimestampMixin):
+    roles: dict
 
     class Config:
         from_attributes = True

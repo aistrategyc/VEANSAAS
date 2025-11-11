@@ -6,16 +6,19 @@ const rolesSlice = createSlice({
 	initialState: {
 		roles: [],
 		permissions: [],
-		orgUuid: null,
+		orgUuid: '08c1d435-b434-4b79-b9dd-6b9c61657a37',
 		loading: false,
 		error: null,
 	},
 	reducers: {
 		setRoles: (state, action) => {
 			state.roles = action.payload.roles
-			state.permissions = action.payload.permissions
-			state.orgUuid = action.payload.orgUuid
+
 			state.error = null
+		},
+		setPermissions: (state, action) => {
+			state.permissions = action.payload.permissions
+			state.orgUuid = '08c1d435-b434-4b79-b9dd-6b9c61657a37'
 		},
 
 		setRolesLoading: (state, action) => {
@@ -35,7 +38,12 @@ const rolesSlice = createSlice({
 	},
 })
 
-export const { setRoles, setRolesLoading, setRolesError, clearRoles } =
-	rolesSlice.actions
+export const {
+	setRoles,
+	setRolesLoading,
+	setPermissions,
+	setRolesError,
+	clearRoles,
+} = rolesSlice.actions
 
 export default rolesSlice.reducer
