@@ -33,7 +33,7 @@ export const updateService = createAsyncThunk(
 	'services/updateService',
 	async ({ uuid, serviceData }, thunkAPI) => {
 		try {
-			const response = await api.put(`/services/${uuid}`, serviceData)
+			const response = await api.patch(`/services/${uuid}`, serviceData)
 			return response.data
 		} catch (error) {
 			return thunkAPI.rejectWithValue(
@@ -103,7 +103,10 @@ const servicesSlice = createSlice({
 			})
 			.addCase(updateService.fulfilled, (state, action) => {
 				const index = state.items.findIndex(s => s.uuid === action.payload.uuid)
-				if (index !== -1) state.items[index] = action.payload
+				state.items[index] = {
+					...action.meta.arg.serviceData,
+					uuid: action.meta.arg.uuid,
+				}
 			})
 			.addCase(deleteService.fulfilled, (state, action) => {
 				state.items = state.items.filter(s => s.uuid !== action.payload)

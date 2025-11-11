@@ -28,6 +28,7 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { PermissionGuard } from '@/widgets/permissions/PermissionGuard'
 import { Link } from 'react-router'
 import { Pagination } from '@/shared/ui/Pagination'
+import { transPrintRoles } from '@/shared/helper/transformPrintRoles'
 
 export function StaffTable({
 	staffList,
@@ -106,7 +107,9 @@ export function StaffTable({
 									</TableCell>
 									<TableCell>
 										<div className='space-y-1'>
-											{staff.studio_membership.roles.map(role => role)}
+											{staff.studio_membership.roles.map(role =>
+												transPrintRoles(role)
+											)}
 										</div>
 									</TableCell>
 									<TableCell>

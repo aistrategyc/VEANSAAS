@@ -5,10 +5,11 @@ import { AppointmentModal } from '@/features/appointments/AppointmentModal'
 import { useEffect, useState } from 'react'
 import { useAppointment } from '@/features/appointments/hooks/useAppointment'
 import { Loader } from '@/shared/ui/loader/Loader'
-import { useClient } from '@/features/clients/hooks/useClients'
-import { AppointmentsTable } from '@/features/appointments/AppointmentsTable'
 
-export default function AppointmentsPage() {
+import { AppointmentsTable } from '@/features/appointments/AppointmentsTable'
+import useStudios from '@/features/studios/model/api'
+
+const AppointmentsPage = () => {
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
 	const [editingAppointment, setEditingAppointment] = useState(null)
 
@@ -20,12 +21,11 @@ export default function AppointmentsPage() {
 		pagination,
 		handlePageChange,
 	} = useAppointment()
-
-	const { clientSelectionList } = useClient()
+	const { currentStudio } = useStudios()
 
 	useEffect(() => {
 		fetchAppointments()
-	}, [])
+	}, [currentStudio])
 
 	const handleStudioIsOpenModal = () => {
 		setEditingAppointment(null)
@@ -60,7 +60,6 @@ export default function AppointmentsPage() {
 
 			<AppointmentsTable
 				appointments={appointments}
-				clients={clientSelectionList}
 				onEdit={handleEditAppointments}
 				currentPage={pagination.currentPage}
 				pageSize={pagination.pageSize}
@@ -77,3 +76,4 @@ export default function AppointmentsPage() {
 		</div>
 	)
 }
+export default AppointmentsPage

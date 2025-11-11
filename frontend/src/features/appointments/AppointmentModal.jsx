@@ -15,7 +15,7 @@ import FormScrollSelect from './FormScrollSelect'
 import { formatAttributes } from './utils/formatAttributes'
 import { useAppointment } from './hooks/useAppointment'
 
-export function AppointmentModal({
+export const AppointmentModal = ({
 	isOpen,
 	onClose,
 	appointment,
@@ -24,7 +24,8 @@ export function AppointmentModal({
 	onEdit,
 	onDelete,
 	handleCreate,
-}) {
+	selectedSlot,
+}) => {
 	const [selectedService, setSelectedService] = useState(null)
 	const [serviceAttributes, setServiceAttributes] = useState([])
 
@@ -114,6 +115,21 @@ export function AppointmentModal({
 		}
 	}, [appointment, isOpen, reset, services])
 
+	useEffect(() => {
+		if (isOpen && !appointment && selectedSlot) {
+			reset({
+				customer_uuid: '',
+				master_uuid: selectedSlot.resourceId || '',
+				service: '',
+				date_time: selectedSlot.start ? selectedSlot.start.toISOString() : '',
+				duration: 60,
+				price: 0,
+				note: '',
+				attributes: [],
+			})
+		}
+	}, [isOpen, appointment, selectedSlot, reset])
+
 	const onSubmit = data => {
 		trigger()
 
@@ -160,14 +176,7 @@ export function AppointmentModal({
 					/>
 
 					<FormSelect
-						items={
-							masterSelectionList || [
-								{
-									value: '2d07e0ef-65d8-446a-b371-d97157712ec3',
-									label: 'Андрей',
-								},
-							]
-						}
+						items={masterSelectionList || []}
 						title='Мастер *'
 						placeholder='Выберите мастера'
 						name='master_uuid'

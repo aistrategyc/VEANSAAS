@@ -41,20 +41,6 @@ export const useStaff = () => {
 			})
 			.finally(() => setIsLoading(false))
 	}
-	// const getClientInfo = uuid => {
-	//     setIsLoading(true)
-
-	//     api
-	//         .get(`/customers/${uuid}`)
-	//         .then(response => {
-	//             setClientData(response.data)
-	//         })
-	//         .catch(err => {
-	//             console.error('Error fetching studios:', err)
-	//         })
-	//         .finally(() => setIsLoading(false))
-	// }
-
 	const createInvite = (currentStudioUuid, data) => {
 		setIsLoading(true)
 
@@ -69,20 +55,6 @@ export const useStaff = () => {
 			})
 			.finally(() => setIsLoading(false))
 	}
-
-	// const getClientSelectionList = () => {
-	//     setIsLoading(true)
-
-	//     api
-	//         .get(`/customers/selection`)
-	//         .then(response => {
-	//             setClientSelectionList(response.data.items)
-	//         })
-	//         .catch(err => {
-	//             console.error('Error fetching studios:', err)
-	//         })
-	//         .finally(() => setIsLoading(false))
-	// }
 
 	const handlePageChange = (page, pageSize = pagination.pageSize) => {
 		fetchStaff({ page, pageSize })

@@ -24,7 +24,7 @@ export function CalendarView({
 }) {
 	const [draggedEvent, setDraggedEvent] = useState(null)
 
-	const handleSlotClick = (date, hour, resourceId) => {
+	const handleSlotClick = (date, hour, resourceId = null) => {
 		const start = new Date(date)
 		start.setHours(hour, 0, 0, 0)
 		const end = new Date(start)
@@ -71,7 +71,7 @@ export function CalendarView({
 												{slotEvents.map(event => (
 													<div
 														key={event.id}
-														className='text-xs p-1 rounded cursor-pointer hover:opacity-80'
+														className='text-xs p-2 rounded cursor-pointer hover:opacity-80 mb-1'
 														style={{
 															backgroundColor: event.color + '20',
 															borderLeft: `3px solid ${event.color}`,
@@ -81,7 +81,14 @@ export function CalendarView({
 															onEventClick(event)
 														}}
 													>
-														{event.title}
+														<div className='font-medium'>{event.time}</div>
+														<div className='font-semibold'>{event.title}</div>
+														<div className='text-muted-foreground'>
+															{event.price}
+														</div>
+														<div className='text-xs opacity-70'>
+															{event.masterName}
+														</div>
 													</div>
 												))}
 											</div>
@@ -155,7 +162,16 @@ export function CalendarView({
 														onEventClick(event)
 													}}
 												>
-													{event.title}
+													<div className='font-medium'>{event.time}</div>
+													<div className='font-semibold truncate'>
+														{event.title}
+													</div>
+													<div className='text-muted-foreground'>
+														{event.price}
+													</div>
+													<div className='text-xs opacity-70'>
+														{event.masterName}
+													</div>
 												</div>
 											))}
 										</div>
@@ -232,11 +248,27 @@ export function CalendarView({
 												{event.title}
 											</div>
 										))}
-										{dayEvents.length > 3 && (
-											<div className='text-xs text-muted-foreground'>
-												+{dayEvents.length - 3} еще
+										{dayEvents.slice(0, 3).map(event => (
+											<div
+												key={event.id}
+												className='text-xs p-1 rounded cursor-pointer hover:opacity-80 truncate'
+												style={{
+													backgroundColor: event.color + '20',
+													borderLeft: `2px solid ${event.color}`,
+												}}
+												onClick={e => {
+													e.stopPropagation()
+													onEventClick(event)
+												}}
+											>
+												<div className='font-semibold truncate'>
+													{event.time} {event.title}
+												</div>
+												<div className='text-muted-foreground truncate'>
+													{event.price}
+												</div>
 											</div>
-										)}
+										))}
 									</div>
 								</div>
 							)

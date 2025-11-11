@@ -13,7 +13,7 @@ import InventoryPage from '@/pages/inventory/InventoryPage'
 import LoyaltyPage from '@/pages/loyalty/LoyaltyPage'
 import FinancesPage from '@/pages/finances/FinancesPage'
 import AnalyticsPage from '@/pages/analytics/AnalyticsPage'
-import { AuthPage } from '@/pages/auth/AuthPage'
+
 import MainPage from '@/pages/main/MainPage'
 import VerificationEmailPage from '@/pages/auth/VerificationEmailPage'
 import { RegisterSimple } from '@/pages/auth/RegisterSimple'
@@ -26,13 +26,19 @@ import SchedulePage from '@/pages/schedule/SchedulePage'
 
 import AppointmentDetailPage from '@/features/appointments/AppointmentDetailPage'
 import ClientDetailPage from '@/features/clients/ClientDetailPage'
+import RegisterPage from '@/features/auth/RegisterPage'
+import LoginPage from '@/features/auth/LoginPage'
 export const RouterProvider = () => {
 	const { isAuthenticated, isLoading } = useAuth()
 
 	const routes = useRoutes([
 		{
 			path: '/login',
-			element: isAuthenticated ? <Navigate to='/' replace /> : <AuthPage />,
+			element: isAuthenticated ? <Navigate to='/' replace /> : <LoginPage />,
+		},
+		{
+			path: '/register',
+			element: isAuthenticated ? <Navigate to='/' replace /> : <RegisterPage />,
 		},
 		{
 			path: '/*',
@@ -53,8 +59,15 @@ export const RouterProvider = () => {
 						{ path: ':uuid', element: <ClientDetailPage /> },
 					],
 				},
+
+				{
+					path: 'appointments',
+					children: [
+						{ index: true, element: <AppointmentsPage /> },
+						{ path: ':uuid', element: <AppointmentDetailPage /> },
+					],
+				},
 				{ path: 'calendar', element: <CalendarPage /> },
-				{ path: 'records', element: <AppointmentsPage /> },
 				{ path: 'staff', element: <StaffPage /> },
 				{ path: 'services', element: <ServicesPage /> },
 				{ path: 'studios', element: <StudiosPage /> },
@@ -67,7 +80,6 @@ export const RouterProvider = () => {
 				{ path: 'locations', element: <LocationsPage /> },
 				{ path: 'schedule', element: <SchedulePage /> },
 				{ path: 'compatibility', element: <CompatibilityPage /> },
-				{ path: 'records/1', element: <AppointmentDetailPage /> },
 
 				{ path: '*', element: <Navigate to='/' replace /> },
 			],

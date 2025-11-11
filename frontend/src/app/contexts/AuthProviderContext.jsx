@@ -9,14 +9,13 @@ import { useUser } from '@/shared/hooks/useUser'
 import { useDispatch } from 'react-redux'
 import { parseJwt } from '@/shared/helper/jwt-helpers'
 import { setRoles, clearRoles } from '@/shared/slices/rolesSlice'
-import { clearCurrentStudio } from '@/shared/slices/studiosSlice'
 
 export const AuthProvider = ({ children }) => {
 	const [isAuthenticated, setIsAuthenticated] = useState(false)
 	const [isLoading, setIsLoading] = useState(true)
 	const dispatch = useDispatch()
 
-	const { fetchUser, fetchStudios } = useUser()
+	const { fetchUser} = useUser()
 
 	const setAuth = useCallback((accessToken, refreshToken) => {
 		setCookie('authToken', accessToken, 7)
@@ -36,7 +35,7 @@ export const AuthProvider = ({ children }) => {
 		deleteCookie('authToken')
 		deleteCookie('refreshToken')
 		dispatch(clearRoles())
-		dispatch(clearCurrentStudio())
+		localStorage.removeItem('currentStudioUuid')
 		setIsAuthenticated(false)
 	}, [])
 
@@ -46,7 +45,6 @@ export const AuthProvider = ({ children }) => {
 		if (token) {
 			setIsAuthenticated(true)
 			fetchUser()
-			fetchStudios()
 			const dataJwt = parseJwt(token)
 			dispatch(
 				setRoles({

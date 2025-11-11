@@ -20,7 +20,7 @@ export const CategoryList = ({ categories, onEdit }) => {
 			</Card>
 		)
 	}
-
+	console.log(categories)
 	return (
 		<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
 			{categories.items?.map(category => {

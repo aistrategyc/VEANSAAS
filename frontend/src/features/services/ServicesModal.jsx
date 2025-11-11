@@ -31,7 +31,7 @@ const ServiceModal = ({
 			description: '',
 			base_price: 0,
 			is_active: true,
-			category_uuid: '',
+			category: {},
 		},
 	})
 
@@ -49,7 +49,7 @@ const ServiceModal = ({
 					description: service.description || '',
 					base_price: service.base_price,
 					is_active: service.is_active,
-					category_uuid: service.category.uuid,
+					category: { uuid: service.category.uuid },
 				})
 			} else {
 				reset({
@@ -57,7 +57,7 @@ const ServiceModal = ({
 					description: '',
 					base_price: 0,
 					is_active: true,
-					category_uuid: '',
+					category: { uuid: '' },
 				})
 			}
 		}
@@ -67,7 +67,11 @@ const ServiceModal = ({
 		if (service) {
 			onEdit(service, data)
 		} else {
-			onSave(data)
+			const serviceData = {
+				...data,
+				category_uuid: data.category.uuid,
+			}
+			onSave(serviceData)
 		}
 	}
 
@@ -96,9 +100,10 @@ const ServiceModal = ({
 						items={transformToValueLabel(categories.data.selections)}
 						title='Категория *'
 						placeholder={'Выберите категорию'}
-						name='category_uuid'
+						name='category'
 						control={control}
-						error={errors.category_uuid?.message}
+						returnObject
+						error={errors.category?.message}
 					/>
 					<FormInput
 						title='Описание'

@@ -43,7 +43,7 @@ const FormSelect = ({
 		: value || ''
 
 	return (
-		<div className='space-y-2'>
+		<div className='space-y-2 mt-2 mb-4'>
 			<div className='flex items-center'>
 				<Label>{title}</Label>
 				<p className='text-red-500 text-sm h-5 ml-2'>{error}</p>

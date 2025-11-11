@@ -9,27 +9,12 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import {
-	MoreHorizontal,
-	Edit,
-	Trash2,
-	Calendar,
-	Clock,
-	DollarSign,
-	FileText,
-} from 'lucide-react'
+
+import { Edit, Trash2, Calendar, Clock, DollarSign } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Link } from 'react-router'
 import { Pagination } from '@/shared/ui/Pagination'
 
-// Вспомогательные функции для форматирования
 const formatDateTime = dateString => {
 	if (!dateString) return '—'
 	try {
@@ -44,40 +29,6 @@ const formatDateTime = dateString => {
 	} catch {
 		return '—'
 	}
-}
-
-const formatDuration = minutes => {
-	if (!minutes) return '—'
-	const hours = Math.floor(minutes / 60)
-	const mins = minutes % 60
-
-	if (hours > 0) {
-		return `${hours}ч ${mins}м`
-	}
-	return `${mins}мин`
-}
-
-const formatPrice = price => {
-	if (!price && price !== 0) return '—'
-
-	// Если price - объект, берем числовое значение
-	const numericPrice =
-		typeof price === 'object' ? price.value || price.amount || 0 : price
-
-	return new Intl.NumberFormat('ru-RU', {
-		style: 'currency',
-		currency: 'RUB',
-	}).format(numericPrice)
-}
-
-const getInitials = name => {
-	if (!name || typeof name !== 'string') return '?'
-	return name
-		.split(' ')
-		.map(part => part.charAt(0))
-		.join('')
-		.toUpperCase()
-		.slice(0, 2)
 }
 
 const getStatusVariant = status => {
@@ -108,24 +59,13 @@ const getStatusText = status => {
 	}
 }
 
-// Функция для безопасного извлечения строки из объекта
-const safeString = (value, defaultValue = '') => {
-	if (typeof value === 'string') return value
-	if (typeof value === 'object' && value !== null) {
-		return value.name || value.title || value.value || defaultValue
-	}
-	return defaultValue
-}
-
-export function AppointmentsTable({
+export const AppointmentsTable = ({
 	appointments,
-	onEdit,
-	onDelete,
 	currentPage = 1,
 	pageSize = 10,
 	totalCount = 20,
 	onPageChange,
-}) {
+}) => {
 	const totalPages = Math.ceil(totalCount / pageSize)
 	const startItem = (currentPage - 1) * pageSize + 1
 	const endItem = Math.min(currentPage * pageSize, totalCount)
@@ -160,12 +100,12 @@ export function AppointmentsTable({
 						<TableHeader>
 							<TableRow>
 								<TableHead className='w-[180px]'>Дата и время</TableHead>
-								<TableHead className='w-[200px]'>Клиент</TableHead>
+								<TableHead className='w-[100px]'>Клиент</TableHead>
+								<TableHead className='w-[100px]'>Мастер</TableHead>
 								<TableHead className='w-[150px]'>Услуга</TableHead>
 								<TableHead className='w-[100px]'>Длительность</TableHead>
 								<TableHead className='w-[120px]'>Стоимость</TableHead>
 								<TableHead className='w-[120px]'>Статус</TableHead>
-								<TableHead className='w-[80px]'>Действия</TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>
@@ -176,23 +116,28 @@ export function AppointmentsTable({
 										className='group hover:bg-muted/50'
 									>
 										<TableCell>
-											<div className='flex items-center space-x-2 min-w-[140px]'>
-												<Calendar className='h-4 w-4 text-muted-foreground flex-shrink-0' />
-												<div className='flex flex-col'>
-													<span className='font-medium text-sm whitespace-nowrap'>
-														{formatDateTime(appointment.date_time)}
-													</span>
-													<span className='text-xs text-muted-foreground'>
-														{appointment.date_time
-															? new Date(
-																	appointment.date_time
-															  ).toLocaleDateString('ru-RU', {
-																	weekday: 'short',
-															  })
-															: ''}
-													</span>
+											<Link
+												to={`/appointments/${appointment.uuid}`}
+												className='hover:no-underline'
+											>
+												<div className='flex items-center space-x-2 min-w-[140px]'>
+													<Calendar className='h-4 w-4 text-muted-foreground flex-shrink-0' />
+													<div className='flex flex-col'>
+														<span className='font-medium text-sm whitespace-nowrap'>
+															{formatDateTime(appointment.date_time)}
+														</span>
+														<span className='text-xs text-muted-foreground'>
+															{appointment.date_time
+																? new Date(
+																		appointment.date_time
+																  ).toLocaleDateString('ru-RU', {
+																		weekday: 'short',
+																  })
+																: ''}
+														</span>
+													</div>
 												</div>
-											</div>
+											</Link>
 										</TableCell>
 
 										<TableCell>
@@ -209,11 +154,26 @@ export function AppointmentsTable({
 												</div>
 											</Link>
 										</TableCell>
+										<TableCell>
+											<Link
+												to={`/master/${appointment.master_uuid}`}
+												className='hover:no-underline'
+											>
+												<div className='flex items-center space-x-3'>
+													<div className='min-w-0 flex-1'>
+														<p className='font-medium text-sm truncate'>
+															{appointment.master?.first_name}{' '}
+															{appointment.master?.last_name}
+														</p>
+													</div>
+												</div>
+											</Link>
+										</TableCell>
 
 										<TableCell>
 											<div className='space-y-1'>
 												<p className='font-medium text-sm leading-none'>
-													{appointment.service_uuid}
+													{appointment.service?.name}
 												</p>
 											</div>
 										</TableCell>
@@ -246,33 +206,6 @@ export function AppointmentsTable({
 											>
 												{getStatusText(appointment.status)}
 											</Badge>
-										</TableCell>
-
-										<TableCell>
-											<DropdownMenu>
-												<DropdownMenuContent align='end' className='w-48'>
-													<DropdownMenuItem
-														onClick={() => onEdit(appointment)}
-														className='cursor-pointer'
-													>
-														<Edit className='mr-2 h-4 w-4' />
-														Редактировать
-													</DropdownMenuItem>
-													{appointment.note && (
-														<DropdownMenuItem className='cursor-pointer'>
-															<FileText className='mr-2 h-4 w-4' />
-															Примечание
-														</DropdownMenuItem>
-													)}
-													<DropdownMenuItem
-														onClick={() => onDelete(appointment.uuid)}
-														className='cursor-pointer text-destructive focus:text-destructive'
-													>
-														<Trash2 className='mr-2 h-4 w-4' />
-														Удалить
-													</DropdownMenuItem>
-												</DropdownMenuContent>
-											</DropdownMenu>
 										</TableCell>
 									</TableRow>
 								)

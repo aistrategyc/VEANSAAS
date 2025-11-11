@@ -13,6 +13,8 @@ import { Bell, Plus, Settings, Menu, User, X } from 'lucide-react'
 import { useState } from 'react'
 import NotificationDropdown from '../notification/NotificationDropdown'
 import ChangeStudio from './ChangeStudio'
+import useStudios from '../studios/model/api'
+import { useAuth } from '@/shared/hooks/useAuth'
 
 export const TopHeader = () => {
 	const user = {
@@ -26,10 +28,11 @@ export const TopHeader = () => {
 		updatedAt: '2024-01-01T00:00:00Z',
 	}
 	const [isMenuOpen, setIsMenuOpen] = useState(false)
+	const { currentStudio } = useStudios()
+	const { logout } = useAuth()
 
 	return (
 		<header className='flex flex-wrap items-center justify-between p-4 border-b border-border bg-card/50 backdrop-blur-sm'>
-			{/* Логотип и основные кнопки */}
 			<div className='flex items-center gap-2'>
 				<Button
 					variant='ghost'
@@ -44,19 +47,12 @@ export const TopHeader = () => {
 					)}
 				</Button>
 
-				<h1 className='text-xl font-bold text-foreground md:text-2xl'>DAO1</h1>
+				<h1 className='text-xl font-bold text-foreground md:text-2xl'>
+					{currentStudio?.name}
+				</h1>
 				<ChangeStudio />
 			</div>
-
-			{/* Десктопное меню */}
 			<div className='hidden md:flex items-center gap-4'>
-				<div className='flex items-center gap-2'>
-					<div className='flex -space-x-2'>
-						<div className='w-8 h-8 bg-primary rounded-full border-2 border-background'></div>
-						<div className='w-8 h-8 bg-secondary rounded-full border-2 border-background'></div>
-						<div className='w-8 h-8 bg-accent rounded-full border-2 border-background'></div>
-					</div>
-				</div>
 				<ThemeToggle />
 				<NotificationDropdown />
 				<div className='w-8 h-8 bg-primary rounded-full'>
@@ -98,7 +94,7 @@ export const TopHeader = () => {
 								<span>Настройки</span>
 							</DropdownMenuItem>
 							<DropdownMenuSeparator />
-							<DropdownMenuItem>
+							<DropdownMenuItem onClick={() => logout()}>
 								<span>Выйти</span>
 							</DropdownMenuItem>
 						</DropdownMenuContent>

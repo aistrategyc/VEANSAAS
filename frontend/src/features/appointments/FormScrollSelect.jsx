@@ -12,6 +12,8 @@ import {
 import { Input } from '@/components/ui/input'
 import { Loader2 } from 'lucide-react'
 import api from '@/shared/api/client'
+import { FormInput } from '@/shared/ui/input/FormInput'
+import { PhoneInput } from '@/components/ui/phone-input'
 
 const FormScrollSelect = ({
 	name,
@@ -41,7 +43,7 @@ const FormScrollSelect = ({
 	const searchTimeout = useRef(null)
 
 	const fetchItems = useCallback(
-		async (reset = false, email = search) => {
+		async (reset = false) => {
 			if (isLoading || (!hasMore && !reset)) return
 			setIsLoading(true)
 
@@ -51,7 +53,7 @@ const FormScrollSelect = ({
 					params: {
 						limit,
 						offset: reset ? 0 : offset,
-						email: email || undefined,
+						phone_number: search || undefined,
 					},
 				})
 
@@ -81,8 +83,7 @@ const FormScrollSelect = ({
 		}
 	}
 	const handleSearchChange = e => {
-		const value = e.target.value
-		setSearch(value)
+		setSearch(e)
 
 		clearTimeout(searchTimeout.current)
 		searchTimeout.current = setTimeout(() => {
@@ -114,17 +115,20 @@ const FormScrollSelect = ({
 					onScrollCapture={handleScroll}
 				>
 					<div className='p-2'>
-						<Input
-							placeholder='Поиск по email...'
+						<PhoneInput
+							international
+							defaultCountry='PL'
+							placeholder={placeholder || 'Введите номер телефона'}
 							value={search}
 							onChange={handleSearchChange}
+							className='w-full'
 						/>
 					</div>
 
 					<SelectGroup>
 						{items.map(item => (
 							<SelectItem key={item.uuid} value={item.uuid}>
-								{formatLabel(item)} — {item.email}
+								{formatLabel(item)} — {item.phone_number}
 							</SelectItem>
 						))}
 

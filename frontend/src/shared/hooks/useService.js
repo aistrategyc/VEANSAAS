@@ -10,6 +10,7 @@ import {
 	createAttribute,
 	deleteAttribute,
 	fetchCategories,
+	updateCategory,
 } from '../slices/categoriesSlice'
 import api from '@/shared/api/client'
 
@@ -89,6 +90,8 @@ export const useCategories = () => {
 		error,
 		fetch,
 		fetchSelections,
+		update: (uuid, data) =>
+			dispatch(updateCategory({ uuid, categoryData: data })),
 		createAttribute: createAttributeAction,
 		deleteAttribute: deleteAttributeAction,
 	}
