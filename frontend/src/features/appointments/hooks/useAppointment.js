@@ -4,16 +4,37 @@ import api from '@/shared/api/client'
 export const useAppointment = () => {
 	const [isLoading, setIsLoading] = useState(false)
 	const [appointments, setAppointments] = useState([])
-	const [clientData, setClientData] = useState({})
+	const [appointmentData, setAppointmentData] = useState({})
 	const [servicesSelectionList, setServicesSelectionList] = useState([])
+	const [masterSelectionList, setMasterSelectionList] = useState([])
+	const [pagination, setPagination] = useState({
+		currentPage: 1,
+		pageSize: 10,
+		totalCount: 0,
+		hasMore: false,
+	})
 
 	const fetchAppointments = (params = {}) => {
 		setIsLoading(true)
+		const apiParams = {
+			offset: ((params.page || 1) - 1) * (params.pageSize || 10),
+			limit: params.pageSize || 10,
+			...params,
+		}
+		delete apiParams.page
+		delete apiParams.pageSize
 
 		api
-			.get('/appointments', { params })
+			.get('/appointments', { params: apiParams })
 			.then(response => {
 				setAppointments(response.data.items)
+				setPagination(prev => ({
+					...prev,
+					currentPage: params.page || 1,
+					pageSize: params.pageSize || prev.pageSize,
+					totalCount: response.data.pagination.count,
+					hasMore: response.data.pagination.has_more,
+				}))
 			})
 			.catch(err => {
 				console.error('Error fetching studios:', err)
@@ -26,7 +47,7 @@ export const useAppointment = () => {
 		api
 			.get(`/appointments/${uuid}`)
 			.then(response => {
-				setClientData(response.data)
+				setAppointmentData(response.data)
 			})
 			.catch(err => {
 				console.error('Error fetching studios:', err)
@@ -41,13 +62,17 @@ export const useAppointment = () => {
 			.post('/appointments', data)
 			.then(response => {
 				setAppointments(prev => [...prev, response.data])
+				setPagination(prev => ({
+					...prev,
+					totalCount: prev.totalCount + 1,
+				}))
+				toastSuccess('Запись создана')
 				return response.data
 			})
-			.catch(err => {
-				console.error('Error creating studio:', err)
-			})
+			.catch(err => {})
 			.finally(() => setIsLoading(false))
 	}
+	
 
 	const getServicesSelectionList = () => {
 		setIsLoading(true)
@@ -62,16 +87,36 @@ export const useAppointment = () => {
 			})
 			.finally(() => setIsLoading(false))
 	}
+	const getMasterSelectionList = () => {
+		setIsLoading(true)
+
+		return api
+			.get('/users/selection-masters')
+			.then(response => {
+				setMasterSelectionList(response.data)
+			})
+			.catch(err => {
+				console.error('Error creating studio:', err)
+			})
+			.finally(() => setIsLoading(false))
+	}
+	const handlePageChange = (page, pageSize = pagination.pageSize) => {
+		fetchAppointments({ page, pageSize })
+	}
 
 	return {
 		appointments,
-		clientData,
+		appointmentData,
 		isLoading,
 		servicesSelectionList,
+		masterSelectionList,
+		pagination,
 
 		fetchAppointments,
 		createAppointment,
 		getAppointmentInfo,
 		getServicesSelectionList,
+		getMasterSelectionList,
+		handlePageChange,
 	}
 }

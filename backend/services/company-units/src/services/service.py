@@ -2,7 +2,7 @@ from typing import List
 from uuid import UUID
 
 from fastapi import HTTPException, Request, Response, status
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload, selectinload
 
@@ -19,10 +19,15 @@ from shared.schemas.company_units.service import (
     CategoryAttributeCreate,
     CategoryAttributeUpdate,
     ServiceCategoryCreate,
+    ServiceCategoryDetailListResponse,
+    ServiceCategoryDetailResponse,
     ServiceCategoryUpdate,
     ServiceCreate,
     ServiceUpdate,
+    ServiceWithCategoryListResponse,
+    ServiceWithCategoryResponse,
 )
+from shared.schemas.mixins import PaginationResponse
 from shared.utils import update_model_from_dict
 
 
@@ -76,8 +81,10 @@ async def crete_category(
     return db_service_category_with_relations
 
 
-async def get_list_categories(request: Request, db: AsyncSession, auth: AuthContext):
-    result = await db.execute(
+async def get_list_categories(
+    request: Request, offset: int, limit: int, db: AsyncSession, auth: AuthContext
+):
+    query = (
         select(ServiceCategory)
         .where(ServiceCategory.organization_uuid == auth.organization_uuid)
         .options(
@@ -86,8 +93,30 @@ async def get_list_categories(request: Request, db: AsyncSession, auth: AuthCont
             )
         )
     )
-    db_service_category = result.scalars().all()
-    return db_service_category
+
+    count_query = (
+        select(func.count())
+        .where(ServiceCategory.organization_uuid == auth.organization_uuid)
+        .select_from(ServiceCategory)
+    )
+
+    query_result = await db.execute(query.offset(offset).limit(limit))
+
+    db_service_category = query_result.scalars().all()
+    total_count = await db.scalar(count_query) or 0
+
+    return ServiceCategoryDetailListResponse(
+        items=[
+            ServiceCategoryDetailResponse.model_validate(category)
+            for category in db_service_category
+        ],
+        pagination=PaginationResponse(
+            count=total_count,
+            offset=offset,
+            limit=limit,
+            has_more=(offset + limit) < total_count,
+        ),
+    )
 
 
 async def update_category(
@@ -136,12 +165,36 @@ async def create_service(
     return db_service
 
 
-async def get_list_services(request: Request, db: AsyncSession, auth: AuthContext):
-    result = await db.execute(
-        select(Service).where(Service.organization_uuid == auth.organization_uuid)
+async def get_list_services(
+    request: Request, offset: int, limit: int, db: AsyncSession, auth: AuthContext
+):
+    query = (
+        select(Service)
+        .where(Service.organization_uuid == auth.organization_uuid)
+        .options(selectinload(Service.category))
     )
-    db_service = result.scalars().all()
-    return db_service
+
+    count_query = (
+        select(func.count())
+        .where(Service.organization_uuid == auth.organization_uuid)
+        .select_from(Service)
+    )
+    query_result = await db.execute(query.offset(offset).limit(limit))
+    db_services = query_result.scalars().all()
+    total_count = await db.scalar(count_query) or 0
+
+    return ServiceWithCategoryListResponse(
+        items=[
+            ServiceWithCategoryResponse.model_validate(service)
+            for service in db_services
+        ],
+        pagination=PaginationResponse(
+            count=total_count,
+            offset=offset,
+            limit=limit,
+            has_more=(offset + limit) < total_count,
+        ),
+    )
 
 
 async def get_service(
@@ -231,13 +284,23 @@ async def delete_category(
 async def crete_attribute(
     request: Request, data: CategoryAttributeCreate, db: AsyncSession, auth: AuthContext
 ):
-    attribute_data = data.model_dump()
     db_attribute = CategoryAttribute(
-        **attribute_data,
+        **data.model_dump(exclude={'options'}),
         organization_uuid=auth.organization_uuid,
     )
     db.add(db_attribute)
+    db_attribute_options = []
+    if data.options:
+        await db.flush()
+        for data_options in data.options:
+            db_attribute_option = AttributeOption(
+                **data_options.model_dump(),
+                attribute_uuid=db_attribute.uuid,
+                organization_uuid=auth.organization_uuid,
+            )
+            db_attribute_options.append(db_attribute_option)
 
+    db.add_all(db_attribute_options)
     await db.commit()
     return db_attribute
 
@@ -379,3 +442,15 @@ async def get_list_services_detail(
     )
     db_service = result.scalars().all()
     return db_service
+
+
+async def get_categories_selection(
+    request: Request, db: AsyncSession, auth: AuthContext
+):
+    result = await db.execute(
+        select(ServiceCategory).where(
+            ServiceCategory.organization_uuid == auth.organization_uuid
+        )
+    )
+    db_categories = result.scalars().all()
+    return db_categories

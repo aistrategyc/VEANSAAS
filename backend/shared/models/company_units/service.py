@@ -104,6 +104,9 @@ class Service(Base):
         lazy='noload',
         cascade='all, delete',
     )
+    appointments: Mapped[List['Appointment']] = relationship(
+        back_populates='service', lazy='noload', foreign_keys='Appointment.service_uuid'
+    )
     name: Mapped[str] = mapped_column(String(255))
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     base_price: Mapped[Decimal] = mapped_column(Numeric(10, 2), server_default='0.00')

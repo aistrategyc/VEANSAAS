@@ -12,9 +12,7 @@ export const PermissionGuard = ({
 	const permissionsConfig = useSelector(
 		state => state.rootReducer.roles.permissions
 	)
-	const currentStudio = useSelector(
-		state => state.rootReducer.studios.currentStudio?.uuid
-	)
+	const currentStudio = localStorage.getItem('currentStudioUuid')
 
 	const getUserRoles = () => {
 		if (scope === 'studio' && currentStudio) {

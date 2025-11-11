@@ -1,9 +1,15 @@
-from shared.models.mixins import created_at, updated_at, uuid_primary_key
+from typing import List
+
 from sqlalchemy import Boolean, String, true
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from shared.database import Base
-from shared.models.mixins import PhoneNumberMixin
+from shared.models.mixins import (
+    PhoneNumberMixin,
+    created_at,
+    updated_at,
+    uuid_primary_key,
+)
 
 
 class User(Base, PhoneNumberMixin):
@@ -23,18 +29,22 @@ class User(Base, PhoneNumberMixin):
     is_active: Mapped[bool] = mapped_column(Boolean, server_default=true())
     is_verified: Mapped[bool] = mapped_column(Boolean, server_default=true())
     hashed_password: Mapped[str] = mapped_column(String(255))
-    studio_memberships: Mapped[list['StudioMember']] = relationship(
+    studio_memberships: Mapped[List['StudioMember']] = relationship(
         back_populates='user',
         lazy='noload',
         foreign_keys='StudioMember.user_uuid',
         cascade='all, delete',
     )
-    organization_memberships: Mapped[list['OrganizationMember']] = relationship(
+    organization_memberships: Mapped[List['OrganizationMember']] = relationship(
         back_populates='user',
         lazy='noload',
         foreign_keys='OrganizationMember.user_uuid',
-        passive_deletes=True,
         cascade='all, delete',
+    )
+    appointments: Mapped[List['Appointment']] = relationship(
+        back_populates='master',
+        lazy='noload',
+        foreign_keys='Appointment.master_uuid',
     )
     created_at: Mapped[created_at]
     updated_at: Mapped[updated_at]

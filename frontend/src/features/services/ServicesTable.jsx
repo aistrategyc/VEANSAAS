@@ -9,6 +9,7 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table'
+
 import {
 	Card,
 	CardContent,
@@ -16,17 +17,19 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card'
+import { Pagination } from '@/shared/ui/Pagination'
 
-export function ServicesTable({ services, categories, onEdit, onDelete }) {
-	const currentUser = 'Admin'
-	const canEdit = currentUser === 'Admin' || currentUser === 'MasterOwner'
-	const canDelete = currentUser === 'Admin' || currentUser === 'MasterOwner'
-
-	const getCategoryByUuid = categoryUuid => {
-		return categories.find(c => c.uuid === categoryUuid)
-	}
-
-	if (services.length === 0) {
+const ServicesTable = ({
+	services,
+	currentPage,
+	pageSize,
+	onPageChange,
+	onEdit,
+	onDelete,
+}) => {
+	const totalCount = services?.pagination.count
+	const totalPages = Math.ceil(totalCount / pageSize)
+	if (services?.items.length === 0) {
 		return (
 			<Card>
 				<CardHeader>
@@ -44,7 +47,7 @@ export function ServicesTable({ services, categories, onEdit, onDelete }) {
 			<CardHeader className='pb-3'>
 				<CardTitle className='text-xl'>Услуги</CardTitle>
 				<CardDescription>
-					Список всех услуг салона ({services.length})
+					Список всех услуг салона ({services?.pagination.count})
 				</CardDescription>
 			</CardHeader>
 			<CardContent className='p-0'>
@@ -56,7 +59,7 @@ export function ServicesTable({ services, categories, onEdit, onDelete }) {
 								<TableHead>Категория</TableHead>
 								<TableHead>Цена</TableHead>
 								<TableHead>Статус</TableHead>
-								{(canEdit || canDelete) && (
+								{(true || true) && (
 									<TableHead className='w-[120px] text-right pr-6'>
 										Действия
 									</TableHead>
@@ -64,8 +67,7 @@ export function ServicesTable({ services, categories, onEdit, onDelete }) {
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{services.map(service => {
-								const category = getCategoryByUuid(service.category_uuid)
+							{services?.items.map(service => {
 								return (
 									<TableRow
 										key={service.uuid}
@@ -84,16 +86,14 @@ export function ServicesTable({ services, categories, onEdit, onDelete }) {
 											</div>
 										</TableCell>
 										<TableCell>
-											{category ? (
+											{service.category ? (
 												<div className='flex items-center space-x-2'>
-													{category.color && (
-														<div
-															className='w-3 h-3 rounded-full flex-shrink-0'
-															style={{ backgroundColor: category.color }}
-														/>
-													)}
+													<div
+														className='w-3 h-3 rounded-full flex-shrink-0'
+														style={{ backgroundColor: 'orange' }}
+													/>
 													<span className='text-sm font-medium'>
-														{category.name}
+														{service.category.name}
 													</span>
 												</div>
 											) : (
@@ -107,11 +107,6 @@ export function ServicesTable({ services, categories, onEdit, onDelete }) {
 												<span className='font-semibold text-base'>
 													{service.base_price} $
 												</span>
-												{parseFloat(service.base_price) === 0 && (
-													<span className='text-xs text-muted-foreground'>
-														Бесплатно
-													</span>
-												)}
 											</div>
 										</TableCell>
 										<TableCell>
@@ -126,10 +121,10 @@ export function ServicesTable({ services, categories, onEdit, onDelete }) {
 												{service.is_active ? 'Активна' : 'Неактивна'}
 											</Badge>
 										</TableCell>
-										{(canEdit || canDelete) && (
+										{true && (
 											<TableCell>
 												<div className='flex items-center justify-end space-x-1 pr-2'>
-													{canEdit && (
+													{true && (
 														<Button
 															variant='ghost'
 															size='sm'
@@ -140,7 +135,7 @@ export function ServicesTable({ services, categories, onEdit, onDelete }) {
 															<span className='sr-only'>Редактировать</span>
 														</Button>
 													)}
-													{canDelete && (
+													{true && (
 														<Button
 															variant='ghost'
 															size='sm'
@@ -160,7 +155,17 @@ export function ServicesTable({ services, categories, onEdit, onDelete }) {
 						</TableBody>
 					</Table>
 				</div>
+				{totalPages > 1 && (
+					<Pagination
+						currentPage={currentPage}
+						totalCount={totalCount}
+						pageSize={pageSize}
+						onPageChange={onPageChange}
+					/>
+				)}
 			</CardContent>
 		</Card>
 	)
 }
+
+export default ServicesTable

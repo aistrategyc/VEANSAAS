@@ -17,28 +17,6 @@ createRoot(document.getElementById('root')).render(
 				</AuthProvider>
 			</ThemeProvider>
 			<Toaster
-				position='top-right'
-				toastOptions={{
-					duration: 5000,
-					style: {
-						background: '#363636',
-						color: '#fff',
-					},
-					success: {
-						duration: 3000,
-						theme: {
-							primary: 'green',
-							secondary: 'black',
-						},
-					},
-					error: {
-						duration: 6000,
-						style: {
-							background: '#f44336',
-							color: '#fff',
-						},
-					},
-				}}
 			/>
 		</Provider>
 	</BrowserRouter>

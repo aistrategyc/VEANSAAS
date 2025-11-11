@@ -1,5 +1,6 @@
-import { useEffect, useState, useCallback } from 'react'
-import { useForm, useFieldArray } from 'react-hook-form'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
 import { Button } from '@/components/ui/button'
 import { Form } from '@/shared/ui/form/Form'
 import { Trash2 } from 'lucide-react'
@@ -8,33 +9,41 @@ import FormSelect from '@/shared/ui/select/Select'
 import { DialogWrapper } from '@/widgets/wrapper/DialogWrapper'
 import { DateTimePicker } from '@/shared/ui/DateTimePicker'
 
-export function AppointmentModal({
+import { FormServiceAttributes } from './FormServiceAttributes'
+import { createAppointmentSchema } from './utils/validationSchemas'
+import FormScrollSelect from './FormScrollSelect'
+import { formatAttributes } from './utils/formatAttributes'
+import { useAppointment } from './hooks/useAppointment'
+
+export const AppointmentModal = ({
 	isOpen,
 	onClose,
 	appointment,
-	customers,
 	masters,
 	services,
 	onEdit,
 	onDelete,
 	handleCreate,
-}) {
+	selectedSlot,
+}) => {
 	const [selectedService, setSelectedService] = useState(null)
 	const [serviceAttributes, setServiceAttributes] = useState([])
 
 	const {
 		control,
 		handleSubmit,
-		formState: { errors },
+		formState: { errors, isValid },
 		reset,
 		watch,
 		setValue,
+		trigger,
 	} = useForm({
 		mode: 'onChange',
+		resolver: yupResolver(createAppointmentSchema(serviceAttributes)),
 		defaultValues: {
 			customer_uuid: '',
 			master_uuid: '',
-			service_uuid: '',
+			service: '',
 			date_time: '',
 			duration: 0,
 			price: 0,
@@ -43,43 +52,35 @@ export function AppointmentModal({
 		},
 	})
 
-	const { fields, replace } = useFieldArray({
-		control,
-		name: 'attributes',
-	})
+	const watchService = watch('service')
 
-	// Следим за изменением выбранной услуги
-	const watchServiceUuid = watch('service_uuid')
+	const {
+		servicesSelectionList,
+		getServicesSelectionList,
+		getMasterSelectionList,
+		masterSelectionList,
+	} = useAppointment()
 
-	// Обработчик изменения услуги
 	useEffect(() => {
-		if (watchServiceUuid) {
-			const service = services?.find(s => s.uuid === watchServiceUuid)
-			setSelectedService(service)
-			const attributes = service?.category?.attributes || []
-			setServiceAttributes(attributes)
+		if (isOpen) {
+			getServicesSelectionList()
+			getMasterSelectionList()
+		}
+	}, [isOpen])
 
-			// Создаем начальную структуру для атрибутов
-			const initialAttributes = attributes.map(attribute => ({
-				attribute_uuid: attribute.uuid,
-				value: attribute.type === 'boolean' ? 'false' : '',
-				option_uuid: '',
-			}))
-
-			replace(initialAttributes)
-
-			// Устанавливаем базовую цену если она есть
-			if (service?.base_price) {
-				setValue('price', parseFloat(service.base_price))
+	useEffect(() => {
+		if (watchService) {
+			setSelectedService(watchService)
+			setServiceAttributes(watchService.category?.attributes || [])
+			if (watchService.base_price) {
+				setValue('price', parseFloat(watchService.base_price))
 			}
 		} else {
 			setSelectedService(null)
 			setServiceAttributes([])
-			replace([])
 		}
-	}, [watchServiceUuid, services, setValue, replace])
+	}, [watchService])
 
-	// Инициализация формы
 	useEffect(() => {
 		if (isOpen) {
 			if (appointment) {
@@ -90,7 +91,7 @@ export function AppointmentModal({
 				reset({
 					customer_uuid: appointment.customer_uuid,
 					master_uuid: appointment.master_uuid,
-					service_uuid: appointment.service_uuid,
+					service: appointment.service_uuid,
 					date_time: appointment.date_time,
 					duration: appointment.duration,
 					price: appointment.price,
@@ -103,7 +104,7 @@ export function AppointmentModal({
 				reset({
 					customer_uuid: '',
 					master_uuid: '',
-					service_uuid: '',
+					service: '',
 					date_time: '',
 					duration: 0,
 					price: 0,
@@ -114,46 +115,34 @@ export function AppointmentModal({
 		}
 	}, [appointment, isOpen, reset, services])
 
+	useEffect(() => {
+		if (isOpen && !appointment && selectedSlot) {
+			reset({
+				customer_uuid: '',
+				master_uuid: selectedSlot.resourceId || '',
+				service: '',
+				date_time: selectedSlot.start ? selectedSlot.start.toISOString() : '',
+				duration: 60,
+				price: 0,
+				note: '',
+				attributes: [],
+			})
+		}
+	}, [isOpen, appointment, selectedSlot, reset])
+
 	const onSubmit = data => {
-		console.log('Submitted data:', data)
+		trigger()
 
-		// Фильтруем пустые атрибуты (кроме обязательных)
-		const filteredAttributes = data.attributes
-			.map(attr => {
-				const attributeConfig = serviceAttributes.find(
-					a => a.uuid === attr.attribute_uuid
-				)
-
-				// Для select используем option_uuid, для остальных - value
-				if (attributeConfig?.type === 'select') {
-					return {
-						attribute_uuid: attr.attribute_uuid,
-						option_uuid: attr.option_uuid || '',
-					}
-				} else {
-					return {
-						attribute_uuid: attr.attribute_uuid,
-						value: attr.value || '',
-					}
-				}
-			})
-			.filter(attr => {
-				const attributeConfig = serviceAttributes.find(
-					a => a.uuid === attr.attribute_uuid
-				)
-				// Если атрибут обязательный, оставляем его даже если пустой
-				if (attributeConfig?.is_required) return true
-				// Для необязательных атрибутов оставляем только заполненные
-				if (attributeConfig?.type === 'select') {
-					return attr.option_uuid !== ''
-				} else {
-					return attr.value !== ''
-				}
-			})
-
+		const formattedAttributes = formatAttributes(
+			data,
+			services,
+			selectedService,
+			data.service.uuid
+		)
 		const submitData = {
 			...data,
-			attributes: filteredAttributes,
+			service_uuid: data.service?.uuid,
+			attributes: formattedAttributes,
 		}
 
 		if (appointment) {
@@ -161,89 +150,14 @@ export function AppointmentModal({
 		} else {
 			handleCreate(submitData)
 		}
+
+		onClose()
 	}
 
 	const handleDelete = () => {
 		if (appointment && onDelete) {
 			onDelete(appointment)
-		}
-	}
-
-	const renderAttributeField = (attribute, index) => {
-		const commonProps = {
-			title: attribute.name + (attribute.is_required ? ' *' : ''),
-			control: control,
-		}
-
-		switch (attribute.type) {
-			case 'text':
-				return (
-					<FormInput
-						{...commonProps}
-						placeholder={`Введите ${attribute.name.toLowerCase()}`}
-						type='text'
-						name={`attributes.${index}.value`}
-						error={errors.attributes?.[index]?.value?.message}
-					/>
-				)
-
-			case 'number':
-				return (
-					<FormInput
-						{...commonProps}
-						placeholder={`Введите ${attribute.name.toLowerCase()}`}
-						type='number'
-						name={`attributes.${index}.value`}
-						error={errors.attributes?.[index]?.value?.message}
-					/>
-				)
-
-			case 'boolean':
-				return (
-					<div className='flex items-center space-x-2'>
-						<label className='text-sm font-medium'>{attribute.name}</label>
-						<input
-							type='checkbox'
-							{...control.register(`attributes.${index}.value`)}
-							defaultValue='false'
-							onChange={e => {
-								setValue(
-									`attributes.${index}.value`,
-									e.target.checked ? 'true' : 'false'
-								)
-							}}
-							className='h-4 w-4 rounded border-gray-300'
-						/>
-					</div>
-				)
-
-			case 'select':
-				const options =
-					attribute.attribute_options?.map(option => ({
-						value: option.uuid,
-						label: option.value,
-					})) || []
-
-				return (
-					<FormSelect
-						{...commonProps}
-						items={options}
-						placeholder={`Выберите ${attribute.name.toLowerCase()}`}
-						name={`attributes.${index}.option_uuid`}
-						error={errors.attributes?.[index]?.option_uuid?.message}
-					/>
-				)
-
-			default:
-				return (
-					<FormInput
-						{...commonProps}
-						placeholder={`Введите ${attribute.name.toLowerCase()}`}
-						type='text'
-						name={`attributes.${index}.value`}
-						error={errors.attributes?.[index]?.value?.message}
-					/>
-				)
+			onClose()
 		}
 	}
 
@@ -253,61 +167,54 @@ export function AppointmentModal({
 		<DialogWrapper title={title} isOpen={isOpen} onClose={onClose}>
 			<Form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
 				<div className='space-y-4'>
-					<FormSelect
-						items={customers || []}
-						title='Клиент *'
-						placeholder={'Выберите клиента'}
+					<FormScrollSelect
 						name='customer_uuid'
 						control={control}
+						title='Клиент *'
+						placeholder='Выберите клиента'
 						error={errors.customer_uuid?.message}
 					/>
+
 					<FormSelect
-						items={
-							masters || [
-								{
-									value: '2d07e0ef-65d8-446a-b371-d97157712ec3',
-									label: 'Андрей',
-								},
-							]
-						}
+						items={masterSelectionList || []}
 						title='Мастер *'
-						placeholder={'Выберите мастера'}
+						placeholder='Выберите мастера'
 						name='master_uuid'
 						control={control}
 						error={errors.master_uuid?.message}
 					/>
+
 					<FormSelect
-						items={services || []}
+						items={servicesSelectionList || []}
 						title='Услуга *'
-						placeholder={'Выберите услугу'}
-						name='service_uuid'
+						placeholder='Выберите услугу'
+						name='service'
 						control={control}
-						error={errors.service_uuid?.message}
+						returnObject
+						error={errors.service?.message}
 					/>
 
-					{serviceAttributes.length > 0 && (
-						<div className='space-y-4 p-4 border rounded-lg'>
-							{serviceAttributes.map((attribute, index) => (
-								<div key={attribute.uuid}>
-									{/* Скрытые поля для attribute_uuid */}
-									<input
-										type='hidden'
-										{...control.register(`attributes.${index}.attribute_uuid`)}
-										value={attribute.uuid}
-									/>
-									{renderAttributeField(attribute, index)}
-								</div>
-							))}
-						</div>
-					)}
+					<FormServiceAttributes
+						service={selectedService}
+						services={servicesSelectionList}
+						control={control}
+						errors={errors}
+						setValue={setValue}
+						watch={watch}
+					/>
 
-					<DateTimePicker control={control} name='date_time' />
+					<DateTimePicker
+						control={control}
+						name='date_time'
+						error={errors.date_time?.message}
+					/>
+
 					<FormInput
-						title='Длительность (минуты)'
+						title='Длительность (минуты) *'
 						placeholder='Введите длительность услуги'
 						type='number'
-						step = {30}
-						name={'duration'}
+						step={30}
+						name='duration'
 						control={control}
 						error={errors.duration?.message}
 					/>
@@ -315,9 +222,9 @@ export function AppointmentModal({
 					<FormInput
 						title='Цена *'
 						type='number'
-						name={'price'}
+						name='price'
 						control={control}
-						step = {50}
+						step={50}
 						className='h-11'
 						error={errors.price?.message}
 					/>
@@ -326,13 +233,14 @@ export function AppointmentModal({
 						title='Примечание'
 						placeholder='Дополнительная информация...'
 						type='textarea'
-						name={'note'}
+						name='note'
 						control={control}
 						rows={3}
 						className='resize-none min-h-[80px]'
 						error={errors.note?.message}
 					/>
 				</div>
+
 				<div className='flex items-center justify-end space-x-3 pt-6'>
 					{appointment && (
 						<Button
@@ -355,7 +263,7 @@ export function AppointmentModal({
 					>
 						Отмена
 					</Button>
-					<Button type='submit' size='sm' className='px-6'>
+					<Button type='submit' size='sm' className='px-6' disabled={!isValid}>
 						{appointment ? 'Сохранить' : 'Создать'}
 					</Button>
 				</div>

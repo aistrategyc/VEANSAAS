@@ -53,8 +53,6 @@ export const AttributeForm = ({ onAppendAttribute }) => {
 	}
 
 	const onSubmit = data => {
-		console.log('Attribute data:', data)
-
 		const newAttribute = {
 			name: data.name,
 			description: data.description,
@@ -64,7 +62,6 @@ export const AttributeForm = ({ onAppendAttribute }) => {
 			options: data.options || [],
 		}
 
-		console.log('New attribute to append:', newAttribute)
 		onAppendAttribute(newAttribute)
 
 		reset({

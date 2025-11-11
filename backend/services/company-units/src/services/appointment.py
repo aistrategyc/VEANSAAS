@@ -3,6 +3,7 @@ from uuid import UUID
 from fastapi import HTTPException, Request, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from shared.dependencies import AuthContext
 from shared.enums.appointment import AppointmentStatusEnum
@@ -12,8 +13,8 @@ from shared.models.company_units.appointment import (
 )
 from shared.schemas.company_units.appointment import (
     AppointmentCreate,
+    AppointmentInfoResponse,
     AppointmentListResponse,
-    AppointmentResponse,
     AppointmentStatusCreate,
 )
 from shared.schemas.mixins import PaginationResponse
@@ -22,9 +23,13 @@ from shared.schemas.mixins import PaginationResponse
 async def list_appointments(
     request: Request, offset: int, limit: int, db: AsyncSession, auth: AuthContext
 ):
-    query = select(
-        Appointment,
-    ).filter(Appointment.studio_uuid == auth.studio_uuid)
+    query = (
+        select(
+            Appointment,
+        )
+        .where(Appointment.studio_uuid == auth.studio_uuid)
+        .options(selectinload(Appointment.master), selectinload(Appointment.service))
+    )
 
     count_query = (
         select(func.count())
@@ -40,7 +45,7 @@ async def list_appointments(
 
     return AppointmentListResponse(
         items=[
-            AppointmentResponse.model_validate(appointment)
+            AppointmentInfoResponse.model_validate(appointment)
             for appointment in db_appointments
         ],
         pagination=PaginationResponse(

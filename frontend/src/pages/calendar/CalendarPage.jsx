@@ -1,137 +1,161 @@
-import {
-	mockAppointments,
-	mockClients,
-	mockServices,
-	mockSpaces,
-	mockMasters,
-} from '@/lib/mock-data'
+import { useState, useEffect, useMemo } from 'react'
+import { useAppointment } from '@/features/appointments/hooks/useAppointment'
 import { AppointmentModal } from '@/features/appointments/AppointmentModal'
-import { CalendarView } from '@/features/calendar/CalendarView'
 import { CalendarToolbar } from '@/features/calendar/CalendarToolbar'
-import { useState } from 'react'
+import { MasterTimelineView } from '@/features/calendar/MasterTimelineView'
+import useStudios from '@/features/studios/model/api'
+import { Loader } from '@/shared/ui/loader/Loader'
+import { addDays } from 'date-fns'
+import { useNavigate } from 'react-router'
 
-export default function CalendarPage() {
-	const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false)
+const generateMasterColors = masters => {
+	const palette = [
+		'#3B82F6',
+		'#EF4444',
+		'#10B981',
+		'#F59E0B',
+		'#8B5CF6',
+		'#EC4899',
+		'#06B6D4',
+		'#84CC16',
+		'#F97316',
+		'#6366F1',
+	]
+	const colorMap = {}
+	masters.forEach((m, i) => (colorMap[m.uuid] = palette[i % palette.length]))
+	return colorMap
+}
+
+const CalendarPage = () => {
+	const [isModalOpen, setIsModalOpen] = useState(false)
 	const [selectedAppointment, setSelectedAppointment] = useState(null)
 	const [selectedSlot, setSelectedSlot] = useState(null)
 
-	// Convert appointments to calendar events
-	const [selectedDate, setSelectedDate] = useState(new Date())
-	const [viewType, setViewType] = useState('week')
 	const [selectedResource, setSelectedResource] = useState('all')
-	const [resourceType, setResourceType] = useState('master')
-
-	// Преобразование записей в события календаря
-	const events = mockAppointments.map(appointment => {
-		const client = mockClients.find(c => c.id === appointment.clientId)
-		const service = mockServices.find(s => s.id === appointment.serviceId)
-		const master = mockMasters.find(m => m.id === appointment.masterId)
-		const space = mockSpaces.find(s => s.id === appointment.spaceId)
-
-		return {
-			id: appointment.id,
-			title: `${client?.firstName} ${client?.lastName} - ${service?.name}`,
-			start: new Date(appointment.startTime),
-			end: new Date(appointment.endTime),
-			resourceId:
-				resourceType === 'master' ? appointment.masterId : appointment.spaceId,
-			color: resourceType === 'master' ? master?.color : space?.color,
-			data: appointment,
-		}
+	const [viewType, setViewType] = useState('day')
+	const [selectedDate, setSelectedDate] = useState(new Date())
+	const [dateRange, setDateRange] = useState({
+		from: new Date(),
+		to: addDays(new Date(), 6),
 	})
+	const navigate = useNavigate()
 
-	// Получение ресурсов в зависимости от типа
-	const resources =
-		resourceType === 'master'
-			? mockMasters.map(master => ({
-					id: master.id,
-					title: master.name,
-					type: 'master',
-					color: master.color,
-			  }))
-			: mockSpaces.map(space => ({
-					id: space.id,
-					title: space.name,
-					type: 'space',
-					color: space.color,
-			  }))
-	console.log(resources)
+	const {
+		appointments,
+		isLoading,
+		servicesSelectionList,
+		masterSelectionList,
+		fetchAppointments,
+		getServicesSelectionList,
+		getMasterSelectionList,
+		createAppointment,
+	} = useAppointment()
+	const { currentStudio } = useStudios()
 
-	const handleEventClick = event => {
-		console.log('Событие кликнуто:', event)
-		setSelectedAppointment(event.data)
-		setIsAppointmentModalOpen(true)
+	useEffect(() => {
+		fetchAppointments({ pageSize: 1000 })
+		getServicesSelectionList()
+		getMasterSelectionList()
+	}, [currentStudio])
+
+	const masterColors = useMemo(
+		() => generateMasterColors(masterSelectionList),
+		[masterSelectionList]
+	)
+
+	const resources = useMemo(
+		() =>
+			masterSelectionList.map(m => ({
+				id: m.uuid,
+				title: `${m.first_name} ${m.last_name}`,
+				color: masterColors[m.uuid],
+			})),
+		[masterSelectionList, masterColors]
+	)
+
+	const events = useMemo(() => {
+		return appointments.map(a => {
+			const start = new Date(a.date_time)
+			const end = new Date(start.getTime() + a.duration * 60000)
+			return {
+				id: a.uuid,
+				start,
+				end,
+				duration: a.duration,
+				resourceId: a.master_uuid,
+				serviceName: a.service?.name || 'услуга',
+				price: a.price,
+				color: masterColors[a.master_uuid] || '#888',
+				data: a,
+			}
+		})
+	}, [appointments, masterColors])
+
+	const filteredResources =
+		selectedResource === 'all'
+			? resources
+			: resources.filter(r => r.id === selectedResource)
+
+	const filteredEvents =
+		selectedResource === 'all'
+			? events
+			: events.filter(e => e.resourceId === selectedResource)
+
+	const handleEventClick = e => {
+		if (!e) {
+			setSelectedAppointment(e.data)
+			setIsModalOpen(true)
+		} else {
+			navigate(`/appointments/${e.id}`)
+		}
 	}
 
-	const handleSlotSelect = slotInfo => {
-		console.log('Слот выбран:', slotInfo)
-		setSelectedSlot(slotInfo)
+	const handleSlotSelect = slot => {
+		setSelectedSlot(slot)
 		setSelectedAppointment(null)
-		setIsAppointmentModalOpen(true)
+		setIsModalOpen(true)
 	}
 
-	const handleAppointmentSave = appointmentData => {
-		console.log('[v0] Saving appointment:', appointmentData)
-		mockAppointments.push(appointmentData)
-		// Here would be the actual save logic
-		setIsAppointmentModalOpen(false)
-		setSelectedAppointment(null)
-		setSelectedSlot(null)
+	if (isLoading) {
+		return <Loader />
 	}
 
-	const handleAppointmentDelete = appointmentId => {
-		console.log('[v0] Deleting appointment:', appointmentId)
-		// Here would be the actual delete logic
-		setIsAppointmentModalOpen(false)
-		setSelectedAppointment(null)
-	}
 	return (
 		<div className='space-y-6'>
-			<div className='flex items-center justify-between'>
-				<div>
-					<h1 className='text-3xl font-bold tracking-tight'>
-						Календарь записей
-					</h1>
-					<p className='text-muted-foreground'>
-						Управление записями и расписанием
-					</p>
-				</div>
-			</div>
+			<h1 className='text-3xl font-bold tracking-tight'>Календарь записей</h1>
 
 			<CalendarToolbar
-				selectedDate={selectedDate}
-				onDateChange={setSelectedDate}
 				viewType={viewType}
 				onViewTypeChange={setViewType}
-				resourceType={resourceType}
-				onResourceTypeChange={setResourceType}
+				selectedDate={selectedDate}
+				onDateChange={setSelectedDate}
+				dateRange={dateRange}
+				onDateRangeChange={setDateRange}
 				selectedResource={selectedResource}
 				onResourceChange={setSelectedResource}
 				resources={resources}
 			/>
 
-			<CalendarView
-				events={events}
-				resources={resources}
-				selectedDate={selectedDate}
+			<MasterTimelineView
 				viewType={viewType}
-				resourceType={resourceType}
+				selectedDate={selectedDate}
+				dateRange={dateRange}
+				events={filteredEvents}
+				resources={filteredResources}
 				onEventClick={handleEventClick}
 				onSlotSelect={handleSlotSelect}
 			/>
 
 			<AppointmentModal
-				isOpen={isAppointmentModalOpen}
-				onClose={() => {
-					setIsAppointmentModalOpen(false)
-					setSelectedAppointment(null)
-					setSelectedSlot(null)
-				}}
+				isOpen={isModalOpen}
+				onClose={() => setIsModalOpen(false)}
 				appointment={selectedAppointment}
 				selectedSlot={selectedSlot}
-				onSave={handleAppointmentSave}
-				onDelete={handleAppointmentDelete}
+				handleCreate={createAppointment}
+				services={servicesSelectionList}
+				masters={masterSelectionList}
 			/>
 		</div>
 	)
 }
+export default CalendarPage

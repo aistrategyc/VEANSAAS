@@ -1,73 +1,82 @@
-import api from '@/shared/api/client'
-import { useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { useCallback } from 'react'
+import {
+	fetchStudios,
+	fetchStudiosSelection,
+	createStudio,
+	updateStudio,
+	setCurrentStudio,
+	handlePageChange,
+} from '@/shared/slices/studiosSlice'
 
 const useStudios = () => {
-	const [isLoading, setIsLoading] = useState(false)
-	const [studios, setStudios] = useState([])
+	const dispatch = useDispatch()
 
-	const fetchStudios = (params = {}) => {
-		setIsLoading(true)
+	const {
+		items,
+		studiosSelection,
+		currentStudio,
+		isLoading,
+		pagination,
+		error,
+	} = useSelector(state => state.rootReducer.studios)
 
-		api
-			.get('/studios', { params })
-			.then(response => {
-				setStudios(response.data)
-			})
-			.catch(err => {
-				console.error('Error fetching studios:', err)
-			})
-			.finally(() => setIsLoading(false))
-	}
+	const fetchStudiosHandler = useCallback(
+		(params = {}) => {
+			dispatch(fetchStudios(params))
+		},
+		[dispatch]
+	)
 
-	const createStudio = data => {
-		setIsLoading(true)
+	const fetchStudiosSelectionHandler = useCallback(() => {
+		dispatch(fetchStudiosSelection())
+	}, [dispatch])
 
-		return api
-			.post('/studios', data)
-			.then(response => {
-				setStudios(prev => ({
-					...prev,
-					items: [...prev.items, response.data],
-					pagination: {
-						...prev.pagination,
-						count: prev.pagination.count + 1,
-					},
-				}))
-				return response.data
-			})
-			.catch(err => {
-				console.error('Error creating studio:', err)
-			})
-			.finally(() => setIsLoading(false))
-	}
+	const createStudioHandler = useCallback(
+		data => {
+			return dispatch(createStudio(data)).unwrap()
+		},
+		[dispatch]
+	)
 
-	const updateStudio = (uuid, data) => {
-		setIsLoading(true)
+	const updateStudioHandler = useCallback(
+		(uuid, data) => {
+			return dispatch(updateStudio({ uuid, data })).unwrap()
+		},
+		[dispatch]
+	)
 
-		return api
-			.patch(`/studios/${uuid}`, data)
-			.then(response => {
-				setStudios(prev => ({
-					...prev,
-					items: prev.items.map(studio =>
-						studio.uuid === uuid ? response.data : studio
-					),
-				}))
-				return response.data
-			})
-			.catch(err => {
-				console.error('Error updating studio:', err)
-			})
-			.finally(() => setIsLoading(false))
-	}
+	const handleStudioChange = useCallback(
+		studio => {
+			dispatch(setCurrentStudio(studio))
+		},
+		[dispatch]
+	)
+
+	const handlePageChangeHandler = useCallback(
+		(page, pageSize) => {
+			dispatch(handlePageChange({ page, pageSize }))
+			dispatch(fetchStudios({ page, pageSize }))
+		},
+		[dispatch]
+	)
 
 	return {
-		studios,
+		// State
+		studios: items,
+		studiosSelection,
+		currentStudio,
 		isLoading,
+		pagination,
+		error,
 
-		fetchStudios,
-		createStudio,
-		updateStudio,
+		// Actions
+		fetchStudios: fetchStudiosHandler,
+		fetchStudiosSelection: fetchStudiosSelectionHandler,
+		createStudio: createStudioHandler,
+		updateStudio: updateStudioHandler,
+		handleStudioChange,
+		handlePageChange: handlePageChangeHandler,
 	}
 }
 export default useStudios

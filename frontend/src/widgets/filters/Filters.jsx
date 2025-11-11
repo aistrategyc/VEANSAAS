@@ -33,7 +33,6 @@ export const Filters = ({
 			</CardHeader>
 			<CardContent>
 				<div className='flex flex-col sm:flex-row gap-4 items-start'>
-					{/* Поиск */}
 					<div className='flex-1 w-full'>
 						<div className='relative'>
 							<Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
@@ -63,7 +62,6 @@ export const Filters = ({
 									</SelectContent>
 								</Select>
 							)}
-
 							{filter.type === 'input' && (
 								<Input
 									placeholder={filter.placeholder || filter.label}

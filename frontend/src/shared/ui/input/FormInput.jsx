@@ -78,7 +78,7 @@ export const FormInput = ({
 						{...field}
 						type='number'
 						min='0'
-						step='10'
+						step={step}
 						className={className}
 						error={error}
 					/>

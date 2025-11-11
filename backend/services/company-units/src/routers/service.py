@@ -1,7 +1,7 @@
 from typing import List
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Request, status
+from fastapi import APIRouter, Depends, Query, Request, status
 from services.service import (
     create_attribute_options,
     create_service,
@@ -11,6 +11,7 @@ from services.service import (
     delete_attribute_options,
     delete_category,
     delete_service,
+    get_categories_selection,
     get_list_categories,
     get_list_services,
     get_list_services_detail,
@@ -32,13 +33,16 @@ from shared.schemas.company_units.service import (
     CategoryAttributeResponse,
     CategoryAttributeUpdate,
     ServiceCategoryCreate,
+    ServiceCategoryDetailListResponse,
     ServiceCategoryDetailResponse,
     ServiceCategoryResponse,
+    ServiceCategorySelection,
     ServiceCategoryUpdate,
     ServiceCreate,
     ServiceDetailResponse,
     ServiceResponse,
     ServiceUpdate,
+    ServiceWithCategoryListResponse,
 )
 from shared.security import requires_permission
 
@@ -77,16 +81,33 @@ async def get_list_services_detail_route(
 
 @router.get(
     '',
-    response_model=List[ServiceResponse],
+    response_model=ServiceWithCategoryListResponse,
     status_code=status.HTTP_200_OK,
     name='Service list',
 )
 async def get_list_services_route(
     request: Request,
+    offset: int = Query(0, ge=0),
+    limit: int = Query(10, ge=1, le=1000),
     db: AsyncSession = Depends(get_db),
     auth: AuthContext = Depends(get_auth_context),
 ):
-    return await get_list_services(request=request, db=db, auth=auth)
+    return await get_list_services(
+        request=request, offset=offset, limit=limit, db=db, auth=auth
+    )
+
+
+@router.get(
+    '/categories/selection',
+    response_model=List[ServiceCategorySelection],
+    status_code=status.HTTP_200_OK,
+)
+async def get_categories_selection_route(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    auth: AuthContext = Depends(get_auth_context),
+):
+    return await get_categories_selection(request=request, db=db, auth=auth)
 
 
 @router.post(
@@ -107,16 +128,20 @@ async def crete_category_route(
 
 @router.get(
     '/categories',
-    response_model=List[ServiceCategoryDetailResponse],
+    response_model=ServiceCategoryDetailListResponse,
     status_code=status.HTTP_200_OK,
     name='Category list',
 )
 async def get_list_categories_route(
     request: Request,
+    offset: int = Query(0, ge=0),
+    limit: int = Query(10, ge=1, le=1000),
     db: AsyncSession = Depends(get_db),
     auth: AuthContext = Depends(get_auth_context),
 ):
-    return await get_list_categories(request=request, db=db, auth=auth)
+    return await get_list_categories(
+        request=request, offset=offset, limit=limit, db=db, auth=auth
+    )
 
 
 @router.patch(

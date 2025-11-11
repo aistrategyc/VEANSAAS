@@ -1,4 +1,3 @@
-
 import { HeaderWrapper } from '@/widgets/wrapper/HeaderWrapper'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
@@ -6,10 +5,11 @@ import { AppointmentModal } from '@/features/appointments/AppointmentModal'
 import { useEffect, useState } from 'react'
 import { useAppointment } from '@/features/appointments/hooks/useAppointment'
 import { Loader } from '@/shared/ui/loader/Loader'
-import { useClient } from '@/features/clients/hooks/useClients'
-import { AppointmentsTable } from '@/features/appointments/AppointmentsTable'
 
-export default function AppointmentsPage() {
+import { AppointmentsTable } from '@/features/appointments/AppointmentsTable'
+import useStudios from '@/features/studios/model/api'
+
+const AppointmentsPage = () => {
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
 	const [editingAppointment, setEditingAppointment] = useState(null)
 
@@ -18,16 +18,14 @@ export default function AppointmentsPage() {
 		createAppointment,
 		isLoading,
 		appointments,
-		servicesSelectionList,
-		getServicesSelectionList,
+		pagination,
+		handlePageChange,
 	} = useAppointment()
-	const { clientSelectionList, getClientSelectionList } = useClient()
+	const { currentStudio } = useStudios()
 
 	useEffect(() => {
 		fetchAppointments()
-		getClientSelectionList()
-		getServicesSelectionList()
-	}, [])
+	}, [currentStudio])
 
 	const handleStudioIsOpenModal = () => {
 		setEditingAppointment(null)
@@ -43,6 +41,10 @@ export default function AppointmentsPage() {
 		setIsCreateModalOpen(false)
 		setEditingAppointment(null)
 	}
+	const handlePageChangeWrapper = page => {
+		handlePageChange(page, pagination.pageSize)
+	}
+
 	if (isLoading) {
 		return <Loader />
 	}
@@ -55,20 +57,23 @@ export default function AppointmentsPage() {
 					Новая запись
 				</Button>
 			</HeaderWrapper>
+
 			<AppointmentsTable
 				appointments={appointments}
-				clients={clientSelectionList}
-				services={servicesSelectionList}
 				onEdit={handleEditAppointments}
+				currentPage={pagination.currentPage}
+				pageSize={pagination.pageSize}
+				totalCount={pagination.totalCount}
+				onPageChange={handlePageChangeWrapper}
 			/>
+
 			<AppointmentModal
 				isOpen={isCreateModalOpen}
 				onClose={handleCloseModal}
-				services={servicesSelectionList}
-				customers={clientSelectionList}
 				handleCreate={createAppointment}
 				appointment={editingAppointment}
 			/>
 		</div>
 	)
 }
+export default AppointmentsPage
