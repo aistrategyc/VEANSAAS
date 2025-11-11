@@ -28,6 +28,7 @@ import AppointmentDetailPage from '@/features/appointments/AppointmentDetailPage
 import ClientDetailPage from '@/features/clients/ClientDetailPage'
 import RegisterPage from '@/features/auth/RegisterPage'
 import LoginPage from '@/features/auth/LoginPage'
+import StaffDetailPage from '@/features/staff/StaffDetailPage'
 export const RouterProvider = () => {
 	const { isAuthenticated, isLoading } = useAuth()
 
@@ -67,8 +68,14 @@ export const RouterProvider = () => {
 						{ path: ':uuid', element: <AppointmentDetailPage /> },
 					],
 				},
+				{
+					path: 'staff',
+					children: [
+						{ index: true, element: <StaffPage /> },
+						{ path: ':uuid', element: <StaffDetailPage /> },
+					],
+				},
 				{ path: 'calendar', element: <CalendarPage /> },
-				{ path: 'staff', element: <StaffPage /> },
 				{ path: 'services', element: <ServicesPage /> },
 				{ path: 'studios', element: <StudiosPage /> },
 				{ path: 'inventory', element: <InventoryPage /> },

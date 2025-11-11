@@ -6,6 +6,7 @@ import { MasterTimelineView } from '@/features/calendar/MasterTimelineView'
 import useStudios from '@/features/studios/model/api'
 import { Loader } from '@/shared/ui/loader/Loader'
 import { addDays } from 'date-fns'
+import { useNavigate } from 'react-router'
 
 const generateMasterColors = masters => {
 	const palette = [
@@ -26,11 +27,10 @@ const generateMasterColors = masters => {
 }
 
 const CalendarPage = () => {
-	
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const [selectedAppointment, setSelectedAppointment] = useState(null)
 	const [selectedSlot, setSelectedSlot] = useState(null)
-	
+
 	const [selectedResource, setSelectedResource] = useState('all')
 	const [viewType, setViewType] = useState('day')
 	const [selectedDate, setSelectedDate] = useState(new Date())
@@ -38,6 +38,7 @@ const CalendarPage = () => {
 		from: new Date(),
 		to: addDays(new Date(), 6),
 	})
+	const navigate = useNavigate()
 
 	const {
 		appointments,
@@ -101,8 +102,12 @@ const CalendarPage = () => {
 			: events.filter(e => e.resourceId === selectedResource)
 
 	const handleEventClick = e => {
-		setSelectedAppointment(e.data)
-		setIsModalOpen(true)
+		if (!e) {
+			setSelectedAppointment(e.data)
+			setIsModalOpen(true)
+		} else {
+			navigate(`/appointments/${e.id}`)
+		}
 	}
 
 	const handleSlotSelect = slot => {

@@ -34,10 +34,21 @@ export const LoginForm = () => {
 	const username = useWatch({ control, name: 'username' })
 
 	useEffect(() => {
+		if (!username) {
+			// Если username пустой, очищаем организации
+			setOrgs([])
+			setValue('organization', '')
+			return
+		}
+
 		const loadOrgs = async () => {
 			setLoadingOrgs(true)
 			try {
-				const userOrgs = [{ value: '1231', label: 'orgee' }]
+				// Имитируем запрос к API
+				const userOrgs = [
+					{ value: '1231', label: 'Организация 1' },
+					{ value: '4321', label: 'Организация 2' },
+				]
 				setOrgs(userOrgs)
 			} catch (err) {
 				setOrgs([])
@@ -49,7 +60,7 @@ export const LoginForm = () => {
 
 		const timer = setTimeout(loadOrgs, 500)
 		return () => clearTimeout(timer)
-	}, [username])
+	}, [username, setValue])
 
 	const onSubmit = data => {
 		fetchLogin({ data, reset })
@@ -62,25 +73,27 @@ export const LoginForm = () => {
 	return (
 		<Form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
 			{error && <p className='text-red-500 text-sm h-5 ml-2'>{error}</p>}
+
 			<FormInput
 				title='Username'
 				type='text'
-				name={'username'}
+				name='username'
 				control={control}
 				error={errors.username?.message}
 			/>
+
 			<FormInput
 				title='Password'
 				type='password'
-				name={'password'}
+				name='password'
 				control={control}
 				error={errors.password?.message}
 			/>
 
-			{/* Селект с организациями */}
-			{orgs.length > 0 && (
+			{/* Появление селекта только если введён username */}
+			{username && orgs.length > 0 && (
 				<FormSelect
-					items={orgs || []}
+					items={orgs}
 					title='Организация *'
 					placeholder='Выберите организацию'
 					name='organization'
@@ -97,6 +110,7 @@ export const LoginForm = () => {
 					Забыли пароль?
 				</Link>
 			</div>
+
 			<Button type='submit' className='w-full'>
 				Send
 			</Button>

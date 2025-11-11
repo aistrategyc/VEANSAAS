@@ -30,7 +30,7 @@ import {
 	ImageIcon,
 	Layers,
 } from 'lucide-react'
-import { Link, useParams } from 'react-router'
+import { Link, useNavigate, useParams } from 'react-router'
 import { useAppointment } from './hooks/useAppointment'
 import {
 	Select,
@@ -228,9 +228,11 @@ export default function AppointmentDetailPage() {
 	const [isEditing, setIsEditing] = useState(false)
 	const [selectedImage, setSelectedImage] = useState()
 	const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('card')
-	const { uuid } = useParams()
 	const [status, setStatus] = useState(appointment.status)
 	const [loading, setLoading] = useState(false)
+
+	const { uuid } = useParams()
+	const navigate = useNavigate()
 
 	const { appointmentData, getAppointmentInfo } = useAppointment()
 
@@ -267,9 +269,8 @@ export default function AppointmentDetailPage() {
 						<Button
 							variant='ghost'
 							className='mb-4 text-muted-foreground hover:text-foreground'
-						>
-							<Link to='/appointments'>Назад к записям</Link>
-						</Button>
+							onClick={() => navigate(-1)}
+						>Назад</Button>
 						<h1 className='text-3xl font-bold text-foreground'>
 							Запись #{appointmentData.uuid}
 						</h1>

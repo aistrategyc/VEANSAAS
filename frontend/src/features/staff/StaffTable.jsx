@@ -83,7 +83,7 @@ export function StaffTable({
 							{staffList?.map(staff => (
 								<TableRow key={staff.uuid}>
 									<TableCell>
-										<Link to={`/clients/${staff.uuid}`}>
+										<Link to={`/staff/${staff.uuid}`}>
 											<div className='flex items-center space-x-3'>
 												<Avatar>
 													<AvatarFallback>

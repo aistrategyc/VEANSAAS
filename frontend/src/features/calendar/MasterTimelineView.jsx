@@ -48,7 +48,7 @@ export function MasterTimelineView({
 					className={`grid ${
 						viewType === 'day'
 							? 'grid-cols-[200px_repeat(22,1fr)]'
-							: `grid-cols-[200px_repeat(${days.length},1fr)]`
+							: `grid-cols-[200px_repeat(7,1fr)]`
 					} border-b bg-muted/40`}
 				>
 					<div className='p-3 border-r font-semibold bg-muted/60'>Мастер</div>
