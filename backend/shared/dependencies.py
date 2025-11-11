@@ -24,7 +24,7 @@ class UserInfo(BaseModel):
 
 
 class AuthContext:
-    def __init__(self, payload: dict, db: AsyncSession):
+    def __init__(self, payload: dict):
         self._payload = payload
         self._type = payload.get('type')
 
@@ -59,34 +59,17 @@ class AuthContext:
 
     @property
     def roles(self) -> set:
-        result = await db.execute(
-            select(User)
-            .where(
-                User.uuid == auth.user.uuid,
-            )
-            .options(
-                selectinload(User.studio_memberships),
-                selectinload(User.organization_memberships),
-            )
-        )
-        db_user = result.scalar_one_or_none()
-        studios_role = {m.studio_uuid: m.roles for m in db_user.studio_memberships}
-        organizations_role = {
-            m.organization_uuid: m.roles for m in db_user.organization_memberships
-        }
         roles_data = self._payload.get('roles', {})
         unique_roles = set()
         for category in roles_data.values():
             if isinstance(category, dict):
                 for roles_list in category.values():
                     unique_roles.update(roles_list)
-        return {'roles': {'studios': studios_role, 'orgs': organizations_role}}
         return self._payload.get('roles', {})
 
 
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
-    db: AsyncSession = Depends(get_db),
     studio_uuid: str | None = Header(None, alias='X-Studio-UUID'),
 ) -> AuthContext:
     try:
@@ -129,7 +112,6 @@ async def get_current_user(
                 **payload,
                 'studio_uuid': studio_uuid,
             },
-            db=db,
         )
     except JWTError:
         raise HTTPException(
@@ -170,7 +152,6 @@ async def get_service_token(token: str = Depends(oauth2_scheme)) -> AuthContext:
 
 async def get_auth_context(
     token: str = Depends(oauth2_scheme),
-    db: AsyncSession = Depends(get_db),
     studio_uuid: str | None = Header(None, alias='X-Studio-UUID'),
 ) -> AuthContext:
     try:
@@ -179,7 +160,7 @@ async def get_auth_context(
         pass
 
     try:
-        return await get_current_user(token=token, studio_uuid=studio_uuid, db=db)
+        return await get_current_user(token=token, studio_uuid=studio_uuid)
     except HTTPException:
         pass
 
